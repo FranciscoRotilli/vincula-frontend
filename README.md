@@ -22,7 +22,7 @@ Clone o repositório e instale as dependências:
 git clone https://tools.ages.pucrs.br/vincula/frontend.git
 cd frontend
 npm install
-
+```
 
 
 ## Scripts Disponíveis 🧪
@@ -49,7 +49,7 @@ No diretório do projeto, você pode executar os seguintes comandos:
   Executa os testes automatizados configurados no projeto.  
   (Verifica se as funcionalidades estão funcionando corretamente).
 
-
+```
 frontend/
 ├── public/         # Arquivos estáticos (imagens, ícones, etc.)
 ├── src/            # Código-fonte principal
@@ -59,4 +59,8 @@ frontend/
 │   └── utils/      # Funções auxiliares
 ├── package.json    # Configuração de dependências e scripts
 └── README.md       # Documentação do projeto
+```
+
+
+
 
