@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vincula Frontend 🌐
 
-## Getting Started
+Este repositório contém o **frontend do projeto Vincula**, desenvolvido em **Next.js** com **React** e **TypeScript**.  
+O objetivo é fornecer a interface do usuário para interação com o sistema Vincula.
 
-First, run the development server:
+---
+
+## Pré-requisitos ⚙️
+
+Antes de começar, certifique-se de ter instalado:
+
+- [Node.js](https://nodejs.org/) (versão recomendada LTS)
+- [npm](https://www.npmjs.com/)
+
+---
+
+## Como rodar o projeto ▶️
+
+Clone o repositório e instale as dependências:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+git clone https://tools.ages.pucrs.br/vincula/frontend.git
+cd frontend
+npm install
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts Disponíveis 🧪
 
-## Learn More
+No diretório do projeto, você pode executar os seguintes comandos:
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev`  
+  Inicia o servidor de desenvolvimento e abre o projeto em `http://localhost:3000`.  
+  (Útil para desenvolver e visualizar alterações em tempo real).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run build`  
+  Cria uma versão otimizada do projeto para produção.  
+  (Gera os arquivos finais que podem ser publicados no servidor).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run start`  
+  Executa a versão já compilada do projeto em modo de produção.  
+  (Simula como o app rodará depois de publicado).
 
-## Deploy on Vercel
+- `npm run lint`  
+  Analisa o código e aponta problemas de formatação ou boas práticas.  
+  (Ajuda a manter a qualidade e padronização do código).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run test`  
+  Executa os testes automatizados configurados no projeto.  
+  (Verifica se as funcionalidades estão funcionando corretamente).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+frontend/
+├── public/         # Arquivos estáticos (imagens, ícones, etc.)
+├── src/            # Código-fonte principal
+│   ├── components/ # Componentes reutilizáveis
+│   ├── pages/      # Rotas do Next.js
+│   ├── styles/     # Estilos globais e módulos CSS
+│   └── utils/      # Funções auxiliares
+├── package.json    # Configuração de dependências e scripts
+└── README.md       # Documentação do projeto
+
