@@ -122,7 +122,7 @@ const Input = ({
                     input: {
                         sx: { height: height },
                         startAdornment: startIcon ? (
-                            <InputAdornment position="start">
+                            <InputAdornment position="start" sx={{ color: 'rgba(176, 176, 176, 0.8)' }}>
                                 {startIcon}
                             </InputAdornment>
                         ) : undefined,
@@ -132,13 +132,14 @@ const Input = ({
                                     aria-label="toggle password visibility"
                                     onClick={() => setShowPassword((v) => !v)}
                                     edge="end"
+                                    sx={{ color: 'rgba(176, 176, 176, 0.8)' }}
                                 >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                             </InputAdornment>
                         ) : (
                             endIcon ? (
-                                <InputAdornment position="end">
+                                <InputAdornment position="end" sx={{ color: 'rgba(176, 176, 176, 0.8)' }}>
                                     {endIcon}
                                 </InputAdornment>
                             ) : undefined
