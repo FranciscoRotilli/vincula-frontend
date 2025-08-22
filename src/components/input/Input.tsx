@@ -55,7 +55,7 @@ const Input = ({
     const [showPassword, setShowPassword] = React.useState(false)
     const isPassword: boolean = type === "password"
 
-    const labelText = required ? (label + " *") : label
+    const labelText = required && variant != 'filled' ? (label + " *") : label
 
     const outsideLabel = labelText && variant != 'filled'
 
