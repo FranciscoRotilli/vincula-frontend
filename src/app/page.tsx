@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React from 'react';
-const ButtonShowcase = dynamic(() => import('../components/ButtonShowcase'), { ssr: false });
+const Button = dynamic(() => import('../components/Button'), { ssr: false });
 import styles from './page.module.css';
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <ButtonShowcase />
+        <Button label="Teste" onClick={() => alert('Button clicked!')} variant="outlined" size="small" />
       </main>
       <footer className={styles.footer}>
         <a
