@@ -1,0 +1,4 @@
+.label {
+    color: var(--label-primary);
+    margin-bottom: 0.3em;
+}
