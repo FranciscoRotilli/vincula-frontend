@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styles from './Input.module.css'
-import colors from '@/styles/colors'
+
 import {
     FormControl,
     FormHelperText,
@@ -12,30 +12,52 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 type InputProps = React.ComponentProps<'input'> & {
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+    name?: string
+    value?: string | number
+    minLength?: number
+    maxLength?: number
+    pattern?: string
+    id?: string
     variant?: 'outlined' | 'filled' | 'standard'
     height?: number
-    type?: string
+    type?: 'text' | 'password' | 'email' | 'tel' | 'date' | 'time' | 'datetime-local' | 'search'
+    required?: boolean
     placeholder: string
+    disabled?: boolean
     label?: string
     error?: string
+    validate?: (value: string) => string | undefined
     startIcon?: React.ReactElement<SvgIconProps>
     endIcon?: React.ReactElement<SvgIconProps>
 }
 
 const Input = ({
+    onChange,
+    name,
+    value,
+    minLength,
+    maxLength,
+    pattern,
+    id,
     variant = 'outlined',
     height = 40,
     type = "text",
+    required = false,
     placeholder,
+    disabled = false,
     label,
     error,
+    validate,
     startIcon,
     endIcon
 }: InputProps) => {
     const [showPassword, setShowPassword] = React.useState(false)
     const isPassword: boolean = type === "password"
 
-    const outsideLabel = label && variant != 'filled'
+    const labelText = required ? (label + " *") : label
+
+    const outsideLabel = labelText && variant != 'filled'
 
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [elementError, setError] = React.useState<string | undefined>(undefined)
@@ -53,10 +75,21 @@ const Input = ({
         if (inputRef.current) {
             const customMsg = getCustomErrorMessage(inputRef.current)
             inputRef.current.setCustomValidity(customMsg)
+            let validationMsg = customMsg
+
+            if (validate && inputRef.current.value) {
+                const customError = validate(inputRef.current.value)
+                if (customError) {
+                    validationMsg = customError
+                    inputRef.current.setCustomValidity(customError)
+                }
+            }
+
             if (!inputRef.current.validity.valid) {
-                setError(customMsg)
+                setError(validationMsg)
             } else {
                 setError(undefined)
+                inputRef.current.setCustomValidity("")
             }
         }
     }
@@ -66,18 +99,28 @@ const Input = ({
 
     return (
         <FormControl error={hasError} fullWidth>
-            {outsideLabel && <p className={styles.label}>{label}</p>}
+            {outsideLabel && (
+                <p className={`${styles.label} ${required ? styles.requiredLabel : ''}`}>
+                    {labelText}
+                </p>
+            )}
             <TextField
-                label={outsideLabel ? undefined : label}
+                onChange={onChange}
+                value={value}
+                name={name}
+                id={id}
+                label={outsideLabel ? undefined : labelText}
                 variant={variant}
                 type={isPassword ? showPassword ? 'text' : 'password' : type}
+                required={required}
                 placeholder={placeholder}
+                disabled={disabled}
                 size="small"
                 inputRef={inputRef}
                 onBlur={handleBlur}
                 slotProps={{
                     input: {
-                        sx: {height: height},
+                        sx: { height: height },
                         startAdornment: startIcon ? (
                             <InputAdornment position="start">
                                 {startIcon}
@@ -100,6 +143,11 @@ const Input = ({
                                 </InputAdornment>
                             ) : undefined
                         ),
+                    },
+                    htmlInput: {
+                        minLength,
+                        maxLength,
+                        pattern,
                     }
                 }}
                 error={hasError}

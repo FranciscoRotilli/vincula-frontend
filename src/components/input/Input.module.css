@@ -4,3 +4,7 @@
     margin-bottom: 0.35em;
     font-size: 0.875em;
 }
+
+.requiredLabel {
+    font-weight: bold;
+}
