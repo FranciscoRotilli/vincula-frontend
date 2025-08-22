@@ -12,7 +12,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 type InputProps = React.ComponentProps<'input'> & {
-    size?: number
+    height?: number
     type?: React.HTMLAttributes<InputProps>
     placeholder: string
     label?: string
@@ -22,7 +22,7 @@ type InputProps = React.ComponentProps<'input'> & {
 }
 
 const Input = ({
-    size = 40,
+    height = 40,
     type = "text",
     placeholder,
     label,
@@ -39,7 +39,7 @@ const Input = ({
             {label && <p className={styles.label}>{label}</p>}
             <OutlinedInput
                 sx={{
-                    height: size
+                    height: height
                 }}
                 type={isPassword && !showPassword ? "password" : "text"}
                 placeholder={placeholder}
