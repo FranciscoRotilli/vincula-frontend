@@ -1,4 +1,6 @@
 .label {
     color: var(--label-primary);
-    margin-bottom: 0.3em;
+    margin-left: 00.25em;
+    margin-bottom: 0.35em;
+    font-size: 0.875em;
 }
