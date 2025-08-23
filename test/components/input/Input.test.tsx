@@ -24,25 +24,9 @@ describe('Input component', () => {
         expect(screen.getByText('Erro de validação')).toBeInTheDocument()
     })
 
-    it('shows custom validation error on blur', () => {
-        const validate = (value: string) => value !== 'ok' ? 'Valor inválido' : undefined
-        render(<Input label="Teste" placeholder="Teste" validate={validate} />)
-        const input = screen.getByPlaceholderText('Teste')
-        fireEvent.change(input, { target: { value: 'errado' } })
-        fireEvent.blur(input)
-        expect(screen.getByText('Valor inválido')).toBeInTheDocument()
-    })
-
-    it('shows required error on blur', () => {
-        render(<Input label="Nome" placeholder="Digite seu nome" required />)
-        const input = screen.getByPlaceholderText('Digite seu nome') as HTMLInputElement
-        
-        Object.defineProperty(input, 'validity', {
-            value: { valueMissing: true, valid: false },
-            writable: true
-        })
-        fireEvent.blur(input)
-        expect(screen.getByText('Campo obrigatório')).toBeInTheDocument()
+    it('does not show error when error prop is not provided', () => {
+        render(<Input label="Nome" placeholder="Digite seu nome" />)
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 
     describe('Password functionality', () => {
@@ -102,70 +86,6 @@ describe('Input component', () => {
         })
     })
 
-    describe('Validation constraints', () => {
-        it('shows minLength error', () => {
-            render(<Input label="Senha" placeholder="Digite sua senha" minLength={8} />)
-            const input = screen.getByPlaceholderText('Digite sua senha') as HTMLInputElement
-            
-            // Simulate HTML5 validation
-            fireEvent.change(input, { target: { value: '123' } })
-            Object.defineProperty(input, 'validity', {
-                value: { tooShort: true, valid: false },
-                writable: true
-            })
-            Object.defineProperty(input, 'minLength', {
-                value: 8,
-                writable: true
-            })
-            fireEvent.blur(input)
-            expect(screen.getByText('Mínimo 8 caracteres')).toBeInTheDocument()
-        })
-
-        it('shows maxLength error', () => {
-            render(<Input label="Nome" placeholder="Digite seu nome" maxLength={5} />)
-            const input = screen.getByPlaceholderText('Digite seu nome') as HTMLInputElement
-            
-            // Simulate HTML5 validation
-            fireEvent.change(input, { target: { value: '123456789' } })
-            Object.defineProperty(input, 'validity', {
-                value: { tooLong: true, valid: false },
-                writable: true
-            })
-            Object.defineProperty(input, 'maxLength', {
-                value: 5,
-                writable: true
-            })
-            fireEvent.blur(input)
-            expect(screen.getByText('Máximo 5 caracteres')).toBeInTheDocument()
-        })
-
-        it('shows pattern mismatch error', () => {
-            render(<Input label="Código" placeholder="Digite o código" pattern="[0-9]{4}" />)
-            const input = screen.getByPlaceholderText('Digite o código') as HTMLInputElement
-            
-            fireEvent.change(input, { target: { value: 'abc' } })
-            Object.defineProperty(input, 'validity', {
-                value: { patternMismatch: true, valid: false },
-                writable: true
-            })
-            fireEvent.blur(input)
-            expect(screen.getByText('Valor inválido')).toBeInTheDocument()
-        })
-
-        it('shows type mismatch error for email', () => {
-            render(<Input label="Email" placeholder="Digite seu email" type="email" />)
-            const input = screen.getByPlaceholderText('Digite seu email') as HTMLInputElement
-            
-            fireEvent.change(input, { target: { value: 'email-invalido' } })
-            Object.defineProperty(input, 'validity', {
-                value: { typeMismatch: true, valid: false },
-                writable: true
-            })
-            fireEvent.blur(input)
-            expect(screen.getByText('Formato inválido')).toBeInTheDocument()
-        })
-    })
-
     describe('Props', () => {
         it('renders disabled input', () => {
             render(<Input label="Nome" placeholder="Digite seu nome" disabled />)
@@ -217,36 +137,26 @@ describe('Input component', () => {
     })
 
     describe('Error handling', () => {
-        it('clears error when input becomes valid', () => {
-            const validate = (value: string) => value.length < 3 ? 'Mínimo 3 caracteres' : undefined
-            render(<Input label="Nome" placeholder="Digite seu nome" validate={validate} />)
-            const input = screen.getByPlaceholderText('Digite seu nome')
-            
-            // Trigger error
-            fireEvent.change(input, { target: { value: 'ab' } })
-            fireEvent.blur(input)
-            expect(screen.getByText('Mínimo 3 caracteres')).toBeInTheDocument()
-            
-            // Fix error
-            fireEvent.change(input, { target: { value: 'abc' } })
-            fireEvent.blur(input)
-            expect(screen.queryByText('Mínimo 3 caracteres')).not.toBeInTheDocument()
-        })
-
-        it('prioritizes custom validation error over built-in validation', () => {
-            const validate = (value: string) => 'Erro customizado'
-            render(<Input label="Nome" placeholder="Digite seu nome" validate={validate} required />)
-            const input = screen.getByPlaceholderText('Digite seu nome')
-            
-            fireEvent.change(input, { target: { value: 'teste' } })
-            fireEvent.blur(input)
-            expect(screen.getByText('Erro customizado')).toBeInTheDocument()
-            expect(screen.queryByText('Campo obrigatório')).not.toBeInTheDocument()
-        })
-
-        it('shows prop error even when input is valid', () => {
-            render(<Input label="Nome" placeholder="Digite seu nome" error="Erro externo" value="Valor válido" />)
+        it('shows error when error prop is provided', () => {
+            render(<Input label="Nome" placeholder="Digite seu nome" error="Erro externo" />)
             expect(screen.getByText('Erro externo')).toBeInTheDocument()
+        })
+
+        it('hides error when error prop is empty or undefined', () => {
+            const { rerender } = render(<Input label="Nome" placeholder="Digite seu nome" error="" />)
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+            
+            rerender(<Input label="Nome" placeholder="Digite seu nome" error={undefined} />)
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+        })
+
+        it('updates error message when error prop changes', () => {
+            const { rerender } = render(<Input label="Nome" placeholder="Digite seu nome" error="Primeiro erro" />)
+            expect(screen.getByText('Primeiro erro')).toBeInTheDocument()
+            
+            rerender(<Input label="Nome" placeholder="Digite seu nome" error="Segundo erro" />)
+            expect(screen.getByText('Segundo erro')).toBeInTheDocument()
+            expect(screen.queryByText('Primeiro erro')).not.toBeInTheDocument()
         })
     })
 })
