@@ -1,14 +1,20 @@
 "use client";
 
-import * as React from "react";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
+import {
+  Box,
+  Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableSortLabel,
+} from "@mui/material";
+import { visuallyHidden } from "@mui/utils";
+import React, { useMemo, useState } from "react";
 
 export interface Column<T> {
   key: keyof T;
@@ -17,64 +23,188 @@ export interface Column<T> {
   render?: (value: T[keyof T], row: T) => React.ReactNode;
 }
 
+export type Order = "asc" | "desc";
+
 interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
+  selectable?: boolean;
+  onRowClick?: (row: T) => void;
 }
 
-export default function GenericTable<T extends { [key: string]: any }>({
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  const valueA = a[orderBy];
+  const valueB = b[orderBy];
+
+  if (valueB < valueA) return -1;
+  if (valueB > valueA) return 1;
+  return 0;
+}
+
+function getComparator<T>(
+  order: Order,
+  orderBy: keyof T
+): (a: T, b: T) => number {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+export default function GenericTable<T extends { id: number | string }>({
   columns,
   data,
+  selectable = false,
+  onRowClick,
 }: GenericTableProps<T>) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [order, setOrder] = useState<Order>("asc");
+  const [orderBy, setOrderBy] = useState<keyof T>(columns[0].key);
+  const [selected, setSelected] = useState<(string | number)[]>([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleRequestSort = (property: keyof T) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = data.map((n) => n.id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleRowClick = (event: React.MouseEvent<unknown>, id: string | number, row: T) => {
+    if (selectable) {
+      const selectedIndex = selected.indexOf(id);
+      let newSelected: (string | number)[] = [];
+
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1)
+        );
+      }
+      setSelected(newSelected);
+    }
+    if (onRowClick) onRowClick(row);
+  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
+  const isSelected = (id: string | number) => selected.indexOf(id) !== -1;
+
+  const rows = useMemo(
+    () =>
+      [...data]
+        .sort(getComparator(order, orderBy))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [order, orderBy, page, rowsPerPage, data]
+  );
+
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="generic table">
+    <Paper sx={{ width: "100%", mb: 2 }}>  {/* usar modulo css */}
+      <TableContainer>
+        <Table stickyHeader aria-label="generic table">  {/* sticky header? */}
           <TableHead>
             <TableRow>
+              {selectable && (
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    indeterminate={selected.length > 0 && selected.length < data.length}
+                    checked={data.length > 0 && selected.length === data.length}
+                    onChange={handleSelectAll}
+                  />
+                </TableCell>
+              )}
               {columns.map((column) => (
-                <TableCell key={String(column.key)} align={column.align || "left"}>
-                  {column.label}
+                <TableCell
+                  key={String(column.key)}
+                  align={column.align || "left"}
+                  sortDirection={orderBy === column.key ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === column.key}
+                    direction={orderBy === column.key ? order : "asc"}
+                    onClick={() => handleRequestSort(column.key)}
+                  >
+                    {column.label}
+                    {orderBy === column.key ? (
+                      <Box component="span" sx={visuallyHidden}>
+                        {order === "desc" ? "ordenado decrescente" : "ordenado crescente"}
+                      </Box>
+                    ) : null}
+                  </TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
-              <TableRow hover role="checkbox" tabIndex={-1} key={rowIndex}>
-                {columns.map((column) => {
-                  const value = row[column.key];
-                  return (
-                    <TableCell key={String(column.key)} align={column.align || "left"}>
-                      {column.render ? column.render(value, row) : value}
+            {rows.map((row, rowIndex) => {
+              const isItemSelected = isSelected(row.id);
+              return (
+                <TableRow
+                  hover
+                  onClick={(event) => handleRowClick(event, row.id, row)}
+                  role="checkbox"
+                  aria-checked={isItemSelected}
+                  tabIndex={-1}
+                  key={row.id}
+                  selected={isItemSelected}
+                  sx={{ cursor: "pointer" }} // usar modulo css
+                >
+                  {selectable && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isItemSelected}
+                      />
                     </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
+                  )}
+                  {columns.map((column) => {
+                    const value = row[column.key];
+                    return (
+                      <TableCell key={String(column.key)} align={column.align || "left"}>
+                        {column.render
+                          ? column.render(value, row)
+                          : (value as React.ReactNode)}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
 
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[5, 10, 25]} // revisar
         component="div"
         count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
         labelRowsPerPage="Linhas por página"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} de ${count}`
+        }
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
