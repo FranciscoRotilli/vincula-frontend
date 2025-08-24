@@ -6,7 +6,7 @@ import { CalendarMonth, DateRange, Lock, Person, Search } from '@mui/icons-mater
 
 const InputShowcase = () => {
 
-    const [value, setValue] = React.useState("")
+    const [value, setValue] = React.useState("Value")
 
     return (
         <div style={{ 
@@ -19,7 +19,7 @@ const InputShowcase = () => {
             <div style={{ background: "#fff", padding: 20, width: 350, flexShrink: 0 }}>
                 <Input 
                     onChange = {e => setValue(e.target.value)} // Optional, function
-                    value = {value} // Optional, string
+                    value = {value} // Can't be used without useState
                     name = "Name" // Optional, string
                     id = "id-input" // Optional, string
                     variant = 'outlined' // Optional (default: outlined), 'outlined' | 'filled' | 'standard'
@@ -30,7 +30,7 @@ const InputShowcase = () => {
                     //disabled = {false} // Optional (default: false), boolean
                     label = "Label" // Optional, string
                     //error = "Error message" // Optional, string
-                    //startIcon = {<CalendarMonth />} // Optional, icon element https://mui.com/material-ui/material-icons/
+                    startIcon = {<CalendarMonth />} // Optional, icon element https://mui.com/material-ui/material-icons/
                     //endIcon = {<CalendarMonth />} // // Optional, icon element https://mui.com/material-ui/material-icons/
                 />
             </div>

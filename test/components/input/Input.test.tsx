@@ -53,7 +53,6 @@ describe('Input component', () => {
     describe('Variants', () => {
         it('renders with filled variant', () => {
             render(<Input label="Nome" placeholder="Digite seu nome" variant="filled" />)
-            // With filled variant, the label should be inside the TextField (MUI behavior)
             expect(screen.getByText('Nome')).toBeInTheDocument()
         })
 
@@ -116,10 +115,16 @@ describe('Input component', () => {
             expect(input).toHaveAttribute('id', 'user-input')
         })
 
-        it('renders with value prop', () => {
+        it('renders with initial value prop', () => {
             render(<Input label="Nome" placeholder="Digite seu nome" value="João Silva" />)
             const input = screen.getByPlaceholderText('Digite seu nome')
             expect(input).toHaveValue('João Silva')
+        })
+
+        it('handles numeric value prop converted to string', () => {
+            render(<Input label="Idade" placeholder="Digite sua idade" value="25" />)
+            const input = screen.getByPlaceholderText('Digite sua idade')
+            expect(input).toHaveValue('25')
         })
     })
 
@@ -157,6 +162,67 @@ describe('Input component', () => {
             rerender(<Input label="Nome" placeholder="Digite seu nome" error="Segundo erro" />)
             expect(screen.getByText('Segundo erro')).toBeInTheDocument()
             expect(screen.queryByText('Primeiro erro')).not.toBeInTheDocument()
+        })
+    })
+
+    describe('Icon color changes', () => {
+        it('changes icon color when user types in input', () => {
+            render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
+            
+            const input = screen.getByPlaceholderText('Digite seu email')
+            const startIcon = screen.getByTestId('start-icon').parentElement
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
+            
+            fireEvent.change(input, { target: { value: 'test@example.com' } })
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
+            
+            fireEvent.change(input, { target: { value: '' } })
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
+        })
+
+        it('changes icon color when component receives value prop', () => {
+            const { rerender } = render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
+            
+            const startIcon = screen.getByTestId('start-icon').parentElement
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
+            
+            rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="test@example.com" />)
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
+            
+            rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="" />)
+            
+            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
+        })
+
+        it('changes password toggle icon color when user types', () => {
+            render(<Input label="Senha" placeholder="Digite sua senha" type="password" />)
+            
+            const input = screen.getByPlaceholderText('Digite sua senha')
+            const toggleButton = screen.getByLabelText('toggle password visibility')
+            
+            expect(toggleButton).toHaveStyle('color: var(--text-color-secundary)')
+            
+            fireEvent.change(input, { target: { value: 'mypassword' } })
+            
+            expect(toggleButton).toHaveStyle('color: var(--text-color-primary)')
+        })
+
+        it('changes end icon color when user types', () => {
+            render(<Input label="Código" placeholder="Digite o código" endIcon={<Lock data-testid="end-icon" />} />)
+            
+            const input = screen.getByPlaceholderText('Digite o código')
+            const endIcon = screen.getByTestId('end-icon').parentElement
+            
+            expect(endIcon).toHaveStyle('color: var(--text-color-secundary)')
+            
+            fireEvent.change(input, { target: { value: '123456' } })
+            
+            expect(endIcon).toHaveStyle('color: var(--text-color-primary)')
         })
     })
 })

@@ -21,6 +21,8 @@ type InputProps = Omit<TextFieldProps, 'error'> & {
     label?: string
     startIcon?: React.ReactElement<SvgIconProps>
     endIcon?: React.ReactElement<SvgIconProps>
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+    value?: string
 }
 
 const Input = React.forwardRef<HTMLDivElement, InputProps>(({
@@ -32,6 +34,8 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
     error,
     startIcon,
     endIcon,
+    onChange,
+    value,
     ...rest
 }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false)
@@ -41,6 +45,18 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
     const outsideLabel = labelText && variant != 'filled'
 
     const hasError = !!error
+
+    const [hasValue, setHasValue] = React.useState(!!value && value.toString().length > 0)
+    const iconColor = hasValue ? "var(--text-color-primary)" : "var(--text-color-secundary)"
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setHasValue(event.target.value.length > 0)
+        if (onChange) onChange(event)
+    }
+
+    React.useEffect(() => {
+        setHasValue(!!value && value.toString().length > 0)
+    }, [value])
 
     return (
         <FormControl error={hasError} fullWidth>
@@ -52,6 +68,8 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
             <TextField
                 {...rest}
                 ref={ref}
+                onChange={handleChange}
+                value={value}
                 size='small'
                 fullWidth
                 variant={variant}
@@ -63,7 +81,7 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
                     input: {
                         sx: { height: height },
                         startAdornment: startIcon ? (
-                            <InputAdornment position="start" sx={{ color: 'rgba(176, 176, 176, 0.8)' }}>
+                            <InputAdornment position="start" sx={{ color: iconColor }}>
                                 {startIcon}
                             </InputAdornment>
                         ) : undefined,
@@ -73,14 +91,14 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
                                     aria-label="toggle password visibility"
                                     onClick={() => setShowPassword((v) => !v)}
                                     edge="end"
-                                    sx={{ color: 'rgba(176, 176, 176, 0.8)' }}
+                                    sx={{ color: iconColor }}
                                 >
                                     {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                             </InputAdornment>
                         ) : (
                             endIcon ? (
-                                <InputAdornment position="end" sx={{ color: 'rgba(176, 176, 176, 0.8)' }}>
+                                <InputAdornment position="end" sx={{ color: iconColor }}>
                                     {endIcon}
                                 </InputAdornment>
                             ) : undefined
