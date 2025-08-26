@@ -1,16 +1,22 @@
-import * as React from 'react'
-import styles from './Input.module.css'
-
+'use client'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
     FormControl,
     FormHelperText,
+    IconButton,
     InputAdornment,
     SvgIconProps,
-    IconButton,
     TextField,
     TextFieldProps,
 } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { 
+    ChangeEvent, 
+    forwardRef, 
+    ReactElement, 
+    useEffect, 
+    useState} from 'react'
+
+import styles from './Input.module.css'
 
 type InputProps = Omit<TextFieldProps, 'error'> & {
     type?: 'text' | 'password' | 'email' | 'tel' | 'date' | 'time' | 'datetime-local' | 'search'
@@ -19,13 +25,13 @@ type InputProps = Omit<TextFieldProps, 'error'> & {
     error?: string
     placeholder: string
     label?: string
-    startIcon?: React.ReactElement<SvgIconProps>
-    endIcon?: React.ReactElement<SvgIconProps>
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+    startIcon?: ReactElement<SvgIconProps>
+    endIcon?: ReactElement<SvgIconProps>
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void
     value?: string
 }
 
-const Input = React.forwardRef<HTMLDivElement, InputProps>(({
+const Input = forwardRef<HTMLDivElement, InputProps>(({
     type = "text",
     variant = "outlined",
     height,
@@ -38,7 +44,7 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
     value,
     ...rest
 }, ref) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const isPassword: boolean = type === "password"
 
     const labelText = required && variant != 'filled' ? (label + " *") : label
@@ -46,15 +52,15 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
 
     const hasError = !!error
 
-    const [hasValue, setHasValue] = React.useState(!!value && value.toString().length > 0)
+    const [hasValue, setHasValue] = useState(!!value && value.toString().length > 0)
     const iconColor = hasValue ? "var(--text-color-primary)" : "var(--text-color-secundary)"
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setHasValue(event.target.value.length > 0)
         if (onChange) onChange(event)
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         setHasValue(!!value && value.toString().length > 0)
     }, [value])
 
@@ -114,5 +120,7 @@ const Input = React.forwardRef<HTMLDivElement, InputProps>(({
         </FormControl>
     )
 })
+
+Input.displayName = 'Input';
 
 export default Input
