@@ -2,7 +2,7 @@
 import React from 'react';
 import { FiEdit2, FiXCircle } from 'react-icons/fi';
 
-import Button from './generic_button/Button';
+import Button from './Button';
 
 const ButtonShowcase = () => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>

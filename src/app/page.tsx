@@ -2,10 +2,10 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React from 'react';
-const Button = dynamic(() => import('../components/Button'), { ssr: false });
+const Button = dynamic(() => import('../components/generic_button/Button'), { ssr: false });
 import { FiAperture, FiEdit2, FiXCircle } from 'react-icons/fi';
 
-import ButtonShowcase from '@/components/ButtonShowcase';
+import ButtonShowcase from '@/components/generic_button/ButtonShowcase';
 
 import styles from './page.module.css';
 
