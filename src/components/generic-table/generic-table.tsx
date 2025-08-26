@@ -65,7 +65,7 @@ export default function GenericTable<T extends { id: number | string }>({
   const [orderBy, setOrderBy] = useState<keyof T>(columns[0].key);
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleRequestSort = (property: keyof T) => {
     const isAsc = orderBy === property && order === "asc";
@@ -125,111 +125,111 @@ export default function GenericTable<T extends { id: number | string }>({
 
   return (
     <Paper className={styles.tablePaper}>
-      <TableContainer>
-        <Table className={styles.tableContainer} stickyHeader aria-label="generic table">
-          {/* {loading ? (
-            <CircularProgress size={40} className={styles.loading} />
-          ) : ( */}
-          <TableHead className={styles.tableHead}>
-            <TableRow>
-              {selectable && (
-                <TableCell
-                  className={styles.headTableCell}
-                  padding="checkbox"
-                >
-                  <Checkbox
-                    color="primary"
-                    indeterminate={
-                      selected.length > 0 &&
-                      selected.length < data.length
-                    }
-                    checked={
-                      data.length > 0 &&
-                      selected.length === data.length
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
-              )}
+      <TableContainer className={styles.tableContainer}>
+        {loading ? (
+          <CircularProgress size={40} className={styles.loading} />
+        ) : (
+          <Table stickyHeader aria-label="generic table">
+            <TableHead className={styles.tableHead}>
+              <TableRow>
+                {selectable && (
+                  <TableCell
+                    className={styles.headTableCell}
+                    padding="checkbox"
+                  >
+                    <Checkbox
+                      color="primary"
+                      indeterminate={
+                        selected.length > 0 &&
+                        selected.length < data.length
+                      }
+                      checked={
+                        data.length > 0 &&
+                        selected.length === data.length
+                      }
+                      onChange={handleSelectAll}
+                    />
+                  </TableCell>
+                )}
 
-              {columns.map((column) => (
-                <TableCell
-                  className={styles.headTableCell}
-                  key={String(column.key)}
-                  align={column.align || "left"}
-                  sortDirection={
-                    orderBy === column.key ? order : false
-                  }
-                >
-                  <TableSortLabel
-                    className={styles.tableCellLabel}
-                    active={orderBy === column.key}
-                    direction={
-                      orderBy === column.key ? order : "asc"
-                    }
-                    onClick={() =>
-                      handleRequestSort(column.key)
+                {columns.map((column) => (
+                  <TableCell
+                    className={styles.headTableCell}
+                    key={String(column.key)}
+                    align={column.align || "left"}
+                    sortDirection={
+                      orderBy === column.key ? order : false
                     }
                   >
-                    {column.label}
-                    {orderBy === column.key && (
-                      <Box component="span" sx={visuallyHidden}>
-                        {order === "desc"
-                          ? "ordenado decrescente"
-                          : "ordenado crescente"}
-                      </Box>
-                    )}
-                  </TableSortLabel>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+                    <TableSortLabel
+                      className={styles.tableCellLabel}
+                      active={orderBy === column.key}
+                      direction={
+                        orderBy === column.key ? order : "asc"
+                      }
+                      onClick={() =>
+                        handleRequestSort(column.key)
+                      }
+                    >
+                      {column.label}
+                      {orderBy === column.key && (
+                        <Box component="span" sx={visuallyHidden}>
+                          {order === "desc"
+                            ? "ordenado decrescente"
+                            : "ordenado crescente"}
+                        </Box>
+                      )}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {rows.map((row, rowIndex) => {
-              const isItemSelected = isSelected(row.id);
-              return (
-                <TableRow
-                  hover
-                  key={row.id}
-                  role="checkbox"
-                  tabIndex={-1}
-                  selected={isItemSelected}
-                  aria-checked={isItemSelected}
-                  className={styles.tableRow}
-                  onClick={(event) =>
-                    handleRowClick(event, row.id, row)
-                  }
-                >
-                  {selectable && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        className={styles.tableCheckbox}
-                        color="primary"
-                        checked={isItemSelected}
-                      />
-                    </TableCell>
-                  )}
-
-                  {columns.map((column) => {
-                    const value = row[column.key];
-                    return (
-                      <TableCell
-                        key={String(column.key)}
-                        align={column.align || "left"}
-                      >
-                        {column.render
-                          ? column.render(value, row)
-                          : (value as React.ReactNode)}
+            <TableBody>
+              {rows.map((row, rowIndex) => {
+                const isItemSelected = isSelected(row.id);
+                return (
+                  <TableRow
+                    hover
+                    key={row.id}
+                    role="checkbox"
+                    tabIndex={-1}
+                    selected={isItemSelected}
+                    aria-checked={isItemSelected}
+                    className={styles.tableRow}
+                    onClick={(event) =>
+                      handleRowClick(event, row.id, row)
+                    }
+                  >
+                    {selectable && (
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          className={styles.tableCheckbox}
+                          color="primary"
+                          checked={isItemSelected}
+                        />
                       </TableCell>
-                    );
-                  })}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-          {/* )} */}
-        </Table>
+                    )}
+
+                    {columns.map((column) => {
+                      const value = row[column.key];
+                      return (
+                        <TableCell
+                          key={String(column.key)}
+                          align={column.align || "left"}
+                        >
+                          {column.render
+                            ? column.render(value, row)
+                            : (value as React.ReactNode)}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
 
       <TablePagination

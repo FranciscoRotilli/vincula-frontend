@@ -4,11 +4,12 @@
 
 .tableContainer {
   min-height: 400px; /* mudar */
+  display: flex;
 }
 
-/* .loading {
+.loading {
   margin: auto;
-} */
+}
 
 .tableRow {
   cursor: pointer;

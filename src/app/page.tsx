@@ -1,15 +1,44 @@
 'use client';
 
-import Image from 'next/image';
+// import Image from 'next/image';
 import React from 'react';
 
+import GenericTable, { Column } from "../components/generic-table/generic-table";
 import styles from "./page.module.css";
+
+const data = [
+  { id: 1, name: 'João Silva', cpf: '12345678901', email: 'joao.silva@email.com' },
+  { id: 2, name: 'Maria Souza', cpf: '23456789012', email: 'maria.souza@email.com' },
+  { id: 3, name: 'Pedro Santos', cpf: '34567890123', email: 'pedro.santos@email.com' },
+  { id: 4, name: 'Ana Oliveira', cpf: '45678901234', email: 'ana.oliveira@email.com' },
+  { id: 5, name: 'Carlos Pereira', cpf: '56789012345', email: 'carlos.pereira@email.com' },
+  { id: 6, name: 'Fernanda Lima', cpf: '67890123456', email: 'fernanda.lima@email.com' },
+  { id: 7, name: 'Ricardo Alves', cpf: '78901234567', email: 'ricardo.alves@email.com' },
+  { id: 8, name: 'Juliana Costa', cpf: '89012345678', email: 'juliana.costa@email.com' },
+  { id: 9, name: 'Marcos Rocha', cpf: '90123456789', email: 'marcos.rocha@email.com' },
+  { id: 10, name: 'Patrícia Martins', cpf: '01234567890', email: 'patricia.martins@email.com' },
+];
+
+const columns: Column<typeof data[0]>[] = [
+  { key: "name", label: "Nome", align: "left" },
+  { key: "email", label: "E-mail", align: "center" },
+  { key: "cpf", label: "CPF", align: "center" },
+  { key: "id", label: "ID", align: "right", render: (value) => <strong>#{value}</strong> },
+];
 
 export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
+        <GenericTable
+          columns={columns}
+          data={data}
+          loading={false}
+          selectable
+          onRowClick={(row) => console.log(row)}
+        />
+      </main>
+      {/* <Image
           className={styles.logo}
           src="/next.svg"
           alt="Next.js logo"
@@ -93,7 +122,7 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
-      </footer>
+      </footer> */}
     </div>
   );
 }
