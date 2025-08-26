@@ -3,7 +3,7 @@ import React from 'react';
 import { FiEdit2 } from 'react-icons/fi';
 import { describe, expect, it, vi } from 'vitest';
 
-import Button from '../../../src/components/generic_button/Button';
+import Button from '../../../src/components/GenericButton/Button';
 
 describe('Button', () => {
   it('renders with label', () => {

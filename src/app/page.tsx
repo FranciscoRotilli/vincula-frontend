@@ -2,10 +2,10 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React from 'react';
-const Button = dynamic(() => import('../components/generic_button/Button'), { ssr: false });
+const Button = dynamic(() => import('../components/GenericButton/Button'), { ssr: false });
 import { FiAperture, FiEdit2, FiXCircle } from 'react-icons/fi';
 
-import ButtonShowcase from '@/components/generic_button/ButtonShowcase';
+import ButtonShowcase from '@/components/GenericButton/ButtonShowcase';
 
 import styles from './page.module.css';
 
@@ -46,7 +46,7 @@ export default function Home() {
           size="small"
           icon={<FiAperture />}
 				/> */}
-        {/*<ButtonShowcase />}
+        {<ButtonShowcase />}
         {/* Showcase com variações do componente botão, 
 				use <Button /> para testar o botão indivudalmente */}
       </main>
