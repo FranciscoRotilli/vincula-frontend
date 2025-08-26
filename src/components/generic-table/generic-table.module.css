@@ -1,0 +1,29 @@
+.tablePaper {
+  min-width: 700px; /* mudar */
+}
+
+.tableContainer {
+  min-height: 400px; /* mudar */
+}
+
+/* .loading {
+  margin: auto;
+} */
+
+.tableRow {
+  cursor: pointer;
+}
+
+.headTableCell {
+  border-bottom: 2px solid #ff8300 !important; /* mudar para variavel global */
+  border-top: 2px solid #ff8300 !important; /* mudar para variavel global */
+  font-weight: bold !important;
+}
+
+.tableCellLabel {
+  color: #ff8300 !important;
+
+  svg {
+    color: #ff8300 !important;
+  }
+}

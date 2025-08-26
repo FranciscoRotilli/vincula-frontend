@@ -3,6 +3,7 @@
 import {
   Box,
   Checkbox,
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -16,6 +17,8 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import React, { useMemo, useState } from "react";
 
+import styles from "./generic-table.module.css"
+
 export interface Column<T> {
   key: keyof T;
   label: string;
@@ -28,6 +31,7 @@ export type Order = "asc" | "desc";
 interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
+  loading: boolean;
   selectable?: boolean;
   onRowClick?: (row: T) => void;
 }
@@ -53,6 +57,7 @@ function getComparator<T>(
 export default function GenericTable<T extends { id: number | string }>({
   columns,
   data,
+  loading,
   selectable = false,
   onRowClick,
 }: GenericTableProps<T>) {
@@ -119,69 +124,100 @@ export default function GenericTable<T extends { id: number | string }>({
   );
 
   return (
-    <Paper sx={{ width: "100%", mb: 2 }}>  {/* usar modulo css */}
+    <Paper className={styles.tablePaper}>
       <TableContainer>
-        <Table stickyHeader aria-label="generic table">  {/* sticky header? */}
-          <TableHead>
+        <Table className={styles.tableContainer} stickyHeader aria-label="generic table">
+          {/* {loading ? (
+            <CircularProgress size={40} className={styles.loading} />
+          ) : ( */}
+          <TableHead className={styles.tableHead}>
             <TableRow>
               {selectable && (
-                <TableCell padding="checkbox">
+                <TableCell
+                  className={styles.headTableCell}
+                  padding="checkbox"
+                >
                   <Checkbox
                     color="primary"
-                    indeterminate={selected.length > 0 && selected.length < data.length}
-                    checked={data.length > 0 && selected.length === data.length}
+                    indeterminate={
+                      selected.length > 0 &&
+                      selected.length < data.length
+                    }
+                    checked={
+                      data.length > 0 &&
+                      selected.length === data.length
+                    }
                     onChange={handleSelectAll}
                   />
                 </TableCell>
               )}
+
               {columns.map((column) => (
                 <TableCell
+                  className={styles.headTableCell}
                   key={String(column.key)}
                   align={column.align || "left"}
-                  sortDirection={orderBy === column.key ? order : false}
+                  sortDirection={
+                    orderBy === column.key ? order : false
+                  }
                 >
                   <TableSortLabel
+                    className={styles.tableCellLabel}
                     active={orderBy === column.key}
-                    direction={orderBy === column.key ? order : "asc"}
-                    onClick={() => handleRequestSort(column.key)}
+                    direction={
+                      orderBy === column.key ? order : "asc"
+                    }
+                    onClick={() =>
+                      handleRequestSort(column.key)
+                    }
                   >
                     {column.label}
-                    {orderBy === column.key ? (
+                    {orderBy === column.key && (
                       <Box component="span" sx={visuallyHidden}>
-                        {order === "desc" ? "ordenado decrescente" : "ordenado crescente"}
+                        {order === "desc"
+                          ? "ordenado decrescente"
+                          : "ordenado crescente"}
                       </Box>
-                    ) : null}
+                    )}
                   </TableSortLabel>
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {rows.map((row, rowIndex) => {
               const isItemSelected = isSelected(row.id);
               return (
                 <TableRow
                   hover
-                  onClick={(event) => handleRowClick(event, row.id, row)}
-                  role="checkbox"
-                  aria-checked={isItemSelected}
-                  tabIndex={-1}
                   key={row.id}
+                  role="checkbox"
+                  tabIndex={-1}
                   selected={isItemSelected}
-                  sx={{ cursor: "pointer" }} // usar modulo css
+                  aria-checked={isItemSelected}
+                  className={styles.tableRow}
+                  onClick={(event) =>
+                    handleRowClick(event, row.id, row)
+                  }
                 >
                   {selectable && (
                     <TableCell padding="checkbox">
                       <Checkbox
+                        className={styles.tableCheckbox}
                         color="primary"
                         checked={isItemSelected}
                       />
                     </TableCell>
                   )}
+
                   {columns.map((column) => {
                     const value = row[column.key];
                     return (
-                      <TableCell key={String(column.key)} align={column.align || "left"}>
+                      <TableCell
+                        key={String(column.key)}
+                        align={column.align || "left"}
+                      >
                         {column.render
                           ? column.render(value, row)
                           : (value as React.ReactNode)}
@@ -192,15 +228,16 @@ export default function GenericTable<T extends { id: number | string }>({
               );
             })}
           </TableBody>
+          {/* )} */}
         </Table>
       </TableContainer>
 
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]} // revisar
         component="div"
         count={data.length}
-        rowsPerPage={rowsPerPage}
         page={page}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={[5, 10, 25]} // revisar
         labelRowsPerPage="Linhas por página"
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} de ${count}`
