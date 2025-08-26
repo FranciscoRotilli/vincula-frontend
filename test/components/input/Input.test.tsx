@@ -1,7 +1,10 @@
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
+
 import { CalendarMonth, Lock } from '@mui/icons-material'
+import { fireEvent,render, screen } from '@testing-library/react'
+import React from 'react'
+import { describe, expect, it, vi } from 'vitest'
+
 import Input from '../../../src/components/input/Input'
 
 describe('Input component', () => {
@@ -12,7 +15,7 @@ describe('Input component', () => {
     })
 
     it('calls onChange when typing', () => {
-        const handleChange = jest.fn()
+        const handleChange = vi.fn()
         render(<Input label="Nome" placeholder="Digite seu nome" onChange={handleChange} />)
         const input = screen.getByPlaceholderText('Digite seu nome')
         fireEvent.change(input, { target: { value: 'João' } })

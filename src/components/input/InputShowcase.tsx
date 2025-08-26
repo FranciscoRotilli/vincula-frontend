@@ -1,8 +1,8 @@
 'use client'
+import { CalendarMonth, Person, Search } from '@mui/icons-material'
 import React from 'react'
 
 import Input from './Input'
-import { CalendarMonth, DateRange, Lock, Person, Search } from '@mui/icons-material'
 
 const InputShowcase = () => {
 
