@@ -46,7 +46,7 @@ export default function Home() {
           size="small"
           icon={<FiAperture />}
 				/> */}
-        <ButtonShowcase />{' '}
+        {/*<ButtonShowcase />}
         {/* Showcase com variações do componente botão, 
 				use <Button /> para testar o botão indivudalmente */}
       </main>
