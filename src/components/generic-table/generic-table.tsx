@@ -186,47 +186,53 @@ export default function GenericTable<T extends { id: number | string }>({
             </TableHead>
 
             <TableBody>
-              {rows.map((row, rowIndex) => {
-                const isItemSelected = isSelected(row.id);
-                return (
-                  <TableRow
-                    hover
-                    key={row.id}
-                    role="checkbox"
-                    tabIndex={-1}
-                    selected={isItemSelected}
-                    aria-checked={isItemSelected}
-                    className={styles.tableRow}
-                    onClick={(event) =>
-                      handleRowClick(event, row.id, row)
-                    }
-                  >
-                    {selectable && (
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          className={styles.tableCheckbox}
-                          color="primary"
-                          checked={isItemSelected}
-                        />
-                      </TableCell>
-                    )}
-
-                    {columns.map((column) => {
-                      const value = row[column.key];
-                      return (
-                        <TableCell
-                          key={String(column.key)}
-                          align={column.align || "left"}
-                        >
-                          {column.render
-                            ? column.render(value, row)
-                            : (value as React.ReactNode)}
+              {rows && rows.length !== 0 ? (
+                rows.map((row, rowIndex) => {
+                  const isItemSelected = isSelected(row.id);
+                  return (
+                    <TableRow
+                      hover
+                      key={row.id}
+                      role="checkbox"
+                      tabIndex={-1}
+                      selected={isItemSelected}
+                      aria-checked={isItemSelected}
+                      className={styles.tableRow}
+                      onClick={(event) => handleRowClick(event, row.id, row)}
+                    >
+                      {selectable && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            className={styles.tableCheckbox}
+                            color="primary"
+                            checked={isItemSelected}
+                          />
                         </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+                      )}
+
+                      {columns.map((column) => {
+                        const value = row[column.key];
+                        return (
+                          <TableCell
+                            key={String(column.key)}
+                            align={column.align || "left"}
+                          >
+                            {column.render
+                              ? column.render(value, row)
+                              : (value as React.ReactNode)}
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length + (selectable ? 1 : 0)} align="center">
+                    Nenhum dado encontrado
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}
