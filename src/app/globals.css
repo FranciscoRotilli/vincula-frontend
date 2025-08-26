@@ -14,6 +14,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  background: url("/public/backgrounds/login-background.svg") no-repeat center center fixed;
+  background-size: cover;
 }
 
 body {

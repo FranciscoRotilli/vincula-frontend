@@ -49,7 +49,15 @@ export default function LoginPage() {
   const canSubmit = !isSubmitting;
 
   return (
-    <main className={styles.page}>
+    <main
+      className={styles.page}
+      style={{
+        backgroundImage: "url('/backgrounds/login-background.svg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh"
+      }}
+      >
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/logos/mp-logo.svg" alt="" width={258} height={84} />
       </div>
@@ -87,7 +95,7 @@ export default function LoginPage() {
                 className={`${styles.input} ${styles.withLeft}`}
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
-                placeholder={errors.usuario ?? "Insira o usuário"}
+                placeholder={"Insira o usuário"}
                 aria-invalid={!!errors.usuario}
               />
             </div>
@@ -103,7 +111,7 @@ export default function LoginPage() {
                 type={mostrar ? "text" : "password"}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                placeholder={errors.senha ?? "Insira a senha"}
+                placeholder={"Insira a senha"}
                 aria-invalid={!!errors.senha}
               />
               <button
