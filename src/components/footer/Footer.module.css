@@ -5,7 +5,7 @@
   background-color: #FFD96C;
   display: flex;
   justify-content: space-between;
-  padding: 6px 8px;
+  padding: 0.375em 0.5em;
   box-sizing: border-box;
 }
 
@@ -15,14 +15,14 @@
 }
 
 .text {
-  font-size: 10px;
+  font-size: 0.675em;
   color: #000;
-  padding-top: 12px;
-  padding-left: 12px;
+  padding-top: 0.75em;
+  padding-left: 0.75em;
 }
 
 .right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625em;
 }

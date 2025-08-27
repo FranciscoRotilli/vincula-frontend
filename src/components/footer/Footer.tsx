@@ -15,13 +15,13 @@ export default function Footer() {
 
       <div className={styles.right}>
         <Image
-            src="/vincula.png"
+            src="/vincula.svg"
             alt="Vincula"
             width={140}
             height={22}
           />
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="Logomarca Vincula"
             width={54}
             height={54}
