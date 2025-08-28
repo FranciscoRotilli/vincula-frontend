@@ -17,39 +17,8 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import React, { useMemo, useState } from "react";
 
+import { GenericTableProps, Order } from "../../types/Table";
 import styles from "./genericTable.module.css"
-
-export interface Column<T> {
-  key: keyof T;
-  label: string;
-  align?: "left" | "center" | "right";
-  render?: (value: T[keyof T], row: T) => React.ReactNode;
-}
-
-export type Order = "asc" | "desc";
-
-export interface Pagination {
-  currentPage: number;
-  pageSize: number;
-  totalItems: number;
-  onPageChange: (page: number, pageSize: number) => void;
-}
-
-export interface RowAction<T> {
-  label: string;
-  icon?: React.ReactNode;
-  onClick: (row: T) => void;
-}
-
-interface GenericTableProps<T> {
-  columns: Column<T>[];
-  data: T[];
-  loading: boolean;
-  pagination?: Pagination; // se não vier, cai no client-side
-  selectable?: boolean;
-  rowActions?: RowAction<T>[];
-  onRowClick?: (row: T) => void;
-}
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const valueA = a[orderBy];

@@ -1,10 +1,10 @@
 .tablePaper {
-  min-width: 800px; /* rever */
+  max-width: 1000px; /* rever */
+  width: 100%;
 }
 
 .tableContainer {
   min-height: 400px; /* rever */
-  display: flex;
 }
 
 .loading {
