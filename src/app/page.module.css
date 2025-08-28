@@ -14,7 +14,6 @@
   padding: 80px;
   gap: 64px;
   font-family: var(--font-geist-sans);
-  background-color: whitesmoke; /* remover  */
 }
 
 @media (prefers-color-scheme: dark) {

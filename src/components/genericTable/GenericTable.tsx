@@ -17,7 +17,7 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import React, { useMemo, useState } from "react";
 
-import styles from "./generic-table.module.css"
+import styles from "./genericTable.module.css"
 
 export interface Column<T> {
   key: keyof T;
