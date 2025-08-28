@@ -28,10 +28,18 @@ export interface Column<T> {
 
 export type Order = "asc" | "desc";
 
+export interface Pagination {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  onPageChange: (page: number, pageSize: number) => void;
+}
+
 interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
+  pagination?: Pagination; // se não vier, cai no client-side
   selectable?: boolean;
   onRowClick?: (row: T) => void;
 }
@@ -58,6 +66,7 @@ export default function GenericTable<T extends { id: number | string }>({
   columns,
   data,
   loading,
+  pagination,
   selectable = false,
   onRowClick,
 }: GenericTableProps<T>) {
@@ -67,7 +76,17 @@ export default function GenericTable<T extends { id: number | string }>({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleRequestSort = (property: keyof T) => {
+  const isPaginationServerSide = !!pagination;
+
+  const clientSideRows = useMemo(() => {
+    return [...data]
+      .sort(getComparator(order, orderBy))
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  }, [data, order, orderBy, page, rowsPerPage]);
+
+  const rows = isPaginationServerSide ? data : clientSideRows;
+
+  const handleSort = (property: keyof T) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -82,46 +101,46 @@ export default function GenericTable<T extends { id: number | string }>({
     setSelected([]);
   };
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, id: string | number, row: T) => {
+  const handleRowClick = (
+    event: React.MouseEvent<unknown>,
+    id: string | number,
+    row: T
+  ) => {
     if (selectable) {
       const selectedIndex = selected.indexOf(id);
       let newSelected: (string | number)[] = [];
 
       if (selectedIndex === -1) {
         newSelected = newSelected.concat(selected, id);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selected.slice(1));
-      } else if (selectedIndex === selected.length - 1) {
-        newSelected = newSelected.concat(selected.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1)
-        );
+      } else {
+        newSelected = selected.filter((s) => s !== id);
       }
       setSelected(newSelected);
     }
     if (onRowClick) onRowClick(row);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
+  const isSelected = (id: number | string) => selected.includes(id);
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    if (isPaginationServerSide) {
+      pagination!.onPageChange(newPage, pagination!.pageSize);
+    } else {
+      setPage(newPage);
+    }
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newSize = parseInt(event.target.value, 10);
+    if (isPaginationServerSide) {
+      pagination!.onPageChange(0, newSize);
+    } else {
+      setRowsPerPage(newSize);
+      setPage(0);
+    }
   };
-
-  const isSelected = (id: string | number) => selected.indexOf(id) !== -1;
-
-  const rows = useMemo(
-    () =>
-      [...data]
-        .sort(getComparator(order, orderBy))
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data]
-  );
 
   return (
     <Paper className={styles.tablePaper}>
@@ -140,36 +159,27 @@ export default function GenericTable<T extends { id: number | string }>({
                     <Checkbox
                       color="primary"
                       indeterminate={
-                        selected.length > 0 &&
-                        selected.length < data.length
+                        selected.length > 0 && selected.length < data.length
                       }
                       checked={
-                        data.length > 0 &&
-                        selected.length === data.length
+                        data.length > 0 && selected.length === data.length
                       }
                       onChange={handleSelectAll}
                     />
                   </TableCell>
                 )}
-
                 {columns.map((column) => (
                   <TableCell
                     className={styles.headTableCell}
                     key={String(column.key)}
                     align={column.align || "left"}
-                    sortDirection={
-                      orderBy === column.key ? order : false
-                    }
+                    sortDirection={orderBy === column.key ? order : false}
                   >
                     <TableSortLabel
                       className={styles.tableCellLabel}
                       active={orderBy === column.key}
-                      direction={
-                        orderBy === column.key ? order : "asc"
-                      }
-                      onClick={() =>
-                        handleRequestSort(column.key)
-                      }
+                      direction={orderBy === column.key ? order : "asc"}
+                      onClick={() => handleSort(column.key)}
                     >
                       {column.label}
                       {orderBy === column.key && (
@@ -184,10 +194,9 @@ export default function GenericTable<T extends { id: number | string }>({
                 ))}
               </TableRow>
             </TableHead>
-
             <TableBody>
               {rows && rows.length !== 0 ? (
-                rows.map((row, rowIndex) => {
+                rows.map((row) => {
                   const isItemSelected = isSelected(row.id);
                   return (
                     <TableRow
@@ -209,7 +218,6 @@ export default function GenericTable<T extends { id: number | string }>({
                           />
                         </TableCell>
                       )}
-
                       {columns.map((column) => {
                         const value = row[column.key];
                         return (
@@ -228,7 +236,10 @@ export default function GenericTable<T extends { id: number | string }>({
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length + (selectable ? 1 : 0)} align="center">
+                  <TableCell
+                    colSpan={columns.length + (selectable ? 1 : 0)}
+                    align="center"
+                  >
                     Nenhum dado encontrado
                   </TableCell>
                 </TableRow>
@@ -239,11 +250,11 @@ export default function GenericTable<T extends { id: number | string }>({
       </TableContainer>
 
       <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={data.length}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]} // revisar
+        count={isPaginationServerSide ? pagination!.totalItems : data.length}
+        rowsPerPage={isPaginationServerSide ? pagination!.pageSize : rowsPerPage}
+        page={isPaginationServerSide ? pagination!.currentPage : page}
         labelRowsPerPage="Linhas por página"
         labelDisplayedRows={({ from, to, count }) =>
           `${from}–${to} de ${count}`
