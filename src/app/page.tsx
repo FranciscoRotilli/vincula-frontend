@@ -1,11 +1,5 @@
-'use client';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React from 'react';
-const Button = dynamic(() => import('../components/GenericButton/Button'), { ssr: false });
-import { FiAperture, FiEdit2, FiXCircle } from 'react-icons/fi';
-
-import ButtonShowcase from '@/components/GenericButton/ButtonShowcase';
 
 import styles from './page.module.css';
 
@@ -20,6 +14,7 @@ export default function Home() {
           </li>
           <li>Save and see your changes instantly.</li>
         </ol>
+
         <div className={styles.ctas}>
           <a
             className={styles.primary}
@@ -39,16 +34,6 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        {/* <Button
-          label="Teste"
-          onClick={() => alert('Button clicked!')}
-          variant="outlined"
-          size="small"
-          icon={<FiAperture />}
-				/> */}
-        {<ButtonShowcase />}
-        {/* Showcase com variações do componente botão, 
-				use <Button /> para testar o botão indivudalmente */}
       </main>
       <footer className={styles.footer}>
         <a
