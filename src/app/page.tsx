@@ -1,3 +1,6 @@
+'use client'
+import dynamic from 'next/dynamic';
+const Filter = dynamic(() => import('../components/filter/Filter'), { ssr: false });
 import Image from 'next/image';
 import React from 'react';
 
@@ -13,7 +16,11 @@ export default function Home() {
             Get started by editing <code>src/app/page.tsx</code>.
           </li>
           <li>Save and see your changes instantly.</li>
-        </ol>
+				</ol>
+				
+        <Filter onFilter={function (filters) {
+					;
+				} } situations={[]} />
 
         <div className={styles.ctas}>
           <a

@@ -17,6 +17,11 @@
 }
 
 /* Size variants */
+.icon {
+  font-size: 0em;
+  width: 40px;
+  height: 40px;
+}
 .small {
   font-size: 0.85rem;
   padding: 0.35em 1.2em;
@@ -80,6 +85,12 @@
   display: inline-flex;
   align-items: center;
   margin-right: 0.5em;
+  font-size: 1.1em;
+}
+.iconOnly {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0;
   font-size: 1.1em;
 }
 
