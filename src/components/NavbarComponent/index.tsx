@@ -51,10 +51,16 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
       <style>{navLinkStyles}</style>
       <header style={styles.container} aria-label="navbar-component">
         <nav aria-label="main navigation" style={styles.nav}>
-          <Image src="/logo-vincula.svg" width={150} height={45} alt="Vincula Logo"
-          onClick={() => {
-            onNavigate("/home");
-          }}/>
+          <Image 
+            src="/logo-vincula.svg" 
+            width={150} 
+            height={45} 
+            alt="Vincula Logo"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              onNavigate("/home");
+            }}
+          />
         </nav>
 
         <div ref={userMenuRef} style={styles.userArea}>
