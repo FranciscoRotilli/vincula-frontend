@@ -35,12 +35,19 @@ export interface Pagination {
   onPageChange: (page: number, pageSize: number) => void;
 }
 
+export interface RowAction<T> {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: (row: T) => void;
+}
+
 interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
   pagination?: Pagination; // se não vier, cai no client-side
   selectable?: boolean;
+  rowActions?: RowAction<T>[];
   onRowClick?: (row: T) => void;
 }
 
@@ -68,6 +75,7 @@ export default function GenericTable<T extends { id: number | string }>({
   loading,
   pagination,
   selectable = false,
+  rowActions,
   onRowClick,
 }: GenericTableProps<T>) {
   const [order, setOrder] = useState<Order>("asc");
@@ -192,6 +200,11 @@ export default function GenericTable<T extends { id: number | string }>({
                     </TableSortLabel>
                   </TableCell>
                 ))}
+                {rowActions && (
+                  <TableCell className={styles.headTableCell} align="center">
+                    Ação
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -231,6 +244,39 @@ export default function GenericTable<T extends { id: number | string }>({
                           </TableCell>
                         );
                       })}
+                      {rowActions && (
+                        <TableCell align="center">
+                          {rowActions.map((action, index) => {
+                            const handleClick = (e: React.MouseEvent) => {
+                              e.stopPropagation();
+                              action.onClick(row);
+                            };
+
+                            return action.icon ? (
+                              <button
+                                key={index}
+                                onClick={handleClick}
+                                className={styles.actionButton}
+                                aria-label={action.label}
+                              >
+                                {action.icon}
+                              </button>
+                            ) : (
+                              <a
+                                key={index}
+                                href="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleClick(e);
+                                }}
+                                className={styles.actionLink}
+                              >
+                                {action.label}
+                              </a>
+                            );
+                          })}
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })

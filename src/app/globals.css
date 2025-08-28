@@ -15,6 +15,7 @@
   --button-error-border: #d32f2f;
   --button-error-hover: #ffebee;
   --button-error-active: #ffcdd2;
+  --table-primary: #ff8300;
 }
 
 @media (prefers-color-scheme: dark) {
