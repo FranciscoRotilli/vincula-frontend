@@ -37,7 +37,6 @@ export default function RootLayout({
 function LayoutWithNavbar({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <NavbarContainer />
       <div style={{ flex: 1 }}>{children}</div>
     </div>
   );
