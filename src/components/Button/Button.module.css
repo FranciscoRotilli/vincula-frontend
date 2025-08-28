@@ -1,0 +1,88 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
+    border 0.2s;
+  outline: none;
+  gap: 0.5em;
+  font-family: inherit;
+}
+
+/* Size variants */
+.small {
+  font-size: 0.85rem;
+  padding: 0.35em 1.2em;
+}
+.medium {
+  font-size: 1rem;
+  padding: 0.5em 1.5em;
+}
+.large {
+  font-size: 1.15rem;
+  padding: 0.7em 2em;
+}
+
+/* Contained (Primary) */
+.contained {
+  background: var(--button-primary);
+  color: var(--button-primary-contrast);
+  box-shadow: var(--button-primary-shadow);
+}
+.contained:hover:not(.disabled) {
+  background: var(--button-primary-hover);
+}
+.contained:active:not(.disabled) {
+  background: var(--button-primary-active);
+}
+
+/* Outlined (Secondary) */
+.outlined {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-border);
+  border: 1.5px solid var(--button-secondary-border);
+}
+.outlined:hover:not(.disabled) {
+  background: var(--button-secondary-hover);
+}
+.outlined:active:not(.disabled) {
+  background: var(--button-secondary-active);
+}
+
+/* Error variant */
+.error {
+  background: var(--button-error-bg);
+  color: var(--button-error);
+  border: 1.5px solid var(--button-error-border);
+}
+.error:hover:not(.disabled) {
+  background: var(--button-error-hover);
+}
+.error:active:not(.disabled) {
+  background: var(--button-error-active);
+}
+
+/* Disabled state */
+.button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5em;
+  font-size: 1.1em;
+}
+
+.button > span:last-child {
+  display: inline-block;
+}
