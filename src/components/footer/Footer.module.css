@@ -1,0 +1,28 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #FFD96C;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.375em 0.5em;
+  box-sizing: border-box;
+}
+
+.left {
+  display: flex;
+  align-items: flex-start;
+}
+
+.text {
+  font-size: 0.675em;
+  color: #000;
+  padding-top: 0.75em;
+  padding-left: 0.75em;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.625em;
+}

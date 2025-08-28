@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import Navbar from "../../src/components/NavbarComponent/index";
+import Navbar from "@/components/Navbar";
 import React from "react";
 
 describe("NavbarComponent", () => {

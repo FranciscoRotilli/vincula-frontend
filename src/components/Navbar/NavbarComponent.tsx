@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "./NavbarComponent/index";
+import Navbar from "./index";
 import { getCurrentUser, logout } from "@/services/userService";
 
 export default function NavbarContainer() {

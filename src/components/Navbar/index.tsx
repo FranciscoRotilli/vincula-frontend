@@ -35,7 +35,7 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
     <header className={s.container} style={cssVars} aria-label="navbar-component">
       <nav className={s.nav} aria-label="main navigation">
         <Image
-          src="/logo-vincula.svg"
+          src="/vincula.svg"
           width={150}
           height={45}
           alt="Vincula Logo"
