@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import colors from "@/styles/colors";
 import Image from "next/image";
+import colors from "@/styles/colors";
+import s from "./index.module.css";
 
 export type NavbarProps = {
   onNavigate: (href: string) => void;
@@ -10,147 +11,61 @@ export type NavbarProps = {
   user: { name: string; role: string } | null;
 };
 
-const navLinkStyles = `
-  .navLink {
-    padding: 10px;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    color: ${colors.EERIE_BLACK};
-    text-decoration: none;
-    font-weight: 500;
-    text-align: 'bottom';
-    transition: color 150ms ease-in-out;
-    text-underline-offset: 4px;
-  }
-  .navLink:hover {
-    text-decoration: underline;
-  }
-  .navLink.active {
-    color: ${colors.UT_ORANGE};
-    text-decoration: underline;
-  }
-`;
-
 export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
-  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-  const userMenuRef = React.useRef<HTMLDivElement | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    function handleDocumentClick(event: MouseEvent) {
-      if (userMenuRef.current && event.target instanceof Node && !userMenuRef.current.contains(event.target)) {
-        setIsUserMenuOpen(false);
-      }
+    function onDocClick(e: MouseEvent) {
+      if (ref.current && e.target instanceof Node && !ref.current.contains(e.target)) setOpen(false);
     }
-    document.addEventListener("mousedown", handleDocumentClick);
-    return () => document.removeEventListener("mousedown", handleDocumentClick);
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  return (
-    <>
-      <style>{navLinkStyles}</style>
-      <header style={styles.container} aria-label="navbar-component">
-        <nav aria-label="main navigation" style={styles.nav}>
-          <Image 
-            src="/logo-vincula.svg" 
-            width={150} 
-            height={45} 
-            alt="Vincula Logo"
-            style={{ cursor: "pointer" }}
-            onClick={() => {
-              onNavigate("/home");
-            }}
-          />
-        </nav>
+  // expose palette
+  const cssVars: React.CSSProperties = {
+    ["--color-eerie-black" as any]: colors.EERIE_BLACK,
+    ["--color-ut-orange" as any]: colors.UT_ORANGE,
+    ["--color-anti-flash-white" as any]: colors.ANTI_FLASH_WHITE,
+    ["--color-gray" as any]: colors.GRAY,
+  };
 
-        <div ref={userMenuRef} style={styles.userArea}>
-          <div style={styles.userTextGroup}>
-            <div style={styles.userName}>{user?.name ?? ""}</div>
-            <div style={styles.userRole}>{user?.role ?? ""}</div>
-          </div>
-          <button
-            aria-label="Abrir menu do usuário"
-            aria-haspopup="menu"
-            aria-expanded={isUserMenuOpen}
-            onClick={() => setIsUserMenuOpen((v) => !v)}
-            style={styles.arrowButton}
-          >
-            ▾
-          </button>
-          {isUserMenuOpen ? (
-            <div role="menu" style={styles.dropdownMenu}>
-              <button role="menuitem" onClick={onLogout} style={styles.dropdownItem} aria-label="Sair">
-                Sair
-              </button>
-            </div>
-          ) : null}
+  return (
+    <header className={s.container} style={cssVars} aria-label="navbar-component">
+      <nav className={s.nav} aria-label="main navigation">
+        <Image
+          src="/logo-vincula.svg"
+          width={150}
+          height={45}
+          alt="Vincula Logo"
+          style={{ cursor: "pointer" }}
+          onClick={() => onNavigate("/home")}
+        />
+      </nav>
+
+      <div ref={ref} className={s.userArea}>
+        <div className={s.userTextGroup}>
+          <div className={s.userName}>{user?.name ?? ""}</div>
+          <div className={s.userRole}>{user?.role ?? ""}</div>
         </div>
-      </header>
-    </>
+        <button
+          className={s.arrowButton}
+          aria-label="Abrir menu do usuário"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen(v => !v)}
+        >
+          ▾
+        </button>
+        {open && (
+          <div role="menu" className={s.dropdownMenu}>
+            <button role="menuitem" onClick={onLogout} className={s.dropdownItem} aria-label="Sair">
+              Sair
+            </button>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
-
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 12,
-    width: "100%",
-    boxSizing: "border-box",
-    backgroundColor: colors.ANTI_FLASH_WHITE,
-  },
-  userName: {
-    color: colors.EERIE_BLACK,
-    fontWeight: 600,
-    fontSize: 18,
-  },
-  userRole: {
-    color: colors.GRAY,
-    fontSize: 12,
-  },
-  nav: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    justifyContent: "center",
-  },
-  userArea: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-  },
-  userTextGroup: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-  },
-  arrowButton: {
-    border: 0,
-    background: "transparent",
-    cursor: "pointer",
-    color: colors.EERIE_BLACK,
-    padding: 10,
-    lineHeight: 1,
-  },
-  dropdownMenu: {
-    position: "absolute",
-    right: 0,
-    top: "calc(100% + 6px)",
-    background: "white",
-    borderRadius: 3,
-    padding: 4,
-  },
-  dropdownItem: {
-    border: 0,
-    background: "transparent",
-    padding: "8px 12px",
-    textAlign: "left",
-    width: "100%",
-    cursor: "pointer",
-    color: colors.EERIE_BLACK,
-  },
-};
