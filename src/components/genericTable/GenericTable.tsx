@@ -123,7 +123,9 @@ export default function GenericTable<T extends { id: number | string }>({
     <Paper className={styles.tablePaper}>
       <TableContainer className={styles.tableContainer}>
         {loading ? (
-          <CircularProgress size={40} className={styles.loading} />
+          <div className={styles.emptyAndLoadingContainer}>
+            <CircularProgress size={40} className={styles.loading} />
+          </div>
         ) : (
           <Table stickyHeader aria-label="generic table">
             <TableHead className={styles.tableHead}>
@@ -250,12 +252,12 @@ export default function GenericTable<T extends { id: number | string }>({
                   );
                 })
               ) : (
-                <TableRow>
+                <TableRow className={styles.emptyAndLoadingContainer}>
                   <TableCell
-                    colSpan={columns.length + (selectable ? 1 : 0)}
+                    colSpan={columns.length + (selectable ? 1 : 0) + (rowActions ? 1 : 0)}
                     align="center"
                   >
-                    Nenhum dado encontrado
+                    Nenhum registro encontrado
                   </TableCell>
                 </TableRow>
               )}

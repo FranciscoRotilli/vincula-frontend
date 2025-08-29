@@ -1,10 +1,16 @@
 .tablePaper {
-  max-width: 1000px; /* rever */
+  max-width: 62rem;
   width: 100%;
 }
 
 .tableContainer {
-  min-height: 400px; /* rever */
+  width: 100%;
+}
+
+.emptyAndLoadingContainer {
+  display: flex;
+  height: 22rem !important;
+  width: 100% !important;
 }
 
 .loading {
