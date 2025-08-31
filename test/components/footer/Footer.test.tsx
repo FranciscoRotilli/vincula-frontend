@@ -1,7 +1,8 @@
-import React from 'react';
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Footer from "../../../src/components/footer/Footer";
+import React from 'react';
+import { describe, expect,it } from 'vitest';
+
+import Footer from "../../../src/components/Footer/Footer";
 
 
 describe('Footer Component', () => {
