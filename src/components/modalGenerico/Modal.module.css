@@ -1,155 +1,150 @@
-/* O overlay cobre toda a tela e escurece o fundo quando o modal está aberto */
 .overlay {
-    --modal-gray-rgb: 0, 0, 0; /* Variável local para cor preta (não usada diretamente aqui) */
-    position: fixed;            /* Fixa o overlay na tela */
-    top: 0;                     /* Começa do topo */
-    left: 0;                    /* Começa da esquerda */
-    right: 0;                   /* Vai até a direita */
-    bottom: 0;                  /* Vai até embaixo */
-    background-color: rgba(var(--background), 0.5); /* Fundo semitransparente usando a variável de background */
-    display: flex;              /* Usa flexbox para centralizar o modal */
-    justify-content: center;    /* Centraliza horizontalmente */
-    align-items: center;        /* Centraliza verticalmente */
-    z-index: 1000;              /* Garante que fique acima de outros elementos */
-    animation: fadeIn 0.3s ease-out; /* Animação de fade-in ao aparecer */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: color-mix(in srgb, var(--foreground) 50%, transparent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
 }
 
-/* Ajustes para o overlay no modo escuro (dark mode) */
-@media (prefers-color-scheme: dark) {
-    .overlay {
-        --modal-gray-rgb: 0, 0, 0; /* Mantém a variável preta (pode ser usada em outros lugares) */
-    }
-}
-
-/* Container principal do modal (a "caixa" branca) */
 .container {
-    background-color: var(--background); /* Cor de fundo do modal (normalmente branco) */
-    color: var(--foreground);            /* Cor do texto (normalmente preto) */
-    padding: 24px;                       /* Espaçamento interno */
-    border-radius: 12px;                 /* Cantos arredondados */
-    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15); /* Sombra para destacar o modal */
-    min-width: 300px;                    /* Largura mínima */
-    max-width: 90%;                      /* Largura máxima (responsivo) */
-    animation: slideUp 0.4s ease-out;    /* Animação de "subir" ao aparecer */
+    background-color: var(--background);
+    color: var(--foreground);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 300px;
+    max-width: 90%;
+    animation: slideUp 0.4s ease-out;
 }
 
-/* Ajustes para o container no modo escuro */
-@media (prefers-color-scheme: dark) {
-    .container {
-      --gray-rgb: 255, 255, 255; /* Variável para branco */
-      --gray-alpha-200: rgba(var(--gray-rgb), 0.145); /* Branco translúcido */
-    }
-}
-
-/* Animação de fade-in para o overlay */
 @keyframes fadeIn {
     from {
-        opacity: 0; /* Começa invisível */
+        opacity: 0;
     }
     to {
-        opacity: 1; /* Fica visível */
+        opacity: 1;
     }
 }
 
-/* Animação de "subir" para o modal */
 @keyframes slideUp {
     from {
-        transform: translateY(20px); /* Começa 20px abaixo */
-        opacity: 0;                  /* Invisível */
+        transform: translateY(20px);
+        opacity: 0;
     }
+
     to {
-        transform: translateY(0);    /* Posição normal */
-        opacity: 1;                  /* Visível */
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
-/* Cabeçalho do modal (onde fica o título e o botão de fechar) */
 .header {
-    display: flex;                   /* Flexbox para alinhar itens */
-    justify-content: space-between;  /* Espaço entre título e botão de fechar */
-    align-items: center;             /* Centraliza verticalmente */
-    padding-bottom: 16px;            /* Espaço abaixo */
-    margin-bottom: 16px;             /* Margem abaixo */
-    border-bottom: 1px solid var(--foreground); /* Linha separadora */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
-/* Título do modal */
 .title {
-    font-size: 1.25rem;              /* Tamanho da fonte */
-    font-weight: 600;                /* Negrito */
-    color: var(--foreground);        /* Cor do texto */
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
-/* Conteúdo principal do modal */
-.content {
-    background-color: #f5f5f5;
-    overflow-y: auto;                /* Scroll se passar do tamanho */
-    max-height: 65vh;                /* Altura máxima relativa à tela */
-    padding: 4px;                    /* Espaçamento interno */
-    margin: 0 -4px;                  /* Ajuste de margem */
-    color: var(--foreground);        /* Cor do texto */
-}
-
-/* Botão de fechar (X) */
 .closeButton {
-    background-color: var(--background); /* Fundo igual ao modal */
-    border: none;                        /* Sem borda */
-    font-size: 1.8rem;                   /* Tamanho grande */
-    cursor: pointer;                     /* Cursor de clique */
-    color: var(--foreground);            /* Cor do X */
-    line-height: 1;                      /* Altura da linha */
-    padding: 0;                          /* Sem padding extra */
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--foreground);
+    line-height: 1;
+    padding: 0;
+    transition: opacity 0.2s;
 }
 
-/* Efeito ao passar o mouse no botão de fechar */
 .closeButton:hover {
-    color: var(--foreground);            /* Mantém a cor, mas pode ser alterada para destaque */
-    opacity: 0.7;                        /* Fica mais transparente */
+    opacity: 1;
 }
 
-/* Rodapé do modal (onde ficam as ações/botões) */
+.content {
+    overflow-y: auto;
+    max-height: 65vh;
+    padding: 4px;
+    margin: 0 -4px;
+}
+
 .footer {
-    display: flex;                       /* Flexbox para alinhar botões */
-    justify-content: flex-end;           /* Alinha à direita */
-    gap: 16px;                           /* Espaço entre botões */
-    padding-top: 24px;                   /* Espaço acima */
-    margin-top: 24px;                    /* Margem acima */
-    border-top: 1px solid var(--foreground); /* Linha separadora */
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
-/* Tamanhos opcionais do modal */
+
+.button {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin: 5px;
+}
+
+
+.button.primary {
+    background-color: var(--button-primary);
+    color: var(--button-primary-contrast);
+    box-shadow: var(--button-primary-shadow);
+}
+
+button.primary:hover {
+    background-color: var(--button-primary-hover);
+}
+
+button.primary:active {
+    background-color: var(--button-primary-active);
+}
+
+button.secondary {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-border);
+    border: 2px solid var(--button-secondary-border);
+}
+
+button.secondary:hover {
+    background-color: var(--button-secondary-hover);
+}
+
+.button.secondary:active {
+    background-color: var(--button-secondary-active);
+}
+
 .small {
-    max-width: 400px;                    /* Modal pequeno */
+    max-width: 400px;
 }
 
 .medium {
-    max-width: 600px;                    /* Modal médio */
+    max-width: 600px;
 }
 
 .large {
-    max-width: 900px;                    /* Modal grande */
+    max-width: 900px;
 }
 
 .fullscreen {
-    width: 100vw;                        /* Ocupa toda a largura da tela */
-    height: 100vh;                       /* Ocupa toda a altura da tela */
-    max-width: 100%;                     /* Garante que não passe da tela */
-    border-radius: 0;                    /* Sem cantos arredondados */
-}
-
-/* Estilos para os botões do modal */
-.buttonModal {
-    padding: 12px 32px;   /* Aumenta o tamanho do botão */
-    font-size: 1rem;      /* Tamanho da fonte */
-    border-radius: 8px;   /* Cantos arredondados */
-    border: none;         /* Sem borda */
-    background: #ff9800;  /* Cor de fundo (exemplo) */
-    color: #fff;          /* Cor do texto */
-    cursor: pointer;      /* Cursor de clique */
-    margin-left: 8px;     /* Espaço entre botões */
-}
-
-.buttonModal.secondary {
-    background: #f5f5f5;  /* Cor diferente para o botão cancelar */
-    color: #171717;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
 }

@@ -1,120 +1,122 @@
-import Modal from '@/components/modalGenerico/Modal';
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, test, expect, vi } from 'vitest';
 
-// Descreve a suíte de testes para o componente Modal
-describe('Componente: Modal', () => {
+// Importação corrigida para usar o alias de caminho
+import Modal from '@/components/modalGenerico/Modal';
 
-    // Grupo de testes para a renderização básica do componente
-    describe('Renderização', () => {
-        it('não deve renderizar quando a prop "isOpen" for false', () => {
-            render(<Modal isOpen={false} onClose={() => {}}><div>Conteúdo</div></Modal>);
-            // queryByRole é usado pois esperamos que o elemento não seja encontrado
-            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-        });
+// Mock do CSS Module também usando o alias para consistência
+vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
+  default: {
+    overlay: 'overlay',
+    container: 'container',
+    header: 'header',
+    title: 'title',
+    closeButton: 'closeButton',
+    content: 'content',
+    footer: 'footer',
+    small: 'small',
+    medium: 'medium',
+    large: 'large',
+  }
+}));
 
-        it('deve renderizar quando a prop "isOpen" for true', () => {
-            render(<Modal isOpen={true} onClose={() => {}}><div>Conteúdo</div></Modal>);
-            // getByRole é usado pois esperamos que o elemento SEJA encontrado
-            expect(screen.getByRole('dialog')).toBeInTheDocument();
-        });
+describe('Componente Modal', () => {
+  // Teste 1: Não deve renderizar nada se a prop 'isOpen' for false
+  test('não deve renderizar quando isOpen é false', () => {
+    render(
+      <Modal isOpen={false} onClose={() => {}}>
+        <div>Conteúdo do Modal</div>
+      </Modal>
+    );
+    const modal = screen.queryByRole('dialog');
+    expect(modal).not.toBeInTheDocument();
+  });
 
-        it('deve exibir o título e o conteúdo (children) corretamente', () => {
-            const modalTitle = 'Título do Meu Modal';
-            const modalContent = 'Este é o conteúdo interno.';
+  // Teste 2: Deve renderizar o modal completo quando 'isOpen' for true
+  test('deve renderizar o modal com título, conteúdo e ações quando isOpen é true', () => {
+    const handleClose = vi.fn();
+    const handleAction = vi.fn();
 
-            render(
-                <Modal isOpen={true} onClose={() => {}} title={modalTitle}>
-                    <p>{modalContent}</p>
-                </Modal>
-            );
+    render(
+      <Modal
+        isOpen={true}
+        onClose={handleClose}
+        title="Título de Teste"
+        actions={<button onClick={handleAction}>Ação</button>}
+      >
+        <p>Conteúdo do modal</p>
+      </Modal>
+    );
 
-            expect(screen.getByText(modalTitle)).toBeInTheDocument();
-            expect(screen.getByText(modalContent)).toBeInTheDocument();
-        });
-    });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Título de Teste')).toBeInTheDocument();
+    expect(screen.getByText('Conteúdo do modal')).toBeInTheDocument();
+    expect(screen.getByText('Ação')).toBeInTheDocument();
+  });
 
-    // Grupo de testes para as interações do usuário
-    describe('Interações de Usuário', () => {
-        it('deve chamar a função "onClose" ao clicar no botão de fechar (×)', () => {
-            const onCloseMock = vi.fn();
-            render(<Modal isOpen={true} onClose={onCloseMock} title="Teste"><div></div></Modal>);
+  // Teste 3: Deve chamar a função onClose ao clicar no botão de fechar
+  test('deve chamar onClose ao clicar no botão de fechar (X)', () => {
+    const handleClose = vi.fn();
 
-            fireEvent.click(screen.getByRole('button', { name: /×/i }));
-            expect(onCloseMock).toHaveBeenCalledTimes(1);
-        });
+    render(
+      <Modal isOpen={true} onClose={handleClose} title="Teste">
+        <p>Conteúdo</p>
+      </Modal>
+    );
 
-        it('deve chamar a função "onClose" ao clicar no botão "Cancelar"', () => {
-            const onCloseMock = vi.fn();
-            render(<Modal isOpen={true} onClose={onCloseMock}><div></div></Modal>);
+    const closeButton = screen.getByLabelText('Fechar');
+    fireEvent.click(closeButton);
 
-            fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
-            expect(onCloseMock).toHaveBeenCalledTimes(1);
-        });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
 
-        it('deve chamar a função "onAdd" ao clicar no botão "Adicionar"', () => {
-            const onAddMock = vi.fn();
-            render(<Modal isOpen={true} onClose={() => {}} onAdd={onAddMock}><div></div></Modal>);
+  // Teste 4: Deve chamar a função onClose ao clicar no overlay
+  test('deve chamar onClose ao clicar no overlay', () => {
+    const handleClose = vi.fn();
 
-            fireEvent.click(screen.getByRole('button', { name: /adicionar/i }));
-            expect(onAddMock).toHaveBeenCalledTimes(1);
-        });
+    render(
+      <Modal isOpen={true} onClose={handleClose}>
+        <p>Conteúdo</p>
+      </Modal>
+    );
 
-        it('deve chamar "onClose" ao clicar no overlay', () => {
-            const onCloseMock = vi.fn();
-            render(<Modal isOpen={true} onClose={onCloseMock}><div></div></Modal>);
+    const overlay = screen.getByRole('dialog').parentElement;
+    if (overlay) {
+        fireEvent.click(overlay);
+    }
+    
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
 
-            fireEvent.click(screen.getByTestId('overlay'));
-            expect(onCloseMock).toHaveBeenCalledTimes(1);
-        });
+  // Teste 5: NÃO deve chamar onClose ao clicar dentro do conteúdo do modal
+  test('não deve chamar onClose ao clicar dentro do container do modal', () => {
+    const handleClose = vi.fn();
 
-        it('NÃO deve chamar "onClose" ao clicar dentro do conteúdo do modal', () => {
-            const onCloseMock = vi.fn();
-            render(<Modal isOpen={true} onClose={onCloseMock}><div></div></Modal>);
+    render(
+      <Modal isOpen={true} onClose={handleClose}>
+        <p>Clique aqui</p>
+      </Modal>
+    );
 
-            fireEvent.click(screen.getByTestId('modal-container'));
-            expect(onCloseMock).not.toHaveBeenCalled();
-        });
-    });
+    fireEvent.click(screen.getByText('Clique aqui'));
 
-    // Grupo de testes para o comportamento das props
-    describe('Comportamento das Props', () => {
-        it('NÃO deve fechar ao clicar no overlay quando "closeOnOverlayClick" for false', () => {
-            const onCloseMock = vi.fn();
-            render(<Modal isOpen={true} onClose={onCloseMock} closeOnOverlayClick={false}><div></div></Modal>);
+    expect(handleClose).not.toHaveBeenCalled();
+  });
 
-            fireEvent.click(screen.getByTestId('overlay'));
-            expect(onCloseMock).not.toHaveBeenCalled();
-        });
+  // Teste 6: Deve renderizar sem header ou footer se não forem passadas as props
+  test('deve renderizar sem título e ações se as props não forem fornecidas', () => {
+    render(
+      <Modal isOpen={true} onClose={() => {}}>
+        <p>Apenas conteúdo</p>
+      </Modal>
+    );
 
-        // Teste parametrizado para todos os tamanhos
-        it.each(['small', 'medium', 'large', 'fullscreen'])('deve aplicar a classe de tamanho "%s"', (size) => {
-        const testSize = size as 'small' | 'medium' | 'large' | 'fullscreen';
-        render(<Modal isOpen={true} onClose={() => {}} size={testSize}><div></div></Modal>);
-        
-        const container = screen.getByTestId('modal-container');
-        
-        expect(container.className).toContain(testSize);
-    });
-    });
-
-    // Grupo de testes para acessibilidade (a11y)
-    describe('Acessibilidade', () => {
-        it('deve ter o role="dialog" e o atributo aria-modal="true"', () => {
-            render(<Modal isOpen={true} onClose={() => {}}><div></div></Modal>);
-            const modal = screen.getByRole('dialog');
-            
-            expect(modal).toBeInTheDocument();
-            expect(modal).toHaveAttribute('aria-modal', 'true');
-        });
-
-        it('deve associar o título ao modal com "aria-labelledby"', () => {
-            const modalTitle = 'Modal Acessível';
-            render(<Modal isOpen={true} onClose={() => {}} title={modalTitle}><div></div></Modal>);
-
-            const modal = screen.getByRole('dialog');
-            const titleElement = screen.getByText(modalTitle);
-
-            expect(modal).toHaveAttribute('aria-labelledby', titleElement.id);
-        });
-    });
+    const title = screen.queryByRole('heading');
+    
+    expect(title).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
 });
+

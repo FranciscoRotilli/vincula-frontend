@@ -6,10 +6,9 @@ type ModalProps = {
     onClose: () => void;
     title?: string;
     children: ReactNode;
-    onAdd?: () => void; // Adiciona função para o botão Adicionar
     size?: 'small' | 'medium' | 'large' | 'fullscreen';
     closeOnOverlayClick?: boolean;
-    actions?: React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
+    actions?: ReactNode;
 };
 
 const Modal = ({
@@ -17,9 +16,9 @@ const Modal = ({
     onClose,
     children,
     title,
-    onAdd,
     size = 'medium',
-    closeOnOverlayClick = true
+    closeOnOverlayClick = true,
+    actions
 }: ModalProps) => {
     if (!isOpen) {
         return null;
@@ -32,19 +31,18 @@ const Modal = ({
     };
 
     return (
-        <div className={styles.overlay} onClick={handleOverlayClick} data-testid="overlay" >
+        <div className={styles.overlay} onClick={handleOverlayClick}>
             <div
                 className={`${styles.container} ${styles[size]}`}
                 onClick={(e) => e.stopPropagation()}
-                data-testid="modal-container"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="modal-title"
+                aria-labelledby={title ? "modal-title" : undefined}
             >
-                {title !== undefined && (
+                {title && (
                     <header className={styles.header}>
-                        <h2 className={styles.title} id="modal-title">{title}</h2> {/* Adicione o id aqui */}
-                        <button className={styles.closeButton} onClick={onClose}>
+                        <h2 className={styles.title} id="modal-title">{title}</h2>
+                        <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
                             &times;
                         </button>
                     </header>
@@ -54,23 +52,14 @@ const Modal = ({
                     {children}
                 </main>
 
-                <footer className={styles.footer}>
-                    <button
-                        className={styles.buttonModal}
-                        onClick={onAdd}
-                    >
-                        Adicionar
-                    </button>
-                    <button
-                        className={`${styles.buttonModal} ${styles.secondary}`}
-                        onClick={onClose}
-                    >
-                        Cancelar
-                    </button>
-                </footer>
+                {actions && (
+                    <footer className={styles.footer}>
+                        {actions}
+                    </footer>
+                )}
             </div>
         </div>
     );
 };
 
-export default Modal
+export default Modal;
