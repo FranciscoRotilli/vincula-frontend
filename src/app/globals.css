@@ -16,6 +16,9 @@
   --button-error-hover: #ffebee;
   --button-error-active: #ffcdd2;
   --table-primary: #ff8300;
+  --table-icon: #1a2128;
+  --action-link: #337ab7;
+  --action-link-hover: #0050ac;
 }
 
 @media (prefers-color-scheme: dark) {

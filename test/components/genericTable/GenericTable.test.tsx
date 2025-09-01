@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import React from "react";
 
-import GenericTable from "@/components/genericTable/GenericTable";
+import GenericTable from "@/components/GenericTable/GenericTable";
 import { Column } from "@/types/Table";
 
 type Row = { id: number; name: string; email: string };

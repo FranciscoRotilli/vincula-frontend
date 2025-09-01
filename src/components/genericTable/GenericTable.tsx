@@ -18,7 +18,7 @@ import { visuallyHidden } from "@mui/utils";
 import React, { useMemo, useState } from "react";
 
 import { GenericTableProps, Order } from "../../types/Table";
-import styles from "./genericTable.module.css"
+import styles from "./GenericTable.module.css"
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const valueA = a[orderBy];

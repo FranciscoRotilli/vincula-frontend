@@ -42,7 +42,7 @@
   cursor: pointer;
   padding: 4px;
   margin: 0 2px;
-  color: #555;
+  color: var(--table-icon);
   transition: color 0.2s;
 }
 
@@ -52,11 +52,11 @@
 
 .actionLink {
   cursor: pointer;
-  color: #337ab7;
+  color: var(--action-link);
   text-decoration: underline;
   margin: 0 4px;
 }
 
 .actionLink:hover {
-  color: #0050ac;
+  color: var(--action-link-hover);
 }
