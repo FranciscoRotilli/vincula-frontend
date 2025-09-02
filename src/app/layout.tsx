@@ -16,11 +16,10 @@ export const metadata: Metadata = {
   description: "Login Vincula",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={poppins.variable}>
+    <html lang="pt-BR">
       <body>
-        <NavbarContainer />
         {children}
       </body>
     </html>

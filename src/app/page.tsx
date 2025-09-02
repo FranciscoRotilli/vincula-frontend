@@ -7,6 +7,7 @@ import styles from "./page.module.css";
 
 import Input from "@/components/input/Input";
 import Button from "@/components/Button/Button";
+import { Person, Lock } from "@mui/icons-material";
 
 async function loginMock(usuario: string, senha: string) {
   await new Promise((r) => setTimeout(r, 600));
@@ -15,7 +16,7 @@ async function loginMock(usuario: string, senha: string) {
   throw new Error("Usuário e senha são obrigatórios.");
 }
 
-type Errors = { usuario?: string; senha?: string; root?: string };
+type Errors = { usuario?: string; senha?: string; };
 
 export default function LoginPage() {
   const [usuario, setUsuario] = useState("");
@@ -83,6 +84,7 @@ export default function LoginPage() {
               label="Usuário"
               required
               error={errors.usuario}
+              startIcon={<Person />}
             />
 
             <Input
@@ -93,6 +95,7 @@ export default function LoginPage() {
               label="Senha"
               required
               error={errors.senha}
+              startIcon={<Lock />}
             />
 
             <div className={styles.buttonSpacer} />
@@ -103,8 +106,6 @@ export default function LoginPage() {
               disabled={!canSubmit}
               onClick={() => {}}
             />
-
-            {errors.root && <p role="alert">{errors.root}</p>}
           </form>
         </div>
       </section>
