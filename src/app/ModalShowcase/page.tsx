@@ -1,7 +1,9 @@
 'use client';
 import React, { useState } from 'react';
+
 import Modal from '@/components/modalGenerico/Modal';
 import modalStyles from '@/components/modalGenerico/Modal.module.css';
+
 import showcaseStyles from './showcase.module.css';
 
 export default function ShowcasePage() {

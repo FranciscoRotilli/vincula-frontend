@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import styles from './Modal.module.css';
 
 type ModalProps = {
@@ -9,6 +9,7 @@ type ModalProps = {
     size?: 'small' | 'medium' | 'large' | 'fullscreen';
     closeOnOverlayClick?: boolean;
     actions?: ReactNode;
+    disableEscapeKeyDown?: boolean;
 };
 
 const Modal = ({
@@ -18,8 +19,25 @@ const Modal = ({
     title,
     size = 'medium',
     closeOnOverlayClick = true,
-    actions
+    actions,
+    disableEscapeKeyDown = false
 }: ModalProps) => {
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        if (isOpen && !disableEscapeKeyDown) {
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen, onClose, disableEscapeKeyDown]); 
+
     if (!isOpen) {
         return null;
     }
