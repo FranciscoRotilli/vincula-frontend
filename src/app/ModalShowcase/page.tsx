@@ -15,10 +15,8 @@ export default function ShowcasePage() {
 
   return (
     <div className={showcaseStyles.container}>
-      <h1 className={showcaseStyles.title}>
-        Demonstração do Modal
-      </h1>
-      
+      <h1 className={showcaseStyles.title}>Demonstração do Modal</h1>
+
       <div className={showcaseStyles.buttonGrid}>
         <button className={showcaseStyles.triggerButton} onClick={() => setBasicModalOpen(true)}>
           Modal Básico
@@ -38,37 +36,21 @@ export default function ShowcasePage() {
       </div>
 
       {/* 1. Modal Básico */}
-      <Modal
-        isOpen={basicModalOpen}
-        onClose={() => setBasicModalOpen(false)}
-        title="Modal Básico"
-        size="medium"
-      >
+      <Modal isOpen={basicModalOpen} onClose={() => setBasicModalOpen(false)} title="Modal Básico" size="medium">
         <p>
-          Este é um modal básico com título e conteúdo simples.
-          Você pode fechar clicando no X, pressionando ESC ou clicando fora do modal.
+          Este é um modal básico com título e conteúdo simples. Você pode fechar clicando no X, pressionando ESC ou
+          clicando fora do modal.
         </p>
       </Modal>
 
       {/* 2. Modal com Formulário */}
       <Modal
         isOpen={formModalOpen}
-        onClose={() => setFormModalOpen(false)}
         title="Adicionar Novo Item"
-        size="medium"
-        actions={
-          <>
-            <button className={`${modalStyles.button} ${modalStyles.secondary}`} onClick={() => setFormModalOpen(false)}>
-              Cancelar
-            </button>
-            <button className={`${modalStyles.button} ${modalStyles.primary}`} onClick={() => {
-              console.log('Formulário enviado!');
-              setFormModalOpen(false);
-            }}>
-              Salvar
-            </button>
-          </>
-        }
+        onClose={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+        buttons={['Cancelar', 'Salvar']}
       >
         <div className={showcaseStyles.formStack}>
           <label>Nome</label>
@@ -84,23 +66,12 @@ export default function ShowcasePage() {
         onClose={() => setConfirmModalOpen(false)}
         title="Confirmar Exclusão"
         size="small"
-        actions={
-          <>
-            <button className={`${modalStyles.button} ${modalStyles.secondary}`} onClick={() => setConfirmModalOpen(false)}>
-              Cancelar
-            </button>
-            <button className={`${modalStyles.button} ${modalStyles.primary}`} onClick={() => {
-              console.log('Ação confirmada!');
-              setConfirmModalOpen(false);
-            }}>
-              Confirmar
-            </button>
-          </>
-        }
+        onAction={() => {
+          console.log('Ação confirmada!');
+          setConfirmModalOpen(false);
+        }}
       >
-        <p>
-          Tem certeza de que deseja executar esta ação? Esta operação não pode ser desfeita.
-        </p>
+        <p>Tem certeza de que deseja executar esta ação? Esta operação não pode ser desfeita.</p>
       </Modal>
 
       {/* 4. Modal Fullscreen */}
@@ -109,17 +80,16 @@ export default function ShowcasePage() {
         onClose={() => setFullscreenModalOpen(false)}
         title="Modal Fullscreen"
         size="fullscreen"
-        actions={
-          <button className={`${modalStyles.button} ${modalStyles.primary}`} onClick={() => setFullscreenModalOpen(false)}>
-            Fechar
-          </button>
-        }
+        onAction={() => {
+          console.log('Ação confirmada!');
+          setFullscreenModalOpen(false);
+        }}
       >
         <div className={showcaseStyles.fullscreenContent}>
           <h2>Conteúdo Expandido</h2>
           <p>
-            Este modal ocupa toda a tela e é ideal para conteúdos que precisam de mais espaço,
-            como formulários complexos ou visualização de dados detalhados.
+            Este modal ocupa toda a tela e é ideal para conteúdos que precisam de mais espaço, como formulários
+            complexos ou visualização de dados detalhados.
           </p>
         </div>
       </Modal>
@@ -131,20 +101,14 @@ export default function ShowcasePage() {
         title="Modal Protegido"
         size="medium"
         closeOnOverlayClick={false}
-        actions={
-          <>
-            <button className={`${modalStyles.button} ${modalStyles.secondary}`} onClick={() => setNoOverlayCloseModalOpen(false)}>
-              Cancelar
-            </button>
-            <button className={`${modalStyles.button} ${modalStyles.primary}`} onClick={() => setNoOverlayCloseModalOpen(false)}>
-              OK
-            </button>
-          </>
-        }
+        onAction={() => {
+          console.log('Ação confirmada!');
+          setNoOverlayCloseModalOpen(false);
+        }}
       >
         <p>
-          Este modal não fecha ao clicar fora dele. Você deve usar os botões ou a tecla ESC para fechar.
-          Isso é útil para modais com informações importantes que não devem ser fechados acidentalmente.
+          Este modal não fecha ao clicar fora dele. Você deve usar os botões ou a tecla ESC para fechar. Isso é útil
+          para modais com informações importantes que não devem ser fechados acidentalmente.
         </p>
       </Modal>
     </div>
