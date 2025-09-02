@@ -1,3 +1,5 @@
+"use client"
+
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Image from "next/image";
 import React from "react";
@@ -27,7 +29,7 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
   }, []);
 
   return (
-    <header className={s.container} aria-label="navbar-component">
+    <header className={s.container} aria-label="navbar-component" data-testid="navbar-component">
       <nav className={s.nav} aria-label="main navigation">
         <Image
           src="/vincula.svg"
@@ -45,7 +47,7 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
           <div className={s.userRole}>{user?.role ?? ""}</div>
         </div>
 
-        <button
+        <button data-testid="navbar-arrow-button"
           className={s.arrowButton}
           aria-label="Abrir menu do usuário"
           aria-haspopup="menu"
