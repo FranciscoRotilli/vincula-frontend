@@ -19,7 +19,7 @@ vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
     small: 'small',
     medium: 'medium',
     large: 'large',
-  }
+  },
 }));
 
 describe('Componente Modal', () => {
@@ -44,7 +44,9 @@ describe('Componente Modal', () => {
         isOpen={true}
         onClose={handleClose}
         title="Título de Teste"
-        actions={<button onClick={handleAction}>Ação</button>}
+        // actions={<button onClick={handleAction}>Ação</button>}
+        onAction={handleAction}
+        buttons={['Cancelar', 'Ação']}
       >
         <p>Conteúdo do modal</p>
       </Modal>
@@ -84,9 +86,9 @@ describe('Componente Modal', () => {
 
     const overlay = screen.getByRole('dialog').parentElement;
     if (overlay) {
-        fireEvent.click(overlay);
+      fireEvent.click(overlay);
     }
-    
+
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
@@ -114,9 +116,8 @@ describe('Componente Modal', () => {
     );
 
     const title = screen.queryByRole('heading');
-    
+
     expect(title).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
-
