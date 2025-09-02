@@ -9,6 +9,8 @@ import Input from "@/components/input/Input";
 import Button from "@/components/Button/Button";
 import { Person, Lock } from "@mui/icons-material";
 
+import { getApiUrl } from "@/lib/api";
+
 async function loginMock(usuario: string, senha: string) {
   await new Promise((r) => setTimeout(r, 600));
   if (usuario === "erro" || senha === "erro") throw new Error("Credenciais inválidas.");
@@ -19,6 +21,17 @@ async function loginMock(usuario: string, senha: string) {
 type Errors = { usuario?: string; senha?: string; };
 
 export default function LoginPage() {
+  async function testApi() {
+    try {
+      const apiUrl = getApiUrl();
+      console.log("API URL:", apiUrl);
+      const response = await fetch(apiUrl);
+      console.log("API Response:", response);
+    } catch (error) {
+      console.error("Error fetching API URL:", error);
+    }
+  }
+
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
@@ -104,7 +117,7 @@ export default function LoginPage() {
               type="submit"
               label={isSubmitting ? "Entrando..." : "Login"}
               disabled={!canSubmit}
-              onClick={() => {}}
+              onClick={() => {testApi();}}
             />
           </form>
         </div>
