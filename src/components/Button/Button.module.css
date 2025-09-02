@@ -1,11 +1,11 @@
 .button {
   display: inline-flex;
-	min-width: 40px;
-	min-height: 40px;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375em;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -21,8 +21,8 @@
 /* Size variants */
 .icon {
   font-size: 0em;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .small {
   font-size: 0.85rem;
@@ -54,7 +54,7 @@
 .outlined {
   background: var(--button-secondary-bg);
   color: var(--button-secondary-border);
-  border: 1.5px solid var(--button-secondary-border);
+  border: 0.094em solid var(--button-secondary-border);
 }
 .outlined:hover:not(.disabled) {
   background: var(--button-secondary-hover);
@@ -67,7 +67,7 @@
 .error {
   background: var(--button-error-bg);
   color: var(--button-error);
-  border: 1.5px solid var(--button-error-border);
+  border: 0.094em solid var(--button-error-border);
 }
 .error:hover:not(.disabled) {
   background: var(--button-error-hover);
@@ -91,7 +91,7 @@
   font-size: 1.1em;
   vertical-align: middle;
   position: relative;
-  top: 1px;
+  top: 0.0625em;
 }
 
 
