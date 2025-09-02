@@ -148,3 +148,32 @@ button.secondary:hover {
     max-width: 100%;
     border-radius: 0;
 }
+
+
+/* estilos para o modal de formulario */
+.formStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.formStack label {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.textInput {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  background-color: var(--background);
+  color: var(--foreground);
+  font-size: 16px;
+}
+
+.textInput:focus {
+  outline: 2px solid var(--button-primary);
+  border-color: transparent;
+}
