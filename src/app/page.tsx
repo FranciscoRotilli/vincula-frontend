@@ -1,72 +1,56 @@
-"use client";
+'use client';
 
-import React, { useState, type ChangeEvent, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import styles from "./page.module.css";
+import React, { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import styles from './page.module.css';
 
-import Input from "@/components/input/Input";
-import Button from "@/components/Button/Button";
-import { Person, Lock } from "@mui/icons-material";
+import Input from '@/components/input/Input';
+import Button from '@/components/Button/Button';
+import { Person, Lock } from '@mui/icons-material';
+import { useLogin } from '@/hooks/useLogin';
 
-import { getApiUrl } from "@/lib/api";
-
-async function loginMock(usuario: string, senha: string) {
-  await new Promise((r) => setTimeout(r, 600));
-  if (usuario === "erro" || senha === "erro") throw new Error("Credenciais inválidas.");
-  if (usuario.trim() && senha.trim()) return { ok: true, token: "mock-token" };
-  throw new Error("Usuário e senha são obrigatórios.");
-}
-
-type Errors = { usuario?: string; senha?: string; };
+type Errors = { usuario?: string; senha?: string };
 
 export default function LoginPage() {
-  async function testApi() {
-    try {
-      const apiUrl = getApiUrl();
-      console.log("API URL:", apiUrl);
-      const response = await fetch(apiUrl);
-      console.log("API Response:", response);
-    } catch (error) {
-      console.error("Error fetching API URL:", error);
-    }
-  }
-
-  const [usuario, setUsuario] = useState("");
-  const [senha, setSenha] = useState("");
-  const [isSubmitting, setSubmitting] = useState(false);
+  const [usuario, setUsuario] = useState('');
+  const [senha, setSenha] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const router = useRouter();
 
+  const loginMutation = useLogin();
+
   const validate = () => {
     const e: Errors = {};
-    if (!usuario.trim()) e.usuario = "O usuário deve ser informado.";
-    if (!senha.trim()) e.senha = "A senha deve ser informada.";
+    if (!usuario.trim()) e.usuario = 'O usuário deve ser informado.';
+    if (!senha.trim()) e.senha = 'A senha deve ser informada.';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const onSubmit = async (ev: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     setErrors({});
     if (!validate()) return;
-    setSubmitting(true);
-    try {
-      await loginMock(usuario, senha);
-      router.push("/casos");
-    } catch {
-      const msg = "Usuário ou senha inválido.";
-      setErrors({ usuario: msg, senha: msg });
-    } finally {
-      setSubmitting(false);
-    }
+
+    loginMutation.mutate(
+      { username: usuario, password: senha },
+      {
+        onSuccess: (data) => {
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('refresh_token', data.refresh_token);
+          router.push('/casos');
+        },
+        onError: () => {
+          const msg = 'Usuário ou senha inválido.';
+          setErrors({ usuario: msg, senha: msg });
+        },
+      }
+    );
   };
 
-  const canSubmit = !isSubmitting;
-
   return (
-    <main
-      className={styles.page}>
+    <main className={styles.page}>
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
       </div>
@@ -115,9 +99,9 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              label={isSubmitting ? "Entrando..." : "Login"}
-              disabled={!canSubmit}
-              onClick={() => {testApi();}}
+              label={loginMutation.isPending ? 'Entrando...' : 'Login'}
+              disabled={loginMutation.isPending}
+              onClick={() => {}}
             />
           </form>
         </div>
