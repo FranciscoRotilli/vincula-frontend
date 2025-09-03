@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import React from 'react';
-import { Select, Option } from '../components/Select/Select';
+import { Option, CustomSelect } from '../components/Select/Select';
 import styles from './page.module.css';
 export default function Home() {
 
@@ -17,16 +17,12 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-
-          <Select
+          <CustomSelect
             options={options}
-            placeholder="TESTEEEE????"
-            label="Choose an option"
-            onChange={(val) => console.log('Selected:', val)}
-            allowClear
+            onChange={(newVal) => console.log(newVal)}
+            label="testing"
+            required
           />
-
-
         <Image className={styles.logo} src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
         <ol>
           <li>

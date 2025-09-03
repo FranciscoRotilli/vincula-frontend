@@ -1,11 +1,12 @@
 "use client"
 import React, { useState } from 'react';
-/////// import * as SelectPrimitive from '@radix-ui/react-select';
-import { KeyboardArrowDown, KeyboardArrowUp, Clear } from '@mui/icons-material';
-import clsx from 'clsx'; 
-
-import styles from './Select.module.css'; 
-
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 
 export type Option = {
   value: string;
@@ -16,66 +17,60 @@ export type Option = {
 interface SelectProps {
   options: Option[];
   value?: string | null;
-  defaultValue?: string | null;
-  onChange?: (value: string | null) => void;
-  placeholder?: string;
-  label?: string;
-  error?: string | boolean;
-  disabled?: boolean;
+  onChange: (value: string | null) => void;
+  label: string;
   name?: string;
   id?: string;
   required?: boolean;
-  allowClear?: boolean;
-  size?: 'sm' | 'md';
+  isControlled?: boolean;
 }
 
-export const Select: React.FC<SelectProps> = ({
+export const CustomSelect: React.FC<SelectProps> = ({
   options,
   value,
-  defaultValue,
   onChange,
-  placeholder,
   label,
-  error,
-  disabled = false,
   name,
   id,
   required,
-  allowClear = false,
-  size = 'md',
+  isControlled = false,
 }) => {
-  
-  const [internalValue, setInternalValue] = useState(defaultValue || null);
-  const isControlled = value !== undefined;
-  const currentValue = isControlled ? value : internalValue;
+  const [internalValue, setInternalValue] = useState<string>("");
 
-  const handleValueChange = (newValue: string) => {
-    if (!isControlled) setInternalValue(newValue);
-    if (onChange) onChange(newValue);
+  const handleValueChange = (event: SelectChangeEvent<string | null>) => {
+    const newValue = event.target.value === "" ? null : event.target.value;
+    if (!isControlled) {
+      setInternalValue(event.target.value!);
+    }
+    onChange(newValue);
   };
 
-  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    if (!isControlled) setInternalValue(null);
-    if (onChange) onChange(null);
-  };
-
-  const selectedOptionLabel = options.find((opt) => opt.value === currentValue)?.label;
+  const selectValue = isControlled ? value ?? "" : internalValue;
 
   return (
-    <div className={styles.selectWrapper}>
-      {label && <label className={styles.label} htmlFor={id}>{label}</label>}
-    <select className={styles.Brian}>
-        <option disabled selected>{placeholder}</option>
-
-       {
-        options.map((option) => {
-            return (<option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)
-        })
-       }
-    </select>
-    
-      </div>
-    
+      <FormControl fullWidth>
+        <InputLabel id={id}>
+          {label}
+        </InputLabel>
+        <Select
+          labelId={id}
+          id={id}
+          name={name}
+          value={selectValue}
+          label={label}
+          onChange={handleValueChange}
+          required={required}
+        >
+          {options.map((option) => (
+            <MenuItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
   );
 };
