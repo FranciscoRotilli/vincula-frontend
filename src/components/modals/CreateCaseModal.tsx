@@ -1,11 +1,9 @@
 'use client';
-import { Box, TextField } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 
 import Modal from '@/components/modals/Modal';
 import modalStyles from '@/components/modals/Modal.module.css';
-
-import showcaseStyles from './modal.module.css';
+import Input from '@/components/input/Input';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
@@ -54,7 +52,7 @@ export default function CreateCaseModal ({
     <Modal
         isOpen={isOpen}
         title="Adicionar caso"
-        size='large'
+        size='medium'
         onClose={function (): void {
           setCaseName('');
           onClose();
@@ -65,11 +63,11 @@ export default function CreateCaseModal ({
       >
         <div className={modalStyles.formStack}>
           <label>Nome do caso:</label>
-          <input className={modalStyles.textInput} type="text" value={caseName} onChange={(e) => setCaseName(e.target.value)}/>
+          <Input placeholder={''} onChange={(e) => setCaseName(e.target.value)} value={caseName}/>
           <label>Nome do responsável:</label>
-          <TextField className={modalStyles.textInput} type="text" value={CASE_RESPONSABLE} InputProps={{readOnly: true}}/>
+          <Input placeholder={''} disabled value={CASE_RESPONSABLE}/>
           <label>Data de criação:</label>
-          <TextField className={modalStyles.textInput} type="text" value={creationDateFormated} InputProps={{readOnly: true}}/>
+          <Input placeholder={''} disabled value={creationDateFormated}/>
         </div>
       </Modal>
   );

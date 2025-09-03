@@ -1,8 +1,5 @@
 'use client'
-import Image from 'next/image';
 import React, { useState } from 'react';
-
-import styles from './page.module.css';
 
 import CreateCaseModal from '@/components/modals/CreateCaseModal';
 
@@ -14,6 +11,7 @@ return (
         onClose={() => setOpen(false)} 
         onSubmit={(payload) => {
           console.log('Payload recebido na página:', payload);
-        }}      />
+        }}
+      />
   );
 }
