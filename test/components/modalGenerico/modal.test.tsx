@@ -40,14 +40,7 @@ describe('Componente Modal', () => {
     const handleAction = vi.fn();
 
     render(
-      <Modal
-        isOpen={true}
-        onClose={handleClose}
-        title="Título de Teste"
-        // actions={<button onClick={handleAction}>Ação</button>}
-        onAction={handleAction}
-        buttons={['Cancelar', 'Ação']}
-      >
+      <Modal isOpen={true} onClose={handleClose} title="Título de Teste" onAction={handleAction} actionButton="Ação">
         <p>Conteúdo do modal</p>
       </Modal>
     );

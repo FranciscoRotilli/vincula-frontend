@@ -50,7 +50,8 @@ export default function ShowcasePage() {
         onClose={function (): void {
           setFormModalOpen(false);
         }}
-        buttons={['Cancelar', 'Salvar']}
+        actionButton="Salvar"
+        cancelButton="Cancelar"
       >
         <div className={showcaseStyles.formStack}>
           <label>Nome</label>

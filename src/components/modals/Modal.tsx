@@ -9,7 +9,8 @@ type ModalProps = {
   children: ReactNode;
   size?: 'small' | 'medium' | 'large' | 'fullscreen';
   closeOnOverlayClick?: boolean;
-  buttons?: string[];
+  actionButton?: string;
+  cancelButton?: string;
   disableEscapeKeyDown?: boolean;
   onAction?: () => void;
   isError?: boolean;
@@ -23,8 +24,9 @@ const Modal = ({
   size = 'medium',
   closeOnOverlayClick = true,
   disableEscapeKeyDown = false,
-  buttons,
   onAction,
+  actionButton,
+  cancelButton,
   isError = false,
 }: ModalProps) => {
   useEffect(() => {
@@ -75,17 +77,24 @@ const Modal = ({
 
         <main className={styles.content}>{children}</main>
 
-        {buttons && (
+        {(cancelButton || actionButton) && (
           <footer className={styles.footer}>
-            <button className={isError ? `${styles.button}` : `${styles.button} ${styles.secondary}`} onClick={onClose}>
-              {buttons[0]}
-            </button>
-            <button
-              className={isError ? `${styles.button} ${styles.error}` : `${styles.button} ${styles.primary}`}
-              onClick={onAction}
-            >
-              {buttons[1]}
-            </button>
+            {cancelButton && (
+              <button
+                className={isError ? `${styles.button}` : `${styles.button}  ${styles.secondary}`}
+                onClick={onClose}
+              >
+                {cancelButton}
+              </button>
+            )}
+            {actionButton && (
+              <button
+                className={isError ? `${styles.button} ${styles.error}` : `${styles.button} ${styles.primary}`}
+                onClick={onAction}
+              >
+                {actionButton}
+              </button>
+            )}
           </footer>
         )}
       </div>
