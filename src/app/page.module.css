@@ -12,7 +12,7 @@
   position: fixed;
   right: 1.5rem;
   bottom: 1.5rem;
-  opacity: .95;
+  opacity: 0.95;
   pointer-events: none;
   z-index: 0;
 }
@@ -47,8 +47,15 @@
   margin-bottom: 0.75rem;
 }
 
-.logoVincula { margin-top: -2.5rem; }
+.logoVincula {
+  margin-top: -2.5rem;
+}
 
-.form { display: grid; gap: 0.875rem; }
+.form {
+  display: grid;
+  gap: 0.875rem;
+}
 
-.buttonSpacer { height: 0.75rem; }
+.buttonSpacer {
+  height: 0.75rem;
+}

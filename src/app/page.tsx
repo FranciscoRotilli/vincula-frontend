@@ -19,7 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const loginMutation = useLogin();
-  
+
   const validate = () => {
     const e: Errors = {};
     if (!usuario.trim()) e.usuario = 'O usuário deve ser informado.';

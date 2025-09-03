@@ -1,0 +1,108 @@
+.filterContainer {
+  width: 100%;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.topRow .inputWrapper {
+  max-width: 287px;
+  width: 100%;
+}
+
+.fieldsRow {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.select {
+  min-width: 210px;
+  padding: 0.5em 1em;
+  border-radius: 6px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1rem;
+  color: var(--foreground);
+  background: #fff;
+  transition: border 0.2s;
+}
+.select:focus {
+  border-color: var(--button-primary);
+  outline: none;
+}
+
+.filterButton {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: none;
+  margin-left: auto;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: var(--button-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-left: auto;
+  margin-top: 0.2rem;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.clearButton:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .fieldsRow {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .select {
+    min-width: 100%;
+  }
+  .topRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+  }
+}
+
+.label {
+  color: var(--text-color-primary);
+  margin-left: 0.25em;
+  margin-bottom: 0.35em;
+  font-size: 0.875em;
+}

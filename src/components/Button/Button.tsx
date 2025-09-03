@@ -6,7 +6,7 @@ export type ButtonProps = {
   label: string;
   icon?: React.ReactNode;
   variant?: 'contained' | 'outlined' | 'error';
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'icon';
   disabled?: boolean;
   onClick: () => void;
   className?: string;
@@ -23,17 +23,26 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   type = 'button',
 }) => {
+  const hasLabel = !!label;
   return (
     <button
       type={type}
-      className={[styles.button, styles[variant], styles[size], disabled ? styles.disabled : '', className].join(' ')}
+      className={[
+        styles.button,
+        styles[variant],
+        styles[size],
+        disabled ? styles.disabled : '',
+        className
+      ].join(' ')}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       aria-disabled={disabled}
       data-testid="button"
     >
-      {icon && <span className={styles.icon}>{icon}</span>}
-      <span>{label}</span>
+      {icon && (
+        <span className={hasLabel ? styles.icon : styles.iconOnly}>{icon}</span>
+      )}
+      {hasLabel && <span>{label}</span>}
     </button>
   );
 };
