@@ -1,0 +1,17 @@
+:root {
+  --color-primary: #2563eb;
+  --color-border: #e0e0e0;
+  --color-text: #111827;
+  --color-label: #374151;
+  --color-placeholder: #9ca3af;
+  --color-icon-bg: #f3f4f6;
+  --color-icon: #6b7280;
+  --color-disabled-bg: #f9fafb;
+  --color-disabled-text: #9ca3af;
+  --color-error: #ef4444;
+  --color-item-hover-bg: #f3f4f6;
+  --color-white: #ffffff;
+  --font-size-md: 14px;
+  --font-size-sm: 12px;
+  --font-size-label: 16px;
+}
