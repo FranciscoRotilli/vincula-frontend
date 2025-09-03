@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, vi } from 'vitest';
 
 // Importação corrigida para usar o alias de caminho
-import Modal from '@/components/modalGenerico/Modal';
+import Modal from '@/components/modals/Modal';
 
 // Mock do CSS Module também usando o alias para consistência
 vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
@@ -19,7 +19,7 @@ vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
     small: 'small',
     medium: 'medium',
     large: 'large',
-  }
+  },
 }));
 
 describe('Componente Modal', () => {
@@ -40,12 +40,7 @@ describe('Componente Modal', () => {
     const handleAction = vi.fn();
 
     render(
-      <Modal
-        isOpen={true}
-        onClose={handleClose}
-        title="Título de Teste"
-        actions={<button onClick={handleAction}>Ação</button>}
-      >
+      <Modal isOpen={true} onClose={handleClose} title="Título de Teste" onAction={handleAction} actionButton="Ação">
         <p>Conteúdo do modal</p>
       </Modal>
     );
@@ -84,9 +79,9 @@ describe('Componente Modal', () => {
 
     const overlay = screen.getByRole('dialog').parentElement;
     if (overlay) {
-        fireEvent.click(overlay);
+      fireEvent.click(overlay);
     }
-    
+
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
@@ -114,9 +109,8 @@ describe('Componente Modal', () => {
     );
 
     const title = screen.queryByRole('heading');
-    
+
     expect(title).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });
-
