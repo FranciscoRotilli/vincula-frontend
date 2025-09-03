@@ -60,7 +60,8 @@ export default function CreateCaseModal ({
           onClose();
         }}
         onAction={handleSubmit}
-        buttons={['Cancelar', 'Adicionar']}
+        actionButton = 'Adicionar'
+        cancelButton = 'Cancelar'
       >
         <div className={modalStyles.formStack}>
           <label>Nome do caso:</label>
