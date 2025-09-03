@@ -1,73 +1,111 @@
-'use client'
-import dynamic from 'next/dynamic';
-const Filter = dynamic(() => import('../components/filter/Filter'), { ssr: false });
-import Image from 'next/image';
-import React from 'react';
+'use client';
 
+import React, { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import styles from './page.module.css';
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image className={styles.logo} src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-				</ol>
-				
-        <Filter onFilter={function (filters) {
-					;
-				} } situations={[]} />
+import Input from '@/components/input/Input';
+import Button from '@/components/Button/Button';
+import { Person, Lock } from '@mui/icons-material';
+import { useLogin } from '@/hooks/useLogin';
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image className={styles.logo} src="/vercel.svg" alt="Vercel logomark" width={20} height={20} />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+type Errors = { usuario?: string; senha?: string };
+
+export default function LoginPage() {
+  const [usuario, setUsuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [errors, setErrors] = useState<Errors>({});
+  const router = useRouter();
+
+  const loginMutation = useLogin();
+
+  const validate = () => {
+    const e: Errors = {};
+    if (!usuario.trim()) e.usuario = 'O usuário deve ser informado.';
+    if (!senha.trim()) e.senha = 'A senha deve ser informada.';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const onSubmit = (ev: FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+    setErrors({});
+    if (!validate()) return;
+
+    loginMutation.mutate(
+      { username: usuario, password: senha },
+      {
+        onSuccess: (data) => {
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('refresh_token', data.refresh_token);
+          router.push('/casos');
+        },
+        onError: () => {
+          const msg = 'Usuário ou senha inválido.';
+          setErrors({ usuario: msg, senha: msg });
+        },
+      }
+    );
+  };
+
+  return (
+    <main className={styles.page}>
+      <div className={styles.cornerBrand} aria-hidden>
+        <Image src="/mp-logo.svg" alt="" width={258} height={84} />
+      </div>
+
+      <section className={styles.center}>
+        <div className={styles.card}>
+          <div className={styles.logoGroup}>
+            <div className={styles.logoMprs}>
+              <Image
+                src="/mprs-logo.svg"
+                alt="MPRS - Ministério Público do Rio Grande do Sul"
+                width={300}
+                height={217}
+                priority
+              />
+            </div>
+
+            <div className={styles.logoVincula}>
+              <Image src="/vincula.svg" alt="VINCULA" width={400} height={119} />
+            </div>
+          </div>
+
+          <form className={styles.form} onSubmit={onSubmit} noValidate>
+            <Input
+              value={usuario}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setUsuario(e.target.value)}
+              placeholder="Insira o usuário"
+              label="Usuário"
+              required
+              error={errors.usuario}
+              startIcon={<Person />}
+            />
+
+            <Input
+              type="password"
+              value={senha}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
+              placeholder="Insira a senha"
+              label="Senha"
+              required
+              error={errors.senha}
+              startIcon={<Lock />}
+            />
+
+            <div className={styles.buttonSpacer} />
+
+            <Button
+              type="submit"
+              label={loginMutation.isPending ? 'Entrando...' : 'Login'}
+              disabled={loginMutation.isPending}
+              onClick={() => {}}
+            />
+          </form>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }

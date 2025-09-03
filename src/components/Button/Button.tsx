@@ -37,6 +37,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       aria-disabled={disabled}
+      data-testid="button"
     >
       {icon && (
         <span className={hasLabel ? styles.icon : styles.iconOnly}>{icon}</span>

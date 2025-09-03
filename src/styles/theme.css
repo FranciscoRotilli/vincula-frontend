@@ -1,0 +1,24 @@
+:root {
+  --brand-500: #FF5D00;
+  --brand-600: #FF7000;
+  --brand-400: #FF8300;
+  --brand-300: #FF9700;
+  --brand-200: #FFAA00;
+  --brand-100: #FFBD00;
+
+  --error: #FF3333;
+
+  --black: #1A2128;
+  --gray: #F1F1F1;
+  --white: #FFFFFF;
+
+  --brand: var(--brand-400);
+  --brand-hover: var(--brand-600);
+  --surface: var(--white);
+  --text: var(--black);
+  --muted: #6b7280;
+  --border: #e5e7eb;
+
+  --radius-lg: 16px;
+  --shadow-lg: 0 10px 24px rgba(0,0,0,.15);
+}

@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom/vitest'
 
 import { CalendarMonth, Lock } from '@mui/icons-material'
-import { fireEvent,render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import Input from '../../../src/components/input/Input'
+import Input from '../../../src/components/Input/Input'
 
 describe('Input component', () => {
     it('renders with label and placeholder', () => {
@@ -44,7 +44,7 @@ describe('Input component', () => {
             render(<Input label="Senha" placeholder="Digite sua senha" type="password" />)
             const input = screen.getByPlaceholderText('Digite sua senha')
             const toggleButton = screen.getByLabelText('toggle password visibility')
-            
+
             expect(input).toHaveAttribute('type', 'password')
             fireEvent.click(toggleButton)
             expect(input).toHaveAttribute('type', 'text')
@@ -153,7 +153,7 @@ describe('Input component', () => {
         it('hides error when error prop is empty or undefined', () => {
             const { rerender } = render(<Input label="Nome" placeholder="Digite seu nome" error="" />)
             expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-            
+
             rerender(<Input label="Nome" placeholder="Digite seu nome" error={undefined} />)
             expect(screen.queryByRole('alert')).not.toBeInTheDocument()
         })
@@ -161,7 +161,7 @@ describe('Input component', () => {
         it('updates error message when error prop changes', () => {
             const { rerender } = render(<Input label="Nome" placeholder="Digite seu nome" error="Primeiro erro" />)
             expect(screen.getByText('Primeiro erro')).toBeInTheDocument()
-            
+
             rerender(<Input label="Nome" placeholder="Digite seu nome" error="Segundo erro" />)
             expect(screen.getByText('Segundo erro')).toBeInTheDocument()
             expect(screen.queryByText('Primeiro erro')).not.toBeInTheDocument()
@@ -171,60 +171,60 @@ describe('Input component', () => {
     describe('Icon color changes', () => {
         it('changes icon color when user types in input', () => {
             render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
-            
+
             const input = screen.getByPlaceholderText('Digite seu email')
             const startIcon = screen.getByTestId('start-icon').parentElement
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-            
+
             fireEvent.change(input, { target: { value: 'test@example.com' } })
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
-            
+
             fireEvent.change(input, { target: { value: '' } })
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
         })
 
         it('changes icon color when component receives value prop', () => {
             const { rerender } = render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
-            
+
             const startIcon = screen.getByTestId('start-icon').parentElement
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-            
+
             rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="test@example.com" />)
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
-            
+
             rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="" />)
-            
+
             expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
         })
 
         it('changes password toggle icon color when user types', () => {
             render(<Input label="Senha" placeholder="Digite sua senha" type="password" />)
-            
+
             const input = screen.getByPlaceholderText('Digite sua senha')
             const toggleButton = screen.getByLabelText('toggle password visibility')
-            
+
             expect(toggleButton).toHaveStyle('color: var(--text-color-secundary)')
-            
+
             fireEvent.change(input, { target: { value: 'mypassword' } })
-            
+
             expect(toggleButton).toHaveStyle('color: var(--text-color-primary)')
         })
 
         it('changes end icon color when user types', () => {
             render(<Input label="Código" placeholder="Digite o código" endIcon={<Lock data-testid="end-icon" />} />)
-            
+
             const input = screen.getByPlaceholderText('Digite o código')
             const endIcon = screen.getByTestId('end-icon').parentElement
-            
+
             expect(endIcon).toHaveStyle('color: var(--text-color-secundary)')
-            
+
             fireEvent.change(input, { target: { value: '123456' } })
-            
+
             expect(endIcon).toHaveStyle('color: var(--text-color-primary)')
         })
     })
