@@ -1,9 +1,11 @@
 .button {
   display: inline-flex;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375em;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -17,6 +19,18 @@
 }
 
 /* Size variants */
+.icon {
+  font-size: 1.1em;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5em;
+  vertical-align: middle;
+  position: relative;
+  top: 0.0625em;
+}
 .small {
   font-size: 0.85rem;
   padding: 0.35em 1.2em;
@@ -47,7 +61,7 @@
 .outlined {
   background: var(--button-secondary-bg);
   color: var(--button-secondary-border);
-  border: 1.5px solid var(--button-secondary-border);
+  border: 0.094em solid var(--button-secondary-border);
 }
 .outlined:hover:not(.disabled) {
   background: var(--button-secondary-hover);
@@ -60,27 +74,13 @@
 .error {
   background: var(--button-error-bg);
   color: var(--button-error);
-  border: 1.5px solid var(--button-error-border);
+  border: 0.094em solid var(--button-error-border);
 }
 .error:hover:not(.disabled) {
   background: var(--button-error-hover);
 }
 .error:active:not(.disabled) {
   background: var(--button-error-active);
-}
-
-/* Disabled state */
-.button.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.icon {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 0.5em;
-  font-size: 1.1em;
 }
 
 .button > span:last-child {

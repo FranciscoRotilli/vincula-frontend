@@ -121,7 +121,7 @@ export default function GenericTable<T extends { id: number | string }>({
 
   return (
     <Paper className={styles.tablePaper}>
-      <TableContainer className={styles.tableContainer}>
+      <TableContainer className={styles.tableContainer} data-testid="cases-table">
         {loading ? (
           <div className={styles.emptyAndLoadingContainer}>
             <CircularProgress size={40} className={styles.loading} />
