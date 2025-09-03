@@ -6,6 +6,7 @@ import styles from '@/app/home/page.module.css';
 import Footer from '@/components/footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
+import Modal from '@/components/modalGenerico/Modal';
 import { Column } from '@/types/Table';
 
 const columns: Column<typeof data[0]>[] = [
@@ -46,6 +47,7 @@ const rowActions = [
 ];
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div>
       <NavbarContainer />
@@ -56,10 +58,54 @@ export default function Home() {
             label="ADICIONAR CASO"
             variant="contained"
             size="medium"
-            onClick={() => console.log("Botão clicado!")}
+            onClick={() => setIsModalOpen(true)}
             className="btnAdicionarCaso"
           />
         </div>
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Adicionar Caso"
+          size="medium"
+          actions={
+            <>
+              <Button
+                label="Cancelar"
+                variant="outlined"
+                size="small"
+                onClick={() => setIsModalOpen(false)}
+              />
+              <Button
+                label="Salvar"
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  console.log("Caso adicionado!");
+                  setIsModalOpen(false);
+                }}
+              />
+            </>
+          }
+        >
+          <form>
+            <div>
+              <label>Nome do Caso: </label>
+              <input type="text" placeholder="Digite o nome" />
+            </div>
+            <div>
+              <label>Responsável: </label>
+              <input type="text" placeholder="Digite o responsável" />
+            </div>
+            <div>
+              <label>Situação: </label>
+              <select>
+                <option>Aberto</option>
+                <option>Em andamento</option>
+                <option>Concluído</option>
+              </select>
+            </div>
+          </form>
+        </Modal>
         <GenericTable
           columns={columns}
           data={data}
