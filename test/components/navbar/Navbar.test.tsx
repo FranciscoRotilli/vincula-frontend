@@ -40,5 +40,3 @@ describe("NavbarComponent", () => {
     expect(onNavigate).toHaveBeenCalledWith("/home");
   });
 });
-
-
