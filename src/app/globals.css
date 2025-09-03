@@ -15,13 +15,17 @@
   --button-error-border: #d32f2f;
   --button-error-hover: #ffebee;
   --button-error-active: #ffcdd2;
+  --table-primary: #ff8300;
+  --table-icon: #1a2128;
+  --action-link: #337ab7;
+  --action-link-hover: #0050ac;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-    --text-color-primary: #1A2128;
+    --text-color-primary: #1a2128;
     --text-color-secundary: #b0b0b0cc;
   }
 }

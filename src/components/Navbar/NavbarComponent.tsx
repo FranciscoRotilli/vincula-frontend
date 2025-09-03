@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "./index";
+import React from "react";
+
 import { getCurrentUser, logout } from "@/services/userService";
+
+import Navbar from "./index";
 
 export default function NavbarContainer() {
   const router = useRouter();

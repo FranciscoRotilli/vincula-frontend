@@ -1,0 +1,62 @@
+.tablePaper {
+  max-width: 62rem;
+  width: 100%;
+}
+
+.tableContainer {
+  width: 100%;
+}
+
+.emptyAndLoadingContainer {
+  display: flex;
+  height: 22rem !important;
+  width: 100% !important;
+}
+
+.loading {
+  margin: auto;
+}
+
+.tableRow {
+  cursor: pointer;
+}
+
+.headTableCell {
+  border-bottom: 2px solid var(--table-primary) !important;
+  border-top: 2px solid var(--table-primary) !important;
+  color: var(--table-primary) !important;
+  font-weight: bold !important;
+}
+
+.tableCellLabel {
+  color: var(--table-primary) !important;
+
+  svg {
+    color: var(--table-primary) !important;
+  }
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin: 0 2px;
+  color: var(--table-icon);
+  transition: color 0.2s;
+}
+
+.actionButton:hover {
+  color: var(--table-primary);
+}
+
+.actionLink {
+  cursor: pointer;
+  color: var(--action-link);
+  text-decoration: underline;
+  margin: 0 4px;
+}
+
+.actionLink:hover {
+  color: var(--action-link-hover);
+}

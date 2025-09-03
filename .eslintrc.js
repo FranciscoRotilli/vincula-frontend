@@ -6,13 +6,10 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    // Se em algum momento pedir tsconfig, use:
-    // tsconfigRootDir: __dirname,
-    // project: ['./tsconfig.json'],
   },
   extends: [
     'next/core-web-vitals',
-    'plugin:@typescript-eslint/recommended', // regras TS básicas
+    'plugin:@typescript-eslint/recommended',
   ],
   ignorePatterns: [
     '.next',
@@ -23,7 +20,11 @@ module.exports = {
     'public/**/*.js',
     'node_modules',
   ],
-  plugins: ['@typescript-eslint', 'simple-import-sort'],
+  plugins: [
+    '@typescript-eslint',
+    'simple-import-sort',
+    'i18next', // 👈 adicionamos aqui
+  ],
   rules: {
     // ordenar imports
     'simple-import-sort/imports': 'error',
@@ -50,6 +51,23 @@ module.exports = {
         ignoreStrings: true,
         ignoreTemplateLiterals: true,
         ignoreComments: false,
+      },
+    ],
+
+    'i18next/no-literal-string': [
+      'warn',
+      {
+        markupOnly: true,
+        ignoreAttribute: [
+          'id',
+          'key',
+          'to',
+          'href',
+          'className',
+          'data-testid',
+          'aria-label',
+          'aria-describedby',
+        ],
       },
     ],
   },
