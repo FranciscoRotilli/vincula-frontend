@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import GenericTable from '@/components/genericTable/GenericTable';
-import styles from './page.module.css';
+import styles from '@/app/home/page.module.css';
 import Footer from '@/components/footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
+import Button from '@/components/Button/Button';
 import { Column } from '@/types/Table';
 
 const columns: Column<typeof data[0]>[] = [
@@ -13,7 +14,6 @@ const columns: Column<typeof data[0]>[] = [
   { key: "status", label: "Situação", align: "left" },
   { key: "openedAt", label: "Data de Abertura", align: "left" },
 ];
-
 
 const data = [
   { id: 1, case: "Caso 001", responsible: "João Silva", status: "Aberto", openedAt: "2025-08-20" },
@@ -50,8 +50,13 @@ export default function Home() {
   return (
     <div>
       <NavbarContainer />
-      <main>
-    <div className={styles.page}>
+      <Button
+        label="ADICIONAR CASO"
+        variant="contained"
+        size="medium"
+        onClick={() => console.log("Botão clicado!")}
+        className="btnAdicionarCaso"
+      />
       <main className={styles.main}>
         <GenericTable
           columns={columns}
@@ -59,10 +64,7 @@ export default function Home() {
           loading={false}
           selectable
           rowActions={rowActions}
-        // pagination={pagination} // se passar, server side, se não, client-side
         />
-      </main>
-    </div>
       </main>
       <Footer />
     </div>
