@@ -1,12 +1,28 @@
+
+"use client";
+
 import Image from 'next/image';
 import React from 'react';
-
+import { Option, CustomSelect } from '../components/Select/Select';
 import styles from './page.module.css';
-
 export default function Home() {
+
+  const options: Option[] = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3', disabled: true },
+    { value: 'option4', label: 'Option 4' },
+  ];
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+          <CustomSelect
+            options={options}
+            onChange={(newVal) => console.log(newVal)}
+            label="testing"
+            required
+          />
         <Image className={styles.logo} src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
         <ol>
           <li>
@@ -33,6 +49,7 @@ export default function Home() {
           >
             Read our docs
           </a>
+
         </div>
       </main>
       <footer className={styles.footer}>
