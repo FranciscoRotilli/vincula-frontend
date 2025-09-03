@@ -1,8 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 
-import Modal from '@/components/modalGenerico/Modal';
-import modalStyles from '@/components/modalGenerico/Modal.module.css';
+import Modal from '@/components/modals/Modal';
+import modalStyles from '@/components/modals/Modal.module.css';
 
 import showcaseStyles from './showcase.module.css';
 
@@ -48,7 +48,7 @@ export default function ShowcasePage() {
         isOpen={formModalOpen}
         title="Adicionar Novo Item"
         onClose={function (): void {
-          throw new Error('Function not implemented.');
+          setFormModalOpen(false);
         }}
         buttons={['Cancelar', 'Salvar']}
       >

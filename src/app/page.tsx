@@ -4,17 +4,16 @@ import React, { useState } from 'react';
 
 import styles from './page.module.css';
 
-import CreateCaseModal from '@/components/modalGenerico/CreateCaseModal';
+import CreateCaseModal from '@/components/modals/CreateCaseModal';
 
 export default function Lab() {
   const [open, setOpen] = useState(true);
 return (
       <CreateCaseModal
         isOpen={open}
-        onClose={() => setOpen(false)}
+        onClose={() => setOpen(false)} 
         onSubmit={(payload) => {
-          console.log('Caso adicionado:', payload);
-        }}
-      />
+          console.log('Payload recebido na página:', payload);
+        }}      />
   );
 }
