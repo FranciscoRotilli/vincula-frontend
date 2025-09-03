@@ -45,19 +45,21 @@ const rowActions = [
   },
 ];
 
-
 export default function Home() {
   return (
     <div>
       <NavbarContainer />
-      <Button
-        label="ADICIONAR CASO"
-        variant="contained"
-        size="medium"
-        onClick={() => console.log("Botão clicado!")}
-        className="btnAdicionarCaso"
-      />
       <main className={styles.main}>
+        <h1 className={styles.pageTitle}>Meus Casos</h1>
+        <div className={styles.btnContainer}>
+          <Button
+            label="ADICIONAR CASO"
+            variant="contained"
+            size="medium"
+            onClick={() => console.log("Botão clicado!")}
+            className="btnAdicionarCaso"
+          />
+        </div>
         <GenericTable
           columns={columns}
           data={data}
