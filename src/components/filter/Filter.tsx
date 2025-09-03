@@ -5,6 +5,7 @@ import { FiFilter, FiSearch } from 'react-icons/fi';
 import Button from '../Button/Button';
 import Input from '../input/Input';
 import styles from './Filter.module.css';
+import { CustomSelect } from '../Select/Select';
 
 export type FilterValues = {
   search?: string;
@@ -35,23 +36,19 @@ const Filter: React.FC<FilterProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
-  const handleInputChange =
-    (field: keyof FilterValues) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters((prev) => ({
       ...prev,
       [field]: e.target.value,
     }));
   };
 
-  const handleSelectChange =
-    (field: keyof FilterValues) =>
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
+  const handleSelectChange = (field: keyof FilterValues) => (value: string | null) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value ?? undefined,
+    }));
+  };
 
   const handleFilter = () => {
     onFilter(filters);
@@ -103,9 +100,9 @@ const Filter: React.FC<FilterProps> = ({
           variant="contained"
           size="icon"
           label={''}
-          onClick={handleFilter} // Corrija aqui!
+          onClick={handleFilter}
           className={styles.filterButton}
-          disabled={disabled}    // Corrija aqui!
+          disabled={disabled}
         />
       </div>
       <div className={styles.fieldsRow}>
@@ -137,23 +134,17 @@ const Filter: React.FC<FilterProps> = ({
           />
         </div>
         <div className={styles.inputWrapper}>
-          <label htmlFor="situation-select">
+          <label htmlFor="situation-select" className={styles.label}>
             Situação
           </label>
-          <select
-            id="situation-select"
-            className={styles.select}
-            value={filters.situation || ''}
+          <CustomSelect
+            options={situations}
+            value={filters.situation || null}
             onChange={handleSelectChange('situation')}
-            disabled={disabled}
-          >
-            <option value="">Selecione a situação</option>
-            {situations.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            placeholder="Situação"
+            style={{ height: '40px' }}
+            isControlled
+          />
         </div>
       </div>
       {onClear && (

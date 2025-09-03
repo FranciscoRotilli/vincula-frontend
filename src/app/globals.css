@@ -19,6 +19,7 @@
   --table-icon: #1a2128;
   --action-link: #337ab7;
   --action-link-hover: #0050ac;
+  --text-color-placeholder: #a2a2a2;
 }
 
 @media (prefers-color-scheme: dark) {
