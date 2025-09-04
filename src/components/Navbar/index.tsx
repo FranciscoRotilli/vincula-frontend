@@ -1,12 +1,12 @@
-"use client"
+'use client';
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import Image from "next/image";
-import React from "react";
+import Image from 'next/image';
+import React from 'react';
 
 import { t } from '@/texts';
 
-import s from "./index.module.css";
+import s from './index.module.css';
 
 export type NavbarProps = {
   onNavigate: (href: string) => void;
@@ -24,8 +24,8 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
   }, []);
 
   return (
@@ -36,23 +36,24 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
           width={150}
           height={45}
           alt="Vincula Logo"
-          style={{ cursor: "pointer" }}
-          onClick={() => onNavigate("/home")}
+          style={{ cursor: 'pointer' }}
+          onClick={() => onNavigate('/casos')}
         />
       </nav>
 
       <div ref={ref} className={s.userArea}>
         <div className={s.userTextGroup}>
-          <div className={s.userName}>{user?.name ?? ""}</div>
-          <div className={s.userRole}>{user?.role ?? ""}</div>
+          <div className={s.userName}>{user?.name ?? ''}</div>
+          <div className={s.userRole}>{user?.role ?? ''}</div>
         </div>
 
-        <button data-testid="navbar-arrow-button"
+        <button
+          data-testid="navbar-arrow-button"
           className={s.arrowButton}
           aria-label="Abrir menu do usuário"
           aria-haspopup="menu"
           aria-expanded={open}
-          onClick={() => setOpen(v => !v)}
+          onClick={() => setOpen((v) => !v)}
         >
           <ArrowDropDownIcon />
         </button>

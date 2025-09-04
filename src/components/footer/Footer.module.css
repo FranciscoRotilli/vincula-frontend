@@ -2,9 +2,10 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #FFD96C;
+  background-color: var(--background);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   box-sizing: border-box;
 }
 

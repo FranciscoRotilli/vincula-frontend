@@ -21,17 +21,15 @@
 }
 
 .headTableCell {
-  border-bottom: 2px solid var(--table-primary) !important;
-  border-top: 2px solid var(--table-primary) !important;
-  color: var(--table-primary) !important;
+  color: var(--orange-primary) !important;
   font-weight: bold !important;
 }
 
 .tableCellLabel {
-  color: var(--table-primary) !important;
+  color: var(--orange-primary) !important;
 
   svg {
-    color: var(--table-primary) !important;
+    color: var(--orange-primary) !important;
   }
 }
 
@@ -46,7 +44,7 @@
 }
 
 .actionButton:hover {
-  color: var(--table-primary);
+  color: var(--orange-primary);
 }
 
 .actionLink {

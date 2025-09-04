@@ -1,7 +1,11 @@
 :root {
-  --background: #ffffff;
+  --background: #f1f1f1;
+  --white: #ffffff;
+  --black: #000000;
+  --gray: #808080;
   --foreground: #171717;
-  --button-primary: #ff8200;
+  --orange-primary: #ff8300;
+  --orange-secondary: #ff7000;
   --button-primary-hover: #e66e00;
   --button-primary-active: #c95d00;
   --button-primary-contrast: #fff;
@@ -10,12 +14,9 @@
   --button-secondary-border: #ff8200;
   --button-secondary-hover: #fff3e0;
   --button-secondary-active: #ffe0b2;
-  --button-error-bg: #fff;
-  --button-error: #d32f2f;
-  --button-error-border: #d32f2f;
+  --button-error: #ff3333;
   --button-error-hover: #ffebee;
   --button-error-active: #ffcdd2;
-  --table-primary: #ff8300;
   --table-icon: #1a2128;
   --action-link: #337ab7;
   --action-link-hover: #0050ac;

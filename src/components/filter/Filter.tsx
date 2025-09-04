@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { FiFilter, FiSearch } from 'react-icons/fi';
+import { FiFilter } from 'react-icons/fi';
+import { MdOutlineClear } from 'react-icons/md';
 
 import Button from '../Button/Button';
 import Input from '../Input/Input';
@@ -80,59 +81,28 @@ const Filter: React.FC<FilterProps> = ({
 
   return (
     <div className={styles.filterContainer}>
-      <div className={styles.topRow}>
-        <div className={styles.inputWrapper} style={{ flex: 1 }}>
-          <label className={styles.visuallyHidden} htmlFor="search-input">
-            Buscar
-          </label>
-          <Input
-            id="search-input"
-            placeholder="Buscar..."
-            value={filters.search || ''}
-            onChange={handleChange('search')}
-            startIcon={<FiSearch />}
-            onKeyDown={handleKeyDown}
-            disabled={disabled}
-          />
-        </div>
-        <Button
-          icon={<FiFilter />}
-          variant="contained"
-          size="icon"
-          label={''}
-          onClick={handleFilter}
-          className={styles.filterButton}
+      <div className={styles.fieldsRow}>
+        <Input
+          placeholder="Insira o número do caso"
+          label="Número do caso"
+          value={filters.caseNumber || ''}
+          onChange={handleInputChange('caseNumber')}
           disabled={disabled}
         />
-      </div>
-      <div className={styles.fieldsRow}>
-        <div className={styles.inputWrapper}>
-          <Input
-            placeholder="Insira o número do caso"
-            label="Número do caso"
-            value={filters.caseNumber || ''}
-            onChange={handleInputChange('caseNumber')}
-            disabled={disabled}
-          />
-        </div>
-        <div className={styles.inputWrapper}>
-          <Input
-            placeholder="Insira o nome do caso"
-            label="Nome do caso"
-            value={filters.caseName || ''}
-            onChange={handleInputChange('caseName')}
-            disabled={disabled}
-          />
-        </div>
-        <div className={styles.inputWrapper}>
-          <Input
-            placeholder="Insira o responsável"
-            label="Responsável"
-            value={filters.responsible || ''}
-            onChange={handleInputChange('responsible')}
-            disabled={disabled}
-          />
-        </div>
+        <Input
+          placeholder="Insira o nome do caso"
+          label="Nome do caso"
+          value={filters.caseName || ''}
+          onChange={handleInputChange('caseName')}
+          disabled={disabled}
+        />
+        <Input
+          placeholder="Insira o responsável"
+          label="Responsável"
+          value={filters.responsible || ''}
+          onChange={handleInputChange('responsible')}
+          disabled={disabled}
+        />
         <div className={styles.inputWrapper}>
           <label htmlFor="situation-select" className={styles.label}>
             Situação
@@ -142,16 +112,35 @@ const Filter: React.FC<FilterProps> = ({
             value={filters.situation || null}
             onChange={handleSelectChange('situation')}
             placeholder="Situação"
-            style={{ height: '40px' }}
+            style={{ height: '2.5rem', width: '11.25rem' }}
             isControlled
           />
         </div>
       </div>
-      {onClear && (
-        <button className={styles.clearButton} onClick={handleClear} disabled={disabled} type="button">
-          Limpar filtros
-        </button>
-      )}
+      <div className={styles.actions}>
+        {onClear && (
+          <Button
+            icon={<MdOutlineClear />}
+            variant="outlined"
+            size="icon"
+            label={''}
+            onClick={handleClear}
+            className={styles.filterButton}
+            disabled={disabled}
+          />
+        )}
+        <div className={styles.filterIcon}>
+          <Button
+            icon={<FiFilter />}
+            variant="contained"
+            size="icon"
+            label={''}
+            onClick={handleFilter}
+            className={styles.filterButton}
+            disabled={disabled}
+          />
+        </div>
+      </div>
     </div>
   );
 };

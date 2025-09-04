@@ -46,7 +46,7 @@
 
 /* Contained (Primary) */
 .contained {
-  background: var(--button-primary);
+  background: var(--orange-primary);
   color: var(--button-primary-contrast);
   box-shadow: var(--button-primary-shadow);
 }
@@ -72,9 +72,9 @@
 
 /* Error variant */
 .error {
-  background: var(--button-error-bg);
+  background: var(--white);
   color: var(--button-error);
-  border: 0.094em solid var(--button-error-border);
+  border: 0.094em solid var(--button-error);
 }
 .error:hover:not(.disabled) {
   background: var(--button-error-hover);

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import React from "react";
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
-import { getCurrentUser, logout } from "@/services/userService";
+import { getCurrentUser, logout } from '@/services/userService';
 
-import Navbar from "./index";
+import Navbar from './index';
 
 export default function NavbarContainer() {
   const router = useRouter();
@@ -20,11 +20,9 @@ export default function NavbarContainer() {
       onNavigate={(href) => router.push(href)}
       onLogout={async () => {
         await logout();
-        router.push("/login");
+        router.push('/');
       }}
       user={user}
     />
   );
 }
-
-

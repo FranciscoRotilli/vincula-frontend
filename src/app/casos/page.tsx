@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import GenericTable from '@/components/genericTable/GenericTable';
+import GenericTable from '@/components/GenericTable/GenericTable';
 import styles from './page.module.css';
-import Footer from '@/components/Footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
 import { Column } from '@/types/Table';
-import Filter, { FilterValues } from '@/components/filter/Filter';
-import CreateCaseModal from '@/components/modals/CreateCaseModal';
+import Filter, { FilterValues } from '@/components/Filter/Filter';
+import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import AddIcon from '@mui/icons-material/Add';
+import Footer from '@/components/Footer/Footer';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -59,14 +59,12 @@ export default function Casos() {
       const matchesCaseNumber =
         !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
 
-      const matchesCaseName =
-        !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
+      const matchesCaseName = !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
 
       const matchesResponsible =
         !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
 
-      const matchesSituation =
-        !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
+      const matchesSituation = !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
 
       return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
     });
@@ -89,7 +87,7 @@ export default function Casos() {
 
     const updatedCases = [...cases, newCase];
     setCases(updatedCases);
-    setFilteredData(updatedCases); 
+    setFilteredData(updatedCases);
     setIsModalOpen(false);
   };
 
@@ -108,13 +106,9 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateCase}
-        />
-        <div className={styles.tableContainer} >
-          <Filter onFilter={handleFilter} onClear={handleClear}  situations={situations}/>
+        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <div className={styles.tableContainer}>
+          <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <GenericTable
             columns={columns}
             data={filteredData}
