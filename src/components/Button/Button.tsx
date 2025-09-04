@@ -39,9 +39,10 @@ const Button: React.FC<ButtonProps> = ({
       aria-disabled={disabled}
       data-testid="button"
     >
-      {icon && (
+      {/* {icon && (
         <span className={hasLabel ? styles.icon : styles.iconOnly}>{icon}</span>
-      )}
+      )} */}
+      {icon}
       {hasLabel && <span>{label}</span>}
     </button>
   );

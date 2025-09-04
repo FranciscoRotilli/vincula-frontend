@@ -6,6 +6,7 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+
 }
 
 .cornerBrand {
@@ -15,6 +16,7 @@
   opacity: 0.95;
   pointer-events: none;
   z-index: 0;
+  border: 2rem;
 }
 
 .center {

@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import GenericTable from '@/components/genericTable/GenericTable';
-import styles from './page.module.css';
+import styles from '@/app/home/page.module.css';
 import Footer from '@/components/Footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
+import ButtonShowcase from '@/components/Button/ButtonShowcase';
+import Modal from '@/components/modals/Modal';
 import { Column } from '@/types/Table';
-import Filter, { FilterValues } from '@/components/filter/Filter';
 import CreateCaseModal from '@/components/modals/CreateCaseModal';
+
 import AddIcon from '@mui/icons-material/Add';
 
 const columns: Column<(typeof data)[0]>[] = [
@@ -32,97 +34,52 @@ const data = [
 ];
 
 const rowActions = [
+  // {
+  //   label: "Editar",
+  //   icon: <Edit />,
+  //   onClick: (row: unknown) => console.log("Editar", row),
+  // },
+  // {
+  //   label: "Excluir",
+  //   icon: <DeleteOutline />,
+  //   onClick: (row: unknown) => console.log("Excluir", row),
+  // },
   {
     label: 'Ver detalhes',
     onClick: (row: unknown) => console.log('Ver detalhes', row),
   },
 ];
 
-const situations = [
-  { value: 'Aberto', label: 'Aberto' },
-  { value: 'Em andamento', label: 'Em andamento' },
-  { value: 'Concluído', label: 'Concluído' },
-];
-
-export default function Casos() {
+export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cases, setCases] = useState(data);
-  const [filteredData, setFilteredData] = useState(data);
-
-  const handleFilter = (filters: FilterValues) => {
-    const filtered = cases.filter((item) => {
-      const matchesSearch =
-        !filters.search ||
-        item.case.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.responsible.toLowerCase().includes(filters.search.toLowerCase());
-
-      const matchesCaseNumber =
-        !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
-
-      const matchesCaseName =
-        !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
-
-      const matchesResponsible =
-        !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
-
-      const matchesSituation =
-        !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
-
-      return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
-    });
-
-    setFilteredData(filtered);
-  };
-
-  const handleClear = () => {
-    setFilteredData(cases);
-  };
-
-  const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
-    const newCase = {
-      id: cases.length + 1,
-      case: payload.caseName,
-      responsible: payload.caseResponsable,
-      status: 'Aberto',
-      openedAt: payload.creationDate,
-    };
-
-    const updatedCases = [...cases, newCase];
-    setCases(updatedCases);
-    setFilteredData(updatedCases); 
-    setIsModalOpen(false);
-  };
-
   return (
     <div>
       <NavbarContainer />
       <main className={styles.main}>
         <h1 className={styles.pageTitle}>Meus Casos</h1>
         <div className={styles.btnContainer}>
+          <ButtonShowcase />
           <Button
             label="ADICIONAR CASO"
             variant="contained"
-            size="medium"
-            icon={<AddIcon />}
+            size="icon"
             onClick={() => setIsModalOpen(true)}
-            className="btnAdicionarCaso"
+            // className="btnAdicionarCaso"
+            icon={<AddIcon />}
           />
         </div>
         <CreateCaseModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateCase}
+          onSubmit={function (payload: {
+            caseName: string;
+            caseResponsable: string;
+            creationDate: string;
+          }): Promise<void> | void {
+            throw new Error('Function not implemented.');
+          }}
         />
-        <div className={styles.tableContainer} >
-          <Filter onFilter={handleFilter} onClear={handleClear}  situations={situations}/>
-          <GenericTable
-            columns={columns}
-            data={filteredData}
-            loading={false}
-            selectable={false}
-            rowActions={rowActions}
-          />
-        </div>
+        <GenericTable columns={columns} data={data} loading={false} selectable rowActions={rowActions} />
       </main>
       <Footer />
     </div>
