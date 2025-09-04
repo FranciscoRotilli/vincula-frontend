@@ -3,12 +3,15 @@
 import React, { useState } from 'react';
 import GenericTable from '@/components/genericTable/GenericTable';
 import styles from '@/app/home/page.module.css';
-import Footer from '@/components/footer/Footer';
+import Footer from '@/components/Footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
+import ButtonShowcase from '@/components/Button/ButtonShowcase';
 import Modal from '@/components/modals/Modal';
 import { Column } from '@/types/Table';
 import CreateCaseModal from '@/components/modals/CreateCaseModal';
+
+import AddIcon from '@mui/icons-material/Add';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -55,12 +58,14 @@ export default function Home() {
       <main className={styles.main}>
         <h1 className={styles.pageTitle}>Meus Casos</h1>
         <div className={styles.btnContainer}>
+          <ButtonShowcase />
           <Button
             label="ADICIONAR CASO"
             variant="contained"
-            size="medium"
+            size="icon"
             onClick={() => setIsModalOpen(true)}
-            className="btnAdicionarCaso"
+            // className="btnAdicionarCaso"
+            icon={<AddIcon />}
           />
         </div>
         <CreateCaseModal

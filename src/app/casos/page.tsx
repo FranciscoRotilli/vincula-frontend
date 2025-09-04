@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import GenericTable from '@/components/genericTable/GenericTable';
 import styles from './page.module.css';
-import Footer from '@/components/footer/Footer';
+import Footer from '@/components/Footer/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
 import { Column } from '@/types/Table';
+import Filter, { FilterValues } from '@/components/filter/Filter';
 import CreateCaseModal from '@/components/modals/CreateCaseModal';
+import AddIcon from '@mui/icons-material/Add';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -30,24 +32,67 @@ const data = [
 ];
 
 const rowActions = [
-  // {
-  //   label: "Editar",
-  //   icon: <Edit />,
-  //   onClick: (row: unknown) => console.log("Editar", row),
-  // },
-  // {
-  //   label: "Excluir",
-  //   icon: <DeleteOutline />,
-  //   onClick: (row: unknown) => console.log("Excluir", row),
-  // },
   {
     label: 'Ver detalhes',
     onClick: (row: unknown) => console.log('Ver detalhes', row),
   },
 ];
 
+const situations = [
+  { value: 'Aberto', label: 'Aberto' },
+  { value: 'Em andamento', label: 'Em andamento' },
+  { value: 'Concluído', label: 'Concluído' },
+];
+
 export default function Casos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cases, setCases] = useState(data);
+  const [filteredData, setFilteredData] = useState(data);
+
+  const handleFilter = (filters: FilterValues) => {
+    const filtered = cases.filter((item) => {
+      const matchesSearch =
+        !filters.search ||
+        item.case.toLowerCase().includes(filters.search.toLowerCase()) ||
+        item.responsible.toLowerCase().includes(filters.search.toLowerCase());
+
+      const matchesCaseNumber =
+        !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
+
+      const matchesCaseName =
+        !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
+
+      const matchesResponsible =
+        !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
+
+      const matchesSituation =
+        !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
+
+      return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
+    });
+
+    setFilteredData(filtered);
+  };
+
+  const handleClear = () => {
+    setFilteredData(cases);
+  };
+
+  const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
+    const newCase = {
+      id: cases.length + 1,
+      case: payload.caseName,
+      responsible: payload.caseResponsable,
+      status: 'Aberto',
+      openedAt: payload.creationDate,
+    };
+
+    const updatedCases = [...cases, newCase];
+    setCases(updatedCases);
+    setFilteredData(updatedCases); 
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
       <NavbarContainer />
@@ -58,6 +103,7 @@ export default function Casos() {
             label="ADICIONAR CASO"
             variant="contained"
             size="medium"
+            icon={<AddIcon />}
             onClick={() => setIsModalOpen(true)}
             className="btnAdicionarCaso"
           />
@@ -65,15 +111,18 @@ export default function Casos() {
         <CreateCaseModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={function (payload: {
-            caseName: string;
-            caseResponsable: string;
-            creationDate: string;
-          }): Promise<void> | void {
-            throw new Error('Function not implemented.');
-          }}
+          onSubmit={handleCreateCase}
         />
-        <GenericTable columns={columns} data={data} loading={false} selectable rowActions={rowActions} />
+        <div className={styles.tableContainer} >
+          <Filter onFilter={handleFilter} onClear={handleClear}  situations={situations}/>
+          <GenericTable
+            columns={columns}
+            data={filteredData}
+            loading={false}
+            selectable={false}
+            rowActions={rowActions}
+          />
+        </div>
       </main>
       <Footer />
     </div>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FiFilter, FiSearch } from 'react-icons/fi';
 
 import Button from '../Button/Button';
-import Input from '../input/Input';
+import Input from '../Input/Input';
 import styles from './Filter.module.css';
 import { CustomSelect } from '../Select/Select';
 
