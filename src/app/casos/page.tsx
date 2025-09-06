@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import GenericTable from '@/components/GenericTable/GenericTable';
+import Table from '@/components/Table/GenericTable';
 import styles from './page.module.css';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import Button from '@/components/Button/Button';
@@ -109,7 +109,7 @@ export default function Casos() {
         <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
-          <GenericTable
+          <Table
             columns={columns}
             data={filteredData}
             loading={false}

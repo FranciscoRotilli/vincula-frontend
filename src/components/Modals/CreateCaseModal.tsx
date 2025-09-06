@@ -1,8 +1,8 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 
-import Modal from '@/components/Modals/Modal';
-import modalStyles from '@/components/modals/Modal.module.css';
+import Modal from '@/components/Modals/GenericModal';
+import modalStyles from '@/components/Modals/Modal.module.css';
 import Input from '@/components/Input/Input';
 
 type CreateCaseModalProps = {
