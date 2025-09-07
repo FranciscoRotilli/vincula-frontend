@@ -86,10 +86,22 @@ export default function Casos() {
     setFilteredData(cases);
   };
 
-  const handleCreateCase = (payload:
-    { caseName: string; caseResponsable: string; creationDate: string }) => {
+  const handleCreateCase = (
+    payload: {
+      caseName: string;
+      caseResponsable: string;
+      creationDate: string
+    }
+  ) => {
+    const newCase = {
+      id: cases.length + 1,
+      case: payload.caseName,
+      responsible: payload.caseResponsable,
+      status: 'Aberto',
+      openedAt: payload.creationDate,
+    };
     caseMutation.mutate({name: payload.caseName},
-        {onSuccess: (data) => {
+        {onSuccess: (_data) => {
           const newCase = {
           id: cases.length + 1,
           case: payload.caseName,
@@ -101,8 +113,14 @@ export default function Casos() {
           setCases(updatedCases);
           setFilteredData(updatedCases);
           setIsModalOpen(false);
+          router.push('/casos');
         }},
     )
+
+    const updatedCases = [...cases, newCase];
+    setCases(updatedCases);
+    setFilteredData(updatedCases);
+    setIsModalOpen(false);
   };
 
   return (
@@ -120,8 +138,11 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal isOpen={isModalOpen} onClose={() =>
-          setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <CreateCaseModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleCreateCase}
+        />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
