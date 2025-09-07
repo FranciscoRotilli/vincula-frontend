@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
-import Button from '../Button/Button';
-import Input from '../Input/Input';
+import Button from '../Button';
+import Input from '../Input';
 import styles from './Filter.module.css';
-import { CustomSelect } from '../Select/Select';
+import { CustomSelect } from '../Select';
 
 export type FilterValues = {
   search?: string;

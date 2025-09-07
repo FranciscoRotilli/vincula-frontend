@@ -1,9 +1,9 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 
-import Modal from '@/components/Modals/Modal';
-import modalStyles from '@/components/modals/Modal.module.css';
-import Input from '@/components/Input/Input';
+import Modal from '@/components/Modals';
+import modalStyles from '@/components/Modals/Modal.module.css';
+import Input from '@/components/Input';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
