@@ -2,7 +2,7 @@
 import { CalendarMonth, Person, Search } from '@mui/icons-material'
 import React from 'react'
 
-import Input from './Input'
+import Input from '.'
 
 const InputShowcase = () => {
 

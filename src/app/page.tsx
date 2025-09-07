@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './page.module.css';
 
-import Input from '@/components/Input/Input';
-import Button from '@/components/Button/Button';
+import Input from '@/components/Input';
+import Button from '@/components/Button';
 import { Person, Lock } from '@mui/icons-material';
 import { useLogin } from '@/hooks/useLogin';
 
