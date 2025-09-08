@@ -77,14 +77,10 @@ export default function Casos() {
     setPagination({ page: newPage + 1, limit: newLimit });
   };
 
-  const handleCreateCase = (payload: { caseName: string; description?: string }) => {
-    const apiPayload: { name: string; description?: string } = {
+  const handleCreateCase = (payload: { caseName: string }) => {
+    const apiPayload: { name: string } = {
       name: payload.caseName,
     };
-
-    if (payload.description) {
-      apiPayload.description = payload.description;
-    }
 
     caseMutation.mutate(
       apiPayload,

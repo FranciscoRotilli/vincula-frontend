@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import { ApiResponse, FilterParams, FilterSchema, PaginationParams, PaginationSchema } from '@/types/Cases';
 
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export type CaseResponse = {
@@ -14,11 +13,12 @@ export async function addCase(name: string): Promise<any> {
     name,
   }, 
   {
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem('access_token')}`, // header igual ao Swagger
-  }},
-  );
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`, // header igual ao Swagger
+    }
+  },
+    );
   return response.data;
 };
 
