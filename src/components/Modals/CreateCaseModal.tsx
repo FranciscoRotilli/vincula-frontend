@@ -12,7 +12,6 @@ type CreateCaseModalProps = {
     caseName: string;
     caseResponsable: string;
     creationDate: string;
-    description?: string;
   }) => Promise<void> | void;
 };
 
