@@ -11,7 +11,8 @@ type CreateCaseModalProps = {
   onSubmit: (payload: {
     caseName: string;
     caseResponsable: string;
-    creationDate: string; //formato dd/mm/aaaa
+    creationDate: string;
+    description?: string;
   }) => Promise<void> | void;
 };
 
@@ -26,6 +27,7 @@ const formatDate = (d: Date) => {
 
 export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCaseModalProps) {
   const [caseName, setCaseName] = useState('');
+  const [description, setDescription] = useState('');
 
   const creationDate = useMemo(() => (isOpen ? new Date() : null), [isOpen]);
   const creationDateFormated = creationDate ? formatDate(creationDate) : '';
@@ -38,8 +40,16 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       caseName: caseName,
       caseResponsable: CASE_RESPONSABLE,
       creationDate: creationDateFormated,
+      description: description.trim() || undefined,
     });
     setCaseName('');
+    setDescription('');
+    onClose();
+  };
+
+  const handleClose = () => {
+    setCaseName('');
+    setDescription('');
     onClose();
   };
 
@@ -48,19 +58,21 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       isOpen={isOpen}
       title="Adicionar caso"
       size="medium"
-      onClose={function (): void {
-        setCaseName('');
-        onClose();
-      }}
+      onClose={handleClose}
       onAction={handleSubmit}
       actionButton="Adicionar"
       cancelButton="Cancelar"
     >
       <div className={modalStyles.formStack}>
         <label>Nome do caso:</label>
-        <Input placeholder={''} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
+        <Input placeholder={'Digite o nome do caso'} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
+        
+        <label>Descrição (opcional):</label>
+        <Input placeholder={'Digite uma descrição para o caso'} onChange={(e) => setDescription(e.target.value)} value={description} />
+        
         <label>Nome do responsável:</label>
         <Input placeholder={''} disabled value={CASE_RESPONSABLE} />
+        
         <label>Data de criação:</label>
         <Input placeholder={''} disabled value={creationDateFormated} />
       </div>
