@@ -4,14 +4,13 @@ import React, { useMemo, useState } from 'react';
 import Input from '@/components/Input';
 import Modal from '@/components/Modals';
 import modalStyles from '@/components/Modals/Modal.module.css';
+import { Work } from '@mui/icons-material';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: {
     caseName: string;
-    caseResponsable: string;
-    creationDate: string;
   }) => Promise<void> | void;
 };
 
@@ -36,8 +35,6 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
     if (!canSave) return;
     await onSubmit({
       caseName: caseName,
-      caseResponsable: CASE_RESPONSABLE,
-      creationDate: creationDateFormated,
     });
     setCaseName('');
     onClose();
