@@ -1,44 +1,19 @@
-image: node:22-alpine
-
-
 stages:
-  - install_dependencies
+  - setup
+  - lint
   - test
   - build
+  - deploy
 
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
 
-install_dependencies:
-  stage: install_dependencies
-  cache:
-    key: default
-    paths:
-      - .npm/
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-
-lint:
-  stage: test
-  needs: 
-    - install_dependencies
-  script:
-    - npm run lint
-
-unit_test:
-  stage: test
-  needs: 
-    - install_dependencies
-  script:
-    - npm run test
-  coverage: /All files\s*\|\s*([\d\.]+)/
-
-build_app:
-  stage: build
-  needs: 
-    - lint
-    - unit_test
-  script:
-    - npm run build
-  artifacts:
-    paths:
-      - build/
-    expire_in: 1 week
+include:
+  - local: .gitlab/ci/pipelines/mr-to-develop.gitlab-ci.yml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+  - local: .gitlab/ci/pipelines/deploy-main.gitlab-ci.yml
+    rules:
+      - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
