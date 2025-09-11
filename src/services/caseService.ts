@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { ApiResponse, FilterParams, FilterSchema, PaginationParams, PaginationSchema } from '@/types/Cases';
+import { ApiResponse, FilterParams, PaginationParams } from '@/types/Cases';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,16 +26,14 @@ export async function getCases(
   paginationParams: PaginationParams,
   filterParams: FilterParams
 ): Promise<ApiResponse> {
-  const validatedPaginationParams = PaginationSchema.parse(paginationParams)
-  const validatedFilterParams = FilterSchema.parse(filterParams)
   const config = {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
     params: {
-      ...validatedPaginationParams,
-      ...validatedFilterParams
+      ...paginationParams,
+      ...filterParams
     }
   }
   const response = await axios.get(`${API_URL}/case/`, config)

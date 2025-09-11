@@ -42,12 +42,6 @@ function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
     name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber
   };
 
-  Object.keys(apiParams).forEach(key => {
-    if (!apiParams[key as keyof FilterParams]) {
-      delete apiParams[key as keyof FilterParams];
-    }
-  });
-
   return apiParams;
 }
 
