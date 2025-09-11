@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+/* eslint-disable react/no-children-prop */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { TbTrash } from 'react-icons/tb';
+
 import Button from '@/components/Button';
 import GenericTable from '@/components/GenericTable';
-import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import Modal from '@/components/Modals';
+import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+
 import styles from './generalTab.module.css';
 
 // Mock data (substitua por dados reais do backend)
@@ -34,8 +39,20 @@ export default function GeneralTab() {
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showRemoveFileModal, setShowRemoveFileModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
-  const [showRemoveEnvolvidoModal, setShowRemoveEnvolvidoModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
+  const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
+    open: boolean;
+    index: number | null;
+  }>({
+    open: false,
+    index: null,
+  });
+  const [showRemoveEnvolvidoModal, setShowRemoveEnvolvidoModal] = useState<{
+    open: boolean;
+    index: number | null;
+  }>({
+    open: false,
+    index: null,
+  });
   const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
   // States para adicionar envolvidos
@@ -54,7 +71,8 @@ export default function GeneralTab() {
   // Handlers
   const handleAddEnvolvido = () => {
     if (novoNome && novoCpf) {
-      const nextId = envolvidos.length > 0 ? Math.max(...envolvidos.map(e => typeof e.id === 'number' ? e.id : 0)) + 1 : 1;
+      const nextId =
+        envolvidos.length > 0 ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1 : 1;
       setEnvolvidos([...envolvidos, { id: nextId, nome: novoNome, cpf: novoCpf }]);
       setNovoNome('');
       setNovoCpf('');
@@ -73,14 +91,14 @@ export default function GeneralTab() {
 
   // Table configs
   const envolvidosColumns = [
-    { key: "id" as const, label: 'NOME', cell: (row: any) => row.nome },
-    { key: "id" as const, label: 'CPF / CNPJ', cell: (row: any) => row.cpf },
+    { key: 'nome' as any, label: 'NOME', cell: (row: { id: number; nome: string; cpf: string }) => row.nome },
+    { key: 'cpf' as any, label: 'CPF / CNPJ', cell: (row: { id: number; nome: string; cpf: string }) => row.cpf },
     {
-      key: "id" as const,
+      key: 'id' as any,
       label: 'AÇÃO',
-      cell: (_: any, idx: number) => (
+      cell: (_: { id: number; nome: string; cpf: string }, idx: number) => (
         <Button
-          icon={<span style={{ color: 'red' }}>🗑️</span>}
+          icon={<TbTrash />}
           variant="outlined"
           size="small"
           label=""
@@ -91,12 +109,12 @@ export default function GeneralTab() {
   ];
 
   const arquivosColumns = [
-    { key: "id" as const, label: 'NOME', cell: (row: any) => row.nome },
-    { key: "id" as const, label: '', cell: (row: any) => <span className={styles.fileType}>{row.tipo}</span> },
-    { key: "id" as const, label: 'DATA DE INCLUSÃO', cell: (row: any) => row.data },
-    { key: "id" as const, label: 'TAMANHO', cell: (row: any) => row.tamanho },
+    { key: 'id' as any, label: 'NOME', cell: (row: any) => row.nome },
+    { key: 'id' as any, label: '', cell: (row: any) => <span className={styles.fileType}>{row.tipo}</span> },
+    { key: 'id' as any, label: 'DATA DE INCLUSÃO', cell: (row: any) => row.data },
+    { key: 'id' as any, label: 'TAMANHO', cell: (row: any) => row.tamanho },
     {
-      key: "id" as const,
+      key: 'id' as any,
       label: 'AÇÃO',
       cell: (_: any, idx: number) => (
         <Button
@@ -114,7 +132,7 @@ export default function GeneralTab() {
     <div className={styles.pageContainer}>
       {/* Navbar */}
       <nav className={styles.navbar}>
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.label}
             className={styles.navTab}
@@ -153,41 +171,49 @@ export default function GeneralTab() {
 
         {/* Botões de ação */}
         <div className={styles.actionsBox}>
-          <Button label="Alterar nome" variant="contained" onClick={() => setShowNameModal(true)} />
-          <Button label="Alterar situação" variant="contained" onClick={() => setShowSituationModal(true)} />
+          <div className={styles.sectionHeader}>
+            <strong>{'Ações'}</strong>
+          </div>
+
+          <Button size="large" label="Alterar nome" variant="contained" onClick={() => setShowNameModal(true)} />
           <Button
+            size="large"
+            label="Alterar situação"
+            variant="contained"
+            onClick={() => setShowSituationModal(true)}
+          />
+          <Button
+            size="large"
             label="Permitir visualização"
             variant="contained"
-            onClick={() => setVisualizacaoPermitida(v => !v)}
+            onClick={() => setVisualizacaoPermitida((v) => !v)}
           />
-          <Button
-            label="Excluir caso"
-            variant="outlined"
-            onClick={() => setShowDeleteCaseModal(true)}
-          />
+          <Button size="large" label="Excluir caso" variant="outlined" onClick={() => setShowDeleteCaseModal(true)} />
         </div>
 
         {/* Envolvidos */}
         <div className={styles.envolvidosBox}>
           <div className={styles.sectionHeader}>
-            <strong>Investigados ({envolvidos.length})</strong>
+            <strong>
+              {'Investigados'} ({envolvidos.length})
+            </strong>
           </div>
           <div className={styles.sectionDescription}>
-            Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.
+            {'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.'}
           </div>
           <div className={styles.addEnvolvidoRow}>
             <input
               type="text"
               placeholder="Insira o nome"
               value={novoNome}
-              onChange={e => setNovoNome(e.target.value)}
+              onChange={(e) => setNovoNome(e.target.value)}
               className={styles.input}
             />
             <input
               type="text"
               placeholder="Insira o CPF / CNPJ"
               value={novoCpf}
-              onChange={e => setNovoCpf(e.target.value)}
+              onChange={(e) => setNovoCpf(e.target.value)}
               className={styles.input}
             />
             <Button
@@ -205,7 +231,9 @@ export default function GeneralTab() {
         {/* Arquivos */}
         <div className={styles.arquivosBox}>
           <div className={styles.sectionHeader}>
-            <strong>Arquivos ({arquivos.length})</strong>
+            <strong>
+              {'Arquivos'} ({arquivos.length})
+            </strong>
           </div>
           <div className={styles.sectionDescription}>
             Os arquivos em anexo serão usados para a geração de vínculos com os investigados.
@@ -225,29 +253,38 @@ export default function GeneralTab() {
       {/* Modais */}
       {showNameModal && (
         <CreateCaseModal
-					isOpen={showNameModal}
-					onClose={() => setShowNameModal(false)} onSubmit={function (payload: { caseName: string; caseResponsable: string; creationDate: string; }): Promise<void> | void {
-						
-					} }         
+          isOpen={showNameModal}
+          onClose={() => setShowNameModal(false)}
+          onSubmit={function (_payload: {
+            caseName: string;
+            caseResponsable: string;
+            creationDate: string;
+          }): Promise<void> | void {
+            // No implementation needed
+          }}
         />
       )}
       {showSituationModal && (
         <Modal
-					isOpen={showSituationModal}
-					onClose={() => setShowSituationModal(false)}
-					title="Alterar situação" children={undefined}        >
+          isOpen={showSituationModal}
+          onClose={() => setShowSituationModal(false)}
+          title="Alterar situação"
+          children={undefined}
+        >
           {/* Conteúdo do modal de situação */}
         </Modal>
       )}
       {showDeleteCaseModal && (
-        <Modal
-          isOpen={showDeleteCaseModal}
-          onClose={() => setShowDeleteCaseModal(false)}
-          title="Excluir caso"
-        >
+        <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title="Excluir caso">
           <div>
             <p>Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.</p>
-            <Button label="Excluir" variant="contained" onClick={() => {/* requisição de exclusão */}} />
+            <Button
+              label="Excluir"
+              variant="contained"
+              onClick={() => {
+                /* requisição de exclusão */
+              }}
+            />
             <Button label="Cancelar" variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
           </div>
         </Modal>
@@ -296,9 +333,11 @@ export default function GeneralTab() {
       )}
       {showUploadModal && (
         <Modal
-					isOpen={showUploadModal}
-					onClose={() => setShowUploadModal(false)}
-					title="Adicionar arquivo" children={undefined}        >
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          title="Adicionar arquivo"
+          children={undefined}
+        >
           {/* Conteúdo do modal de upload */}
         </Modal>
       )}

@@ -1,7 +1,7 @@
 .pageContainer {
   width: 100%;
   min-height: 100vh;
-  background: #fafafa;
+  background: var(--background);
   padding: 2rem;
 }
 
@@ -9,7 +9,6 @@
   display: flex;
   gap: 2rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #eee;
 }
 
 .navTab {
@@ -17,30 +16,34 @@
   border: none;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #ff9100;
+  color: var(--text-color-placeholder);
   padding: 0.5rem 0;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: border 0.2s, color 0.2s;
 }
 .navTab[aria-current='page'] {
-  color: #ff9100;
-  border-bottom: 3px solid #ff9100;
+  color: var(--orange-primary);
+  /*border-bottom: 3px solid var(--background); */
 }
 
 .gridContainer {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
   gap: 2rem;
 }
 
 .caseDetails {
+	max-height: 198px;
+	position: relative;
+	overflow: hidden;
+	stroke: var(--gray);
+	stroke-width: 1;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
+  background: var(--white);
+  border-radius: 5px;
+  box-shadow: 0 2px 8px var(--button-primary-shadow);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -54,11 +57,14 @@
 }
 
 .actionsBox {
+	max-height: 198px;
+	position: relative;
+	overflow: hidden;
   grid-column: 2 / 3;
   grid-row: 1 / 2;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
+  background: var(--white);
+  border-radius: 5px;
+  box-shadow: 0 2px 8px var(--button-primary-shadow);
   padding: 2rem;
   display: flex;
   flex-direction: row;
@@ -68,10 +74,13 @@
 }
 
 .envolvidosBox {
+	max-height: 519px;
+	position: relative;
+	overflow: hidden;
   grid-column: 1 / 2;
   grid-row: 2 / 3;
-  background: #fff;
-  border-radius: 12px;
+  background: var(--white);
+  border-radius: 5px;
   box-shadow: 0 2px 8px #0001;
   padding: 2rem;
   display: flex;
@@ -80,10 +89,13 @@
 }
 
 .arquivosBox {
+	max-height: 519px;
+	position: relative;
+	overflow: hidden;
   grid-column: 2 / 3;
   grid-row: 2 / 3;
-  background: #fff;
-  border-radius: 12px;
+  background: var(--white);
+  border-radius: 5px;
   box-shadow: 0 2px 8px #0001;
   padding: 2rem;
   display: flex;
@@ -113,7 +125,7 @@
   border-radius: 6px;
   border: 1.5px solid #e0e0e0;
   font-size: 1rem;
-  background: #fafafa;
+  background: var(--white);
   min-width: 180px;
 }
 
@@ -122,8 +134,8 @@
 }
 
 .fileType {
-  background: #eee;
-  color: #888;
+  background: var(--white);
+  color: var(--text-secondary);
   border-radius: 6px;
   padding: 0.2em 0.8em;
   font-size: 0.95em;

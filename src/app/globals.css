@@ -23,6 +23,7 @@
   --text-color-placeholder: #a2a2a2;
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -31,6 +32,7 @@
     --text-color-secundary: #b0b0b0cc;
   }
 }
+*/
 
 html,
 body {
@@ -58,8 +60,10 @@ a {
   text-decoration: none;
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
 }
+*/

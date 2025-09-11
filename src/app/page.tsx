@@ -11,6 +11,7 @@ import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
 import styles from './page.module.css';
+import GeneralTab from './casos/ViewCase/generalTab';
 
 type Errors = { usuario?: string; senha?: string };
 
@@ -38,7 +39,7 @@ export default function LoginPage() {
     loginMutation.mutate(
       { username: usuario, password: senha },
       {
-        onSuccess: (data) => {
+        onSuccess: (data : any) => {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
           router.push('/casos');
@@ -55,7 +56,11 @@ export default function LoginPage() {
     <main className={styles.page}>
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
-      </div>
+			</div>
+			
+			<div>
+				<GeneralTab></GeneralTab>
+			</div>
 
       <section className={styles.center}>
         <div className={styles.card}>
