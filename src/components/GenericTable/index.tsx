@@ -19,6 +19,7 @@ import React, { useMemo, useState } from "react";
 
 import { GenericTableProps, Order } from "../../types/Table";
 import styles from "./GenericTable.module.css"
+import { t } from "@/texts";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const valueA = a[orderBy];
@@ -256,8 +257,9 @@ export default function GenericTable<T extends { id: number | string }>({
                   <TableCell
                     colSpan={columns.length + (selectable ? 1 : 0) + (rowActions ? 1 : 0)}
                     align="center"
+                    data-testid="generic-table-no-data"
                   >
-                    Nenhum registro encontrado
+                    {t('genericTable.noData')}
                   </TableCell>
                 </TableRow>
               )}

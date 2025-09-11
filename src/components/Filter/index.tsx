@@ -6,7 +6,7 @@ import { MdOutlineClear } from 'react-icons/md';
 import Button from '../Button';
 import Input from '../Input';
 import styles from './Filter.module.css';
-import { CustomSelect } from '../Select';
+import { CustomSelect } from '../select';
 
 export type FilterValues = {
   search?: string;
@@ -88,6 +88,7 @@ const Filter: React.FC<FilterProps> = ({
           value={filters.caseNumber || ''}
           onChange={handleInputChange('caseNumber')}
           disabled={disabled}
+          data-testid="case-number-input"
         />
         <Input
           placeholder="Insira o nome do caso"
@@ -95,6 +96,7 @@ const Filter: React.FC<FilterProps> = ({
           value={filters.caseName || ''}
           onChange={handleInputChange('caseName')}
           disabled={disabled}
+          data-testid="case-name-input"
         />
         <Input
           placeholder="Insira o responsável"
@@ -102,9 +104,10 @@ const Filter: React.FC<FilterProps> = ({
           value={filters.responsible || ''}
           onChange={handleInputChange('responsible')}
           disabled={disabled}
+          data-testid="case-responsible-input"
         />
         <div className={styles.inputWrapper}>
-          <label htmlFor="situation-select" className={styles.label}>
+          <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
             Situação
           </label>
           <CustomSelect
@@ -114,12 +117,14 @@ const Filter: React.FC<FilterProps> = ({
             placeholder="Situação"
             style={{ height: '2.5rem', width: '11.25rem' }}
             isControlled
+            data-testid="situation-select"
           />
         </div>
       </div>
       <div className={styles.actions}>
         {onClear && (
           <Button
+            data-testid="clear-button"
             icon={<MdOutlineClear />}
             variant="outlined"
             size="icon"
@@ -131,6 +136,7 @@ const Filter: React.FC<FilterProps> = ({
         )}
         <div className={styles.filterIcon}>
           <Button
+            data-testid="filter-button"
             icon={<FiFilter />}
             variant="contained"
             size="icon"

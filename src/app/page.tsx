@@ -10,6 +10,8 @@ import Button from '@/components/Button';
 import { Person, Lock } from '@mui/icons-material';
 import { useLogin } from '@/hooks/useLogin';
 
+import { t } from '@/texts';
+
 type Errors = { usuario?: string; senha?: string };
 
 export default function LoginPage() {
@@ -22,8 +24,8 @@ export default function LoginPage() {
 
   const validate = () => {
     const e: Errors = {};
-    if (!usuario.trim()) e.usuario = 'O usuário deve ser informado.';
-    if (!senha.trim()) e.senha = 'A senha deve ser informada.';
+    if (!usuario.trim()) e.usuario = t('login.user');
+    if (!senha.trim()) e.senha = t('login.password');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -42,7 +44,7 @@ export default function LoginPage() {
           router.push('/casos');
         },
         onError: () => {
-          const msg = 'Usuário ou senha inválido.';
+          const msg = t('login.invalid');
           setErrors({ usuario: msg, senha: msg });
         },
       }
@@ -82,6 +84,7 @@ export default function LoginPage() {
               required
               error={errors.usuario}
               startIcon={<Person />}
+              data-testid="username-input"
             />
 
             <Input
@@ -92,7 +95,8 @@ export default function LoginPage() {
               label="Senha"
               required
               error={errors.senha}
-              startIcon={<Lock />}
+              startIcon={<Lock data-testid="toggle-password-visibility" />}
+              data-testid="password-input"
             />
 
             <div className={styles.buttonSpacer} />
@@ -102,6 +106,7 @@ export default function LoginPage() {
               label={loginMutation.isPending ? 'Entrando...' : 'Login'}
               disabled={loginMutation.isPending}
               onClick={() => {}}
+              data-testid='login-button'
             />
           </form>
         </div>

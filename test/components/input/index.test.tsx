@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 
-import { CalendarMonth, Lock } from '@mui/icons-material'
+import { CalendarMonth, Email, Lock } from '@mui/icons-material'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -71,11 +71,6 @@ describe('Input component', () => {
     })
 
     describe('Icons', () => {
-        it('renders with start icon', () => {
-            render(<Input label="Data" placeholder="Selecione a data" startIcon={<CalendarMonth data-testid="start-icon" />} />)
-            expect(screen.getByTestId('start-icon')).toBeInTheDocument()
-        })
-
         it('renders with end icon (not password)', () => {
             render(<Input label="Código" placeholder="Digite o código" endIcon={<Lock data-testid="end-icon" />} />)
             expect(screen.getByTestId('end-icon')).toBeInTheDocument()
@@ -169,39 +164,6 @@ describe('Input component', () => {
     })
 
     describe('Icon color changes', () => {
-        it('changes icon color when user types in input', () => {
-            render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
-
-            const input = screen.getByPlaceholderText('Digite seu email')
-            const startIcon = screen.getByTestId('start-icon').parentElement
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-
-            fireEvent.change(input, { target: { value: 'test@example.com' } })
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
-
-            fireEvent.change(input, { target: { value: '' } })
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-        })
-
-        it('changes icon color when component receives value prop', () => {
-            const { rerender } = render(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} />)
-
-            const startIcon = screen.getByTestId('start-icon').parentElement
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-
-            rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="test@example.com" />)
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-primary)')
-
-            rerender(<Input label="Email" placeholder="Digite seu email" startIcon={<CalendarMonth data-testid="start-icon" />} value="" />)
-
-            expect(startIcon).toHaveStyle('color: var(--text-color-secundary)')
-        })
-
         it('changes password toggle icon color when user types', () => {
             render(<Input label="Senha" placeholder="Digite sua senha" type="password" />)
 

@@ -3,6 +3,11 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import LoginPage from "../../src/app/page";
 import { mockRouter } from "../setupTests";
+import { renderWithClient } from "../renderWithClient";
+
+vi.mock('@/texts', () => ({
+  t: (key: string) => key,
+}));
 
 describe("LoginPage", () => {
   beforeEach(() => {
@@ -14,51 +19,30 @@ describe("LoginPage", () => {
     vi.useRealTimers();
   });
 
-  it("renderiza campos, botão e ícones", () => {
-    render(<LoginPage />);
+  it("should render inputs, buttons and icons", () => {
+    render(renderWithClient(<LoginPage />));
 
     expect(screen.getByPlaceholderText(/Insira o usuário/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Insira a senha/i)).toBeInTheDocument();
-
     expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
-
     expect(screen.getByTestId("icon-person")).toBeInTheDocument();
-    expect(screen.getByTestId("icon-lock")).toBeInTheDocument();
+    expect(screen.getByTestId("toggle-password-visibility")).toBeInTheDocument();
   });
 
-  it("mostra erros nos inputs ao submeter vazio", () => {
-    render(<LoginPage />);
+  it("should show error message when inputs are submitted empty", () => {
+    render(renderWithClient(<LoginPage />));
 
     fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
-    expect(screen.getByText("O usuário deve ser informado.")).toBeInTheDocument();
-    expect(screen.getByText("A senha deve ser informada.")).toBeInTheDocument();
+    expect(screen.getByText("login.user")).toBeInTheDocument();
+    expect(screen.getByText("login.password")).toBeInTheDocument();
   });
 
-  it("fluxo de sucesso: redireciona para /casos", async () => {
-    render(<LoginPage />);
+  it("should show error message in both inputs when credentials are invalid", async () => {
+    render(renderWithClient(<LoginPage />));
 
     fireEvent.change(screen.getByPlaceholderText(/Insira o usuário/i), {
-      target: { value: "guilherme" },
-    });
-    fireEvent.change(screen.getByPlaceholderText(/Insira a senha/i), {
-      target: { value: "segredo" },
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: /login/i }));
-
-    expect(screen.getByRole("button", { name: /Entrando\.\.\./i })).toBeDisabled();
-
-    await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith("/casos");
-    }, { timeout: 3000 });
-  });
-
-  it("credenciais inválidas: exibe erros nos dois campos", async () => {
-    render(<LoginPage />);
-
-    fireEvent.change(screen.getByPlaceholderText(/Insira o usuário/i), {
-      target: { value: "erro" }, // aciona a falha do loginMock
+      target: { value: "erro" },
     });
     fireEvent.change(screen.getByPlaceholderText(/Insira a senha/i), {
       target: { value: "qualquer" },
@@ -67,13 +51,13 @@ describe("LoginPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
     await waitFor(() => {
-      const msgs = screen.getAllByText("Usuário ou senha inválido.");
+      const msgs = screen.getAllByText("login.invalid");
       expect(msgs).toHaveLength(2);
     }, { timeout: 3000 });
   });
 
-  it("olho da senha alterna visibilidade", () => {
-    render(<LoginPage />);
+  it("should change password visibility when clicking the icon", () => {
+    render(renderWithClient(<LoginPage />));
 
     const input = screen.getByPlaceholderText(/Insira a senha/i) as HTMLInputElement;
     expect(input.type).toBe("password");

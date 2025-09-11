@@ -31,12 +31,12 @@ describe("NavbarComponent", () => {
     expect(onLogout).toHaveBeenCalled();
   });
 
-  it("navigates to /home when logo is clicked", () => {
+  it("navigates to /casos when logo is clicked", () => {
     const onNavigate = vi.fn();
     render(<Navbar onNavigate={onNavigate} onLogout={() => {}} user={user} />);
 
     const logo = screen.getByRole("img", { name: /vincula logo/i });
     fireEvent.click(logo);
-    expect(onNavigate).toHaveBeenCalledWith("/home");
+    expect(onNavigate).toHaveBeenCalledWith("/casos");
   });
 });

@@ -66,7 +66,7 @@ const Modal = ({
       >
         {title && (
           <header className={styles.header}>
-            <h2 className={styles.title} id="modal-title">
+            <h2 className={styles.title} data-testid="modal-title">
               {title}
             </h2>
             <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
