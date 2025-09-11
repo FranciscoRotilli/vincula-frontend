@@ -1,6 +1,12 @@
 export const texts = {
   'navbar.logout': 'Sair',
 
+  'login.user': 'O usuário deve ser informado.',
+  'login.password': 'A senha deve ser informada.',
+  'login.invalid': 'Usuário ou senha inválido.',
+
+  'genericTable.noData': 'Nenhum registro encontrado.',
+
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
 } as const;
 
