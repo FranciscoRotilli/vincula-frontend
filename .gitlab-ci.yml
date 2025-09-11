@@ -10,9 +10,6 @@ install_dependencies:
   stage: install_dependencies
   script:
     - npm ci
-  artifacts:
-    paths:
-      - node_modules/
 
 lint:
   stage: test
@@ -33,7 +30,7 @@ build_app:
   stage: build
   needs: 
     - lint
-    - test
+    - unit_test
   script:
     - npm run build
   artifacts:
