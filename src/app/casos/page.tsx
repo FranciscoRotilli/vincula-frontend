@@ -83,13 +83,6 @@ export default function Casos() {
   };
 
   const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
-    const newCase = {
-      id: cases.length + 1,
-      case: payload.caseName,
-      responsible: payload.caseResponsable,
-      status: 'Aberto',
-      openedAt: payload.creationDate,
-    };
     caseMutation.mutate({name: payload.caseName},
         {onSuccess: (data) => {
           const newCase = {
@@ -103,14 +96,8 @@ export default function Casos() {
           setCases(updatedCases);
           setFilteredData(updatedCases);
           setIsModalOpen(false);
-          router.push('/casos');
         }},
     )
-
-    const updatedCases = [...cases, newCase];
-    setCases(updatedCases);
-    setFilteredData(updatedCases);
-    setIsModalOpen(false);
   };
 
   return (
