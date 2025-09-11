@@ -1,22 +1,74 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
-import { describe, expect,it } from "vitest";
+import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
 
-import Home from "../../src/app/page";
+import LoginPage from "../../src/app/page";
+import { renderWithClient } from "../renderWithClient";
+import { mockRouter } from "../setupTests";
 
-describe("Home component", () => {
-  it("should render the Next.js logo", () => {
-    render(<Home />);
-    const logo = screen.getByAltText(/Next\.js logo/i);
-    expect(logo).toBeInTheDocument();
+vi.mock('@/texts', () => ({
+  t: (key: string) => key,
+}));
+
+describe("LoginPage", () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+    mockRouter.push.mockReset();
   });
 
-  it('should contain the "Deploy now" link', () => {
-    render(<Home />);
-    const deployLink = screen.getByRole("link", { name: /Deploy now/i });
-    expect(deployLink).toHaveAttribute(
-      "href",
-      expect.stringContaining("https://vercel.com/new")
-    );
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should render inputs, buttons and icons", () => {
+    render(renderWithClient(<LoginPage />));
+
+    expect(screen.getByPlaceholderText(/Insira o usuário/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Insira a senha/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByTestId("icon-person")).toBeInTheDocument();
+    expect(screen.getByTestId("lock-icon")).toBeInTheDocument();
+  });
+
+  it("should show error message when inputs are submitted empty", () => {
+    render(renderWithClient(<LoginPage />));
+
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
+
+    expect(screen.getByText("login.user")).toBeInTheDocument();
+    expect(screen.getByText("login.password")).toBeInTheDocument();
+  });
+
+  it("should show error message in both inputs when credentials are invalid", async () => {
+    render(renderWithClient(<LoginPage />));
+
+    fireEvent.change(screen.getByPlaceholderText(/Insira o usuário/i), {
+      target: { value: "erro" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira a senha/i), {
+      target: { value: "qualquer" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
+
+    await waitFor(() => {
+      const msgs = screen.getAllByText("login.invalid");
+      expect(msgs).toHaveLength(2);
+    }, { timeout: 3000 });
+  });
+
+  it("should change password visibility when clicking the icon", () => {
+    render(renderWithClient(<LoginPage />));
+
+    const input = screen.getByPlaceholderText(/Insira a senha/i) as HTMLInputElement;
+    expect(input.type).toBe("password");
+
+    const toggle = screen.getByRole("button", { name: /toggle password visibility/i });
+
+    fireEvent.click(toggle);
+    expect(input.type).toBe("text");
+
+    fireEvent.click(toggle);
+    expect(input.type).toBe("password");
   });
 });
