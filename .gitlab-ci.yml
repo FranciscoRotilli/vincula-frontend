@@ -16,20 +16,24 @@ install_dependencies:
 
 lint:
   stage: test
-  needs: ["install_dependencies"]
+  needs: 
+    - install_dependencies
   script:
     - npm run lint
 
 unit_test:
   stage: test
-  needs: ["install_dependencies"]
+  needs: 
+    - install_dependencies
   script:
     - npm run test
   coverage: /All files\s*\|\s*([\d\.]+)/
 
 build_app:
   stage: build
-  needs: ["lint", "unit_test"]
+  needs: 
+    - lint
+    - test
   script:
     - npm run build
   artifacts:
