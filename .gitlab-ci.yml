@@ -10,11 +10,11 @@ stages:
 install_dependencies:
   stage: install_dependencies
   cache:
-    untracked: true
-    paths: 
-      - node_modules/
-  script:
-    - npm ci
+    key: default
+    paths:
+      - .npm/
+  before_script:
+    - npm ci --cache .npm --prefer-offline
 
 lint:
   stage: test
