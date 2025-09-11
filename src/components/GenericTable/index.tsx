@@ -17,9 +17,10 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import React, { useMemo, useState } from "react";
 
+import { t } from "@/texts";
+
 import { GenericTableProps, Order } from "../../types/Table";
 import styles from "./GenericTable.module.css"
-import { t } from "@/texts";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const valueA = a[orderBy];

@@ -1,8 +1,10 @@
 import './globals.css';
 import '@/styles/theme.css';
+
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import React from 'react';
+
 import Providers from './providers';
 
 const poppins = Poppins({

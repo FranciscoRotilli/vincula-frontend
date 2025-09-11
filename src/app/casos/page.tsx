@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import Table from '@/components/GenericTable';
-import styles from './page.module.css';
-import NavbarContainer from '@/components/Navbar/NavbarComponent';
-import Button from '@/components/Button';
-import { Column } from '@/types/Table';
-import Filter, { FilterValues } from '@/components/Filter';
-import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import AddIcon from '@mui/icons-material/Add';
+import React, { useState } from 'react';
+
+import Button from '@/components/Button';
+import Filter, { FilterValues } from '@/components/Filter';
 import Footer from '@/components/Footer';
+import Table from '@/components/GenericTable';
+import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+import NavbarContainer from '@/components/Navbar/NavbarComponent';
+import { Column } from '@/types/Table';
+
+import styles from './page.module.css';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },

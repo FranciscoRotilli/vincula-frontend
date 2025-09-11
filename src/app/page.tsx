@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { Lock,Person } from '@mui/icons-material';
 import Image from 'next/image';
-import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
+import React, { type ChangeEvent, type FormEvent,useState } from 'react';
 
-import Input from '@/components/Input';
 import Button from '@/components/Button';
-import { Person, Lock } from '@mui/icons-material';
+import Input from '@/components/Input';
 import { useLogin } from '@/hooks/useLogin';
-
 import { t } from '@/texts';
+
+import styles from './page.module.css';
 
 type Errors = { usuario?: string; senha?: string };
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
               label="Usuário"
               required
               error={errors.usuario}
-              startIcon={<Person />}
+              startIcon={<Person data-testid="icon-person"/>}
               data-testid="username-input"
             />
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
               label="Senha"
               required
               error={errors.senha}
-              startIcon={<Lock data-testid="toggle-password-visibility" />}
+              startIcon={<Lock data-testid="lock-icon" />}
               data-testid="password-input"
             />
 

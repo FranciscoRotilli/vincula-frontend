@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
 import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import React, { useState } from 'react';
+
 import styles from './Select.module.css';
 
 export type Option = {

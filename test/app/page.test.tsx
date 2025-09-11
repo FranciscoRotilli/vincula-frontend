@@ -1,9 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach,beforeEach, describe, expect, it, vi } from "vitest";
+
 import LoginPage from "../../src/app/page";
-import { mockRouter } from "../setupTests";
 import { renderWithClient } from "../renderWithClient";
+import { mockRouter } from "../setupTests";
 
 vi.mock('@/texts', () => ({
   t: (key: string) => key,
@@ -26,7 +27,7 @@ describe("LoginPage", () => {
     expect(screen.getByPlaceholderText(/Insira a senha/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
     expect(screen.getByTestId("icon-person")).toBeInTheDocument();
-    expect(screen.getByTestId("toggle-password-visibility")).toBeInTheDocument();
+    expect(screen.getByTestId("lock-icon")).toBeInTheDocument();
   });
 
   it("should show error message when inputs are submitted empty", () => {
