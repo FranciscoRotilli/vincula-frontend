@@ -1,11 +1,5 @@
 image: node:22-alpine
 
-cache:
-  key:
-    files:
-      - package-lock.json
-  paths:
-    - .npm/
 
 stages:
   - install_dependencies
@@ -15,7 +9,7 @@ stages:
 install_dependencies:
   stage: install_dependencies
   script:
-    - npm ci --cache .npm --prefer-offline
+    - npm ci
   artifacts:
     paths:
       - node_modules/
