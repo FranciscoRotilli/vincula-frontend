@@ -35,6 +35,6 @@ describe("GenericTable component", () => {
 
     it("shows empty state", () => {
         render(<GenericTable columns={columns} data={[]} loading={false} />);
-        expect(screen.getByText("Nenhum dado encontrado")).toBeInTheDocument();
+        expect(screen.getByTestId("generic-table-no-data")).toBeInTheDocument();
     });
 });
