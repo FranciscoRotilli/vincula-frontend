@@ -6,8 +6,13 @@ stages:
   - test
   - build
 
+
 install_dependencies:
   stage: install_dependencies
+  cache:
+    untracked: true
+    paths: 
+      - node_modules/
   script:
     - npm ci
 
