@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { ApiResponse, FilterParams, PaginationParams } from '@/types/Cases';
+import { ApiResponse, ApiSortingParams, FilterParams, PaginationParams } from '@/types/Cases';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -8,6 +8,7 @@ export type CaseResponse = {
     caseName: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function addCase(name: string): Promise<any> {
     const response = await axios.post(`${API_URL}/case/`, {
     name,
@@ -24,8 +25,10 @@ export async function addCase(name: string): Promise<any> {
 
 export async function getCases(
   paginationParams: PaginationParams,
-  filterParams: FilterParams
+  filterParams: FilterParams,
+  sortingParams: ApiSortingParams
 ): Promise<ApiResponse> {
+  
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +36,8 @@ export async function getCases(
     },
     params: {
       ...paginationParams,
-      ...filterParams
+      ...filterParams,
+      ...sortingParams
     }
   }
   const response = await axios.get(`${API_URL}/case/`, config)

@@ -13,7 +13,7 @@ export type FilterValues = {
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
-  situation?: string;
+  situation?: 'Em andamento' | 'Suspenso' | 'Encerrado';
 };
 
 export type SituationOption = { value: string; label: string };

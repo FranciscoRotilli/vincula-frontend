@@ -10,8 +10,9 @@ import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import { useCase, useCases } from '@/hooks/useCase';
-import { CaseItem, FilterParams } from '@/types/Cases';
-import { Column } from '@/types/Table';
+import { t } from '@/texts';
+import { ApiSortingParams, CaseItem, FilterParams } from '@/types/Cases';
+import { Column, Sorting } from '@/types/Table';
 
 import styles from './page.module.css';
 
@@ -45,13 +46,27 @@ function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
   return apiParams;
 }
 
+function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams {
+  return {
+    sort_by: uiSorting.sortBy as 'name' | 'status' | 'creation_date',
+    sort_dir: uiSorting.sortDir
+  };
+}
+
 export default function Casos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [pagination, setPagination] = useState({ page: 1, limit: 10 })
   const [filters, setFilters] = useState<FilterValues>({})
   const apiFilterParams = mapUiFiltersToApiParams(filters);
-  const { data: apiResponse, isLoading, refetch } = useCases(pagination, apiFilterParams)
+  const [sorting, setSorting] = useState<Sorting<CaseItem>>({
+    sortBy: 'creation_date',
+    sortDir: 'desc'
+  })
+  const apiSortingParams = mapUiSortingToApiParams(sorting);
+
+  const { data: apiResponse, isLoading, refetch } = useCases(
+    pagination, apiFilterParams, apiSortingParams)
 
   const cases = apiResponse?.items || []
 
@@ -61,6 +76,10 @@ export default function Casos() {
     setFilters(newFilters)
     setPagination(p => ({ ...p,page: 1 }))
   };
+
+  const handleSortChange = (newSorting: Sorting<CaseItem>) => {
+    setSorting(newSorting)
+  }
 
   const handleClear = () => {
     setFilters({})
@@ -94,7 +113,7 @@ export default function Casos() {
     <div>
       <NavbarContainer />
       <main className={styles.main}>
-        <h1 className={styles.pageTitle}>Meus Casos</h1>
+        <h1 className={styles.pageTitle}>{t('cases.title')}</h1>
         <div className={styles.btnContainer}>
           <Button
             label="ADICIONAR CASO"
@@ -124,6 +143,8 @@ export default function Casos() {
               currentPage: pagination.page - 1,
               onPageChange: handlePageChange,
             }}
+            sorting={sorting}
+            onSort={handleSortChange}
           />
         </div>
       </main>
