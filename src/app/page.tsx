@@ -10,8 +10,6 @@ import Button from '@/components/Button';
 import { Person, Lock } from '@mui/icons-material';
 import { useLogin } from '@/hooks/useLogin';
 
-import AddFileModal from '@/components/Modals/AddFileModal'; // ajuste o caminho se for diferente
-
 type Errors = { usuario?: string; senha?: string };
 
 export default function LoginPage() {
@@ -21,8 +19,6 @@ export default function LoginPage() {
   const router = useRouter();
 
   const loginMutation = useLogin();
-
-  const [openAddFile, setOpenAddFile] = useState(false);
 
   const validate = () => {
     const e: Errors = {};
@@ -101,28 +97,13 @@ export default function LoginPage() {
 
             <div className={styles.buttonSpacer} />
 
-            {/* <Button
+            <Button
               type="submit"
               label={loginMutation.isPending ? 'Entrando...' : 'Login'}
               disabled={loginMutation.isPending}
               onClick={() => {}}
-            /> */}
-
-            <Button
-              type="button"
-              label="Login"
-              onClick={() => setOpenAddFile(true)}
             />
           </form>
-
-          <AddFileModal
-            isOpen={openAddFile}
-            onClose={() => setOpenAddFile(false)}
-            onSubmit={({ origin, type, file }) => {
-              console.log('Teste modal:', { origin, type, file });
-              setOpenAddFile(false);
-            }}
-          />
         </div>
       </section>
     </main>
