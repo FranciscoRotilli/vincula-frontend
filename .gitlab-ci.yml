@@ -17,3 +17,12 @@ include:
   - local: .gitlab/ci/pipelines/deploy-main.gitlab-ci.yml
     rules:
       - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+
+no_job:
+  stage: lint
+  tags:
+    - shell-linux
+  rules:
+    - when: never
+  script:
+    - echo ""
