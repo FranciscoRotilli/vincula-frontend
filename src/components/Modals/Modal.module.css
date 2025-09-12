@@ -68,6 +68,7 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
+  color: #000;
 }
 
 .closeButton {
@@ -75,7 +76,7 @@
   border: none;
   font-size: 1.8rem;
   cursor: pointer;
-  color: var(--foreground);
+  color: #000;
   line-height: 1;
   padding: 0;
   transition: opacity 0.2s;
@@ -146,11 +147,12 @@ button.secondary:hover {
 }
 
 .small {
-  width: 20px;
+  small { width: 20vw; }
 }
 
 .medium {
-  width: 25vw;
+  width: clamp(24rem, 39vw, 35.0625rem);
+  min-height: clamp(20rem, 28vw, 25.1875rem);
 }
 
 .large {
