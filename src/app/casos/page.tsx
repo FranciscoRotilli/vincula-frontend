@@ -12,6 +12,8 @@ import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import { Column } from '@/types/Table';
 
 import styles from './page.module.css';
+import { useCase } from '@/hooks/useCase';
+import router from 'next/router';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -51,6 +53,8 @@ export default function Casos() {
   const [cases, setCases] = useState(data);
   const [filteredData, setFilteredData] = useState(data);
 
+  const caseMutation = useCase();
+
   const handleFilter = (filters: FilterValues) => {
     const filtered = cases.filter((item) => {
       const matchesSearch =
@@ -79,18 +83,21 @@ export default function Casos() {
   };
 
   const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
-    const newCase = {
-      id: cases.length + 1,
-      case: payload.caseName,
-      responsible: payload.caseResponsable,
-      status: 'Aberto',
-      openedAt: payload.creationDate,
-    };
-
-    const updatedCases = [...cases, newCase];
-    setCases(updatedCases);
-    setFilteredData(updatedCases);
-    setIsModalOpen(false);
+    caseMutation.mutate({name: payload.caseName},
+        {onSuccess: (data) => {
+          const newCase = {
+          id: cases.length + 1,
+          case: payload.caseName,
+          responsible: payload.caseResponsable,
+          status: 'Aberto',
+          openedAt: payload.creationDate,
+        };
+          const updatedCases = [...cases, newCase];
+          setCases(updatedCases);
+          setFilteredData(updatedCases);
+          setIsModalOpen(false);
+        }},
+    )
   };
 
   return (
