@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Input from '@/components/Input';
 import Modal from '@/components/Modals';
 import modalStyles from '@/components/Modals/Modal.module.css';
-import { Work } from '@mui/icons-material';
+import { t } from '@/texts';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
@@ -56,13 +56,13 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       cancelButton="Cancelar"
     >
       <div className={modalStyles.formStack}>
-        <label>Nome do caso:</label>
+        <label>{t("modal.caseName")}</label>
         <Input placeholder={'Digite o nome do caso'} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
         
-        <label>Nome do responsável:</label>
+        <label>{t("modal.responsibleName")}</label>
         <Input placeholder={''} disabled value={CASE_RESPONSABLE} />
         
-        <label>Data de criação:</label>
+        <label>{t("modal.creationDate")}</label>
         <Input placeholder={''} disabled value={creationDateFormated} />
       </div>
     </Modal>

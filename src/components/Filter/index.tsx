@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
+import { t } from '@/texts';
+
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
@@ -33,7 +35,7 @@ const Filter: React.FC<FilterProps> = ({
   defaultValues = {},
   situations,
   disabled = false,
-  loading = false,
+  // loading = false, // Commented out - not being used
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
@@ -62,24 +64,26 @@ const Filter: React.FC<FilterProps> = ({
     onClear && onClear();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleFilter();
-  };
+  // Commented out - not being used currently
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') handleFilter();
+  // };
 
-  function handleChange(
-    _arg0: string
-  ):
-    | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
-        ((event: React.ChangeEvent<HTMLInputElement>) => void))
-    | undefined {
-    return _arg0
-      ? (event) =>
-          setFilters((prev) => ({
-            ...prev,
-            [_arg0]: event.target.value,
-          }))
-      : undefined;
-  }
+  // Commented out - not being used currently
+  // function handleChange(
+  //   _arg0: string
+  // ):
+  //   | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
+  //       ((event: React.ChangeEvent<HTMLInputElement>) => void))
+  //   | undefined {
+  //   return _arg0
+  //     ? (event) =>
+  //         setFilters((prev) => ({
+  //           ...prev,
+  //           [_arg0]: event.target.value,
+  //         }))
+  //     : undefined;
+  // }
 
   return (
     <div className={styles.filterContainer}>
@@ -110,7 +114,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <div className={styles.inputWrapper}>
           <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            Situação
+            {t("filter.situation")}
           </label>
           <CustomSelect
             options={situations}
