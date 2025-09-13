@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import Footer from '@/components/footer';
+import Footer from '@/components/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 
 import styles from './CaseContainer.module.css';

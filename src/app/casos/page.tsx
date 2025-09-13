@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import Button from '@/components/Button';
 import Filter, { FilterValues } from '@/components/Filter';
-import Footer from '@/components/footer';
+import Footer from '@/components/Footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
