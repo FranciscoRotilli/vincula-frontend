@@ -16,7 +16,7 @@
 
 .text {
   font-size: 0.675em;
-  color: #000;
+  color: var(--black);
   padding-top: 0.75em;
   padding-left: 0.75em;
 }
