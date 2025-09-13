@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CaseContainer } from '@/components/CaseContainer/CaseContainer';
+import { CaseContainer } from '@/components/CaseContainer';
 import styles from '@/components/CaseContainer/CaseContainer.module.css';
 
 export default async function GeneralInfoPage({ params }: { params: { id: string } }) {

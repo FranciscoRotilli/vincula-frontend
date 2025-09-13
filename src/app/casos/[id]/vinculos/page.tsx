@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CaseContainer } from '@/components/CaseContainer/CaseContainer';
+import { CaseContainer } from '@/components/CaseContainer';
 
 export default async function VinculosPage({ params }: { params: { id: string } }) {
   return (

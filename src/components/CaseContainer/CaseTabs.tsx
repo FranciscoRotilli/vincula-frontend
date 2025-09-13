@@ -46,10 +46,12 @@ const CaseTabs = ({ caseId }: { caseId: string }) => {
                     value={currentTab}
                     onChange={handleChange}
                     aria-label='abas de navegação de caso'
+                    data-testid='tabs-component'
+
                 >
-                    <Tab label="Informações gerais" id="tab-0" />
-                    <Tab label="Vínculos" id="tab-1" />
-                    <Tab label="Visualização dos dados" id="tab-2" />
+                    <Tab label="Informações gerais" id="tab-0" data-testid="tab-general-info" />
+                    <Tab label="Vínculos" id="tab-1" data-testid="tab-vinculos" />
+                    <Tab label="Visualização dos dados" id="tab-2" data-testid="tab-visualizacao" />
                 </Tabs>
             </Box>
         </ThemeProvider>

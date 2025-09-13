@@ -15,7 +15,7 @@ interface CaseContainerProps {
 
 export function CaseContainer({ children, caseId }: CaseContainerProps) {
   return (
-    <div>
+    <div data-testid="case-container">
       <NavbarContainer />
       <div className={styles.caseContainer}>
         <CaseTabs caseId={caseId} />
