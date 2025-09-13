@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import Button from '@/components/Button';
 import Filter, { FilterValues } from '@/components/Filter';
-import Footer from '@/components/Footer';
+import Footer from '@/components/footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
@@ -53,22 +53,30 @@ export default function Casos() {
 
   const handleFilter = (filters: FilterValues) => {
     const filtered = cases.filter((item) => {
+      const search = filters.search?.toLowerCase();
+      const caseNumber = filters.caseNumber?.toLowerCase();
+      const caseName = filters.caseName?.toLowerCase();
+      const responsible = filters.responsible?.toLowerCase();
+      const situation = filters.situation?.toLowerCase();
+
+      const itemCase = item.case.toLowerCase();
+      const itemResponsible = item.responsible.toLowerCase();
+      const itemStatus = item.status.toLowerCase();
+
       const matchesSearch =
-        !filters.search ||
-        item.case.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.responsible.toLowerCase().includes(filters.search.toLowerCase());
+        !search || itemCase.includes(search) || itemResponsible.includes(search);
+      const matchesCaseNumber = !caseNumber || itemCase.includes(caseNumber);
+      const matchesCaseName = !caseName || itemCase.includes(caseName);
+      const matchesResponsible = !responsible || itemResponsible.includes(responsible);
+      const matchesSituation = !situation || itemStatus === situation;
 
-      const matchesCaseNumber =
-        !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
-
-      const matchesCaseName = !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
-
-      const matchesResponsible =
-        !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
-
-      const matchesSituation = !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
-
-      return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
+      return (
+        matchesSearch &&
+        matchesCaseNumber &&
+        matchesCaseName &&
+        matchesResponsible &&
+        matchesSituation
+      );
     });
 
     setFilteredData(filtered);
@@ -78,20 +86,21 @@ export default function Casos() {
     setFilteredData(cases);
   };
 
-  const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
-    const newCase = {
-      id: cases.length + 1,
-      case: payload.caseName,
-      responsible: payload.caseResponsable,
-      status: 'Aberto',
-      openedAt: payload.creationDate,
-    };
+  const handleCreateCase =
+    (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
+      const newCase = {
+        id: cases.length + 1,
+        case: payload.caseName,
+        responsible: payload.caseResponsable,
+        status: 'Aberto',
+        openedAt: payload.creationDate,
+      };
 
-    const updatedCases = [...cases, newCase];
-    setCases(updatedCases);
-    setFilteredData(updatedCases);
-    setIsModalOpen(false);
-  };
+      const updatedCases = [...cases, newCase];
+      setCases(updatedCases);
+      setFilteredData(updatedCases);
+      setIsModalOpen(false);
+    };
 
   return (
     <div>
@@ -108,7 +117,8 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <CreateCaseModal isOpen={isModalOpen} onClose={() =>
+          setIsModalOpen(false)} onSubmit={handleCreateCase} />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
