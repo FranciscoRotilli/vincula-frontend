@@ -84,6 +84,17 @@ const Input = forwardRef<HTMLDivElement, InputProps>(({
                 type={isPassword ? (showPassword ? 'text' : 'password') : type}
                 required={required}
                 error={hasError}
+                sx={{
+                    '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: 'var(--input-disabled-background)',
+                        '& fieldset': {
+                            borderColor: 'var(--input-disabled-border)',
+                        }
+                    },
+                    '& .MuiInputBase-root.Mui-disabled .MuiInputBase-input': {
+                        WebkitTextFillColor: 'var(--input-disabled-textfill)',
+                    }
+                }}
                 slotProps={{
                     input: {
                         sx: { height: height },
