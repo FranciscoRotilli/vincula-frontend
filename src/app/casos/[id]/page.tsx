@@ -16,7 +16,7 @@ export default async function GeneralInfoPage({ params }: { params: { id: string
 
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Investigados (2)</h3>
+              <h3 className={styles.cardTitle}>Investigados</h3>
             </div>
             <div className={styles.cardBody}>
               <p className={styles.cardPlaceholder}>
@@ -39,7 +39,7 @@ export default async function GeneralInfoPage({ params }: { params: { id: string
 
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Ficheiros (2)</h3>
+              <h3 className={styles.cardTitle}>Ficheiros</h3>
             </div>
             <div className={styles.cardBody}>
                <p className={styles.cardPlaceholder}>

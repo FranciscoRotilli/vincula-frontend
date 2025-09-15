@@ -1,6 +1,6 @@
 .caseContainer {
   padding: 1rem 2rem;
-  background-color: #f9f9f9;
+  background-color: var(--background);
   min-height: calc(100vh - 80px);
 }
 
@@ -14,7 +14,7 @@
 .title {
   font-size: 2rem;
   font-weight: bold;
-  color: #ff8200;
+  color: var(--orange-primary);
   text-transform: uppercase;
 }
 
@@ -27,28 +27,28 @@
 
 .userName {
   font-weight: 600;
-  color: #333;
+  color: var(--foreground);
 }
 
 .userRole {
-  color: #777;
+  color: var(--gray);
 }
 
 .pageGrid {
   display: grid;
-  grid-template-columns: 2fr 1fr; 
-  gap: 1.5rem; 
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
 }
 
 .leftColumn,
 .rightColumn {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; 
+  gap: 1.5rem;
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--white);
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -66,18 +66,18 @@
 .cardTitle {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--foreground);
 }
 
 .caseTitle {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #111;
+  color: var(--foreground);
   margin-bottom: 1rem;
 }
 
 .cardPlaceholder {
-  color: #666;
+  color: var(--black);
   font-size: 0.9rem;
   line-height: 1.5;
 }

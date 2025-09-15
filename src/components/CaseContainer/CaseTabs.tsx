@@ -10,7 +10,7 @@ import React from 'react';
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#ff8200',
+            main: '#ff8300',
         },
     },
 });
