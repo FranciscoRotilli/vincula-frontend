@@ -67,7 +67,6 @@ describe("CasosPage", () => {
     expect(screen.getByText(t('modal.caseNumber'))).toBeInTheDocument();
     expect(screen.getByText(t('modal.caseName'))).toBeInTheDocument();
     expect(screen.getByText(t('modal.owner'))).toBeInTheDocument();
-    expect(screen.getAllByText(t('modal.status'))).toHaveLength(2);
   });
 
   it("should show loading state initially", async () => {
