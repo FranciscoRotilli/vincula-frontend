@@ -3,8 +3,8 @@ import React, { useId, useRef, useState } from 'react';
 import Modal from '@/components/Modals';
 import styles from './AddFileModal.module.css';
 
-import CloudUploadOutlinedIcon from '@mui/icons-material/UploadOutlined';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 type AddFileModalProps = {
   isOpen: boolean;
@@ -119,7 +119,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                   </option>
                 ))}
               </select>
-              <KeyboardArrowDownOutlinedIcon className={styles.selectIcon} />
+              <KeyboardArrowDownIcon className={styles.selectIcon} />
             </div>
           </div>
 
@@ -141,12 +141,12 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                   </option>
                 ))}
               </select>
-              <KeyboardArrowDownOutlinedIcon className={styles.selectIcon} />
+              <KeyboardArrowDownIcon className={styles.selectIcon} />
             </div>
           </div>
         </div>
 
-        <div className={styles.fieldFull}>
+        <div className={`${styles.fieldFull} ${styles.fileBlock}`}>
           <label htmlFor={`${titleId}-file`} className={styles.label}>
             Arquivo <span className={styles.required}>*</span>
           </label>
@@ -181,14 +181,18 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
               accept={ACCEPT}
             />
             <div className={styles.dropzoneContent}>
-              <CloudUploadOutlinedIcon fontSize="large" />
+              <FileUploadIcon fontSize="large" />
               <span className={styles.dropzoneText}>
                 {file ? file.name : 'Selecione ou arraste o arquivo'}
               </span>
             </div>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && (
+            <p className={styles.error} role="alert" aria-live="polite">
+              {error}
+            </p>
+          )}
         </div>
       </div>
     </Modal>

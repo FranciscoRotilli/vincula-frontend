@@ -3,22 +3,22 @@
   color: #000;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
+  gap: 0.375rem;
+  margin-top: 0;
 }
 
 .row {
   display: grid;
   grid-template-columns: 14.6875rem 14.6875rem;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .field,
 .fieldFull {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 0.2rem;
   min-width: 0;
 }
 
@@ -26,6 +26,10 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: #000;
+}
+
+.fileBlock {
+  margin-top: 0.75rem;
 }
 
 .required {
@@ -44,7 +48,7 @@
   height: 2.5rem;
   border-radius: 0.625rem;
   padding: 0 2.25rem 0 0.75rem;
-  border: 0.0625rem solid var(--border-color, #e2e2e2);
+  border: 0.0625rem solid rgba(219,219,219,1);
   background: var(--surface, #fff);
   color: #000;
   font-weight: 700;
@@ -53,8 +57,8 @@
 
 .select:focus {
   outline: none;
-  border-color: #000;
-  box-shadow: 0 0 0 0.1875rem color-mix(in oklab, #000 18%, transparent);
+  border-color: rgba(219,219,219,1);
+  box-shadow: 0 0 0 0.1875rem color-mix(in oklab, rgba(219,219,219,1) 35%, transparent);
 }
 
 .selectIcon {
@@ -63,7 +67,7 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: color-mix(in oklab, #000 35%, transparent); /* cinza do mock */
+  color: color-mix(in oklab, #000 35%, transparent);
 }
 
 .inputFile { display: none; }
@@ -103,8 +107,9 @@
 
 .error {
   margin-top: 0.375rem;
-  color: #000;
+  color: #e53935;
   font-size: 0.9rem;
+  font-weight: 700;
 }
 
 @media (max-width: 45rem) {
