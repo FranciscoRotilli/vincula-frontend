@@ -10,6 +10,7 @@ import Filter, { FilterValues } from '@/components/Filter';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import AddIcon from '@mui/icons-material/Add';
 import Footer from '@/components/Footer';
+import { useRouter } from "next/navigation";
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -31,12 +32,16 @@ const data = [
   { id: 10, case: 'Caso 010', responsible: 'Patrícia Martins', status: 'Aberto', openedAt: '2025-08-29' },
 ];
 
+const router = useRouter();
+
 const rowActions = [
-  {
-    label: 'Ver detalhes',
-    onClick: (row: unknown) => console.log('Ver detalhes', row),
-  },
-];
+    {
+      label: "Ver detalhes",
+      onClick: () => {
+        router.push("/temp");
+      },
+    },
+  ];
 
 const situations = [
   { value: 'Aberto', label: 'Aberto' },
