@@ -90,7 +90,7 @@ const Filter: React.FC<FilterProps> = ({
       <div className={styles.fieldsRow}>
         <Input
           placeholder="Insira o número do caso"
-          label="Número do caso"
+          label={t('modal.caseNumber')}
           value={filters.caseNumber || ''}
           onChange={handleInputChange('caseNumber')}
           disabled={disabled}
@@ -98,7 +98,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <Input
           placeholder="Insira o nome do caso"
-          label="Nome do caso"
+          label={t('modal.caseName')}
           value={filters.caseName || ''}
           onChange={handleInputChange('caseName')}
           disabled={disabled}
@@ -106,7 +106,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <Input
           placeholder="Insira o responsável"
-          label="Responsável"
+          label={t('modal.owner')}
           value={filters.responsible || ''}
           onChange={handleInputChange('responsible')}
           disabled={disabled}
