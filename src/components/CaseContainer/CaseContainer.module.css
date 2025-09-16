@@ -4,20 +4,6 @@
   min-height: calc(100vh - 80px);
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--orange-primary);
-  text-transform: uppercase;
-}
-
 .userInfo {
   display: flex;
   flex-direction: column;
