@@ -10,18 +10,16 @@ export default async function GeneralInfoPage({ params }: { params: { id: string
         <div className={styles.leftColumn}>
           <div className={styles.card}>
             <div className={styles.cardBody}>
-              <h2 className={styles.caseTitle}>Operação Ratatouille</h2>
+              <h2 className={styles.caseTitle}></h2>
             </div>
           </div>
 
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Investigados</h3>
+              <h3 className={styles.cardTitle}></h3>
             </div>
             <div className={styles.cardBody}>
-              <p className={styles.cardPlaceholder}>
-                Informe os investigados para possibilitar o vínculo com os ficheiros anexados.
-              </p>
+              <p className={styles.cardPlaceholder}></p>
             </div>
           </div>
         </div>
@@ -29,22 +27,17 @@ export default async function GeneralInfoPage({ params }: { params: { id: string
         <div className={styles.rightColumn}>
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Ações</h3>
+              <h3 className={styles.cardTitle}></h3>
             </div>
-            <div className={styles.cardBody}>
-               <p className={styles.cardPlaceholder}>
-               </p>
-            </div>
+            <div className={styles.cardBody}></div>
           </div>
 
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>Ficheiros</h3>
+              <h3 className={styles.cardTitle}></h3>
             </div>
             <div className={styles.cardBody}>
-               <p className={styles.cardPlaceholder}>
-                Os ficheiros em anexo serão usados para a geração de vínculos.
-               </p>
+              <p className={styles.cardPlaceholder}></p>
             </div>
           </div>
         </div>
