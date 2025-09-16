@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
+import { t } from '@/texts'
 
-export default async function Visualização_dos_dadosPage({ params }: { params: { id: string } }) {
+export default async function visualizacaoDosDadosPage({ params }: { params: { id: string } }) {
   return (
     <CaseContainer caseId={params.id}>
       <div>
         {}
-        <h1>Página de Visualização dos dados: {params.id}</h1>
+        <h1>{t('container.vis')} {params.id}</h1>
       </div>
     </CaseContainer>
   );

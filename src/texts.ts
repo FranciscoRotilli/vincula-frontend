@@ -6,6 +6,8 @@ export const texts = {
   'login.invalid': 'Usuário ou senha inválido.',
 
   'genericTable.noData': 'Nenhum registro encontrado.',
+  'container.vis': 'Página de Visualização dos dados:',
+  'container.vinculo': 'Página de Vínculos do Caso:',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
 } as const;
