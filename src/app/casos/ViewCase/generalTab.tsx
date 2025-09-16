@@ -8,10 +8,11 @@ import Button from '@/components/Button';
 import GenericTable from '@/components/GenericTable';
 import Modal from '@/components/Modals';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+import { Column } from '@/types/Table';
 
 import styles from './generalTab.module.css';
 
-// Mock data (substitua por dados reais do backend)
+// Mock
 const caseDetails = {
   nome: 'Operação Ratatouille',
   responsavel: 'Cicrano',
@@ -21,12 +22,17 @@ const caseDetails = {
   dataAtualizacao: '-',
 };
 
+type EnvolvidoRow = { id: number; nome: string; cpf: string };
+type ArquivoRow = { id: number; nome: string; tipo: string; data: string; tamanho: string };
+
 const envolvidosMock = [
   { id: 1, nome: 'BETO BARBOSA', cpf: '494.392.650-94' },
   { id: 2, nome: 'ZITA AMELI', cpf: '933.250.630-20' },
+  { id: 3, nome: 'TESTE', cpf: '494.392.650-94' },
+  { id: 4, nome: 'TESTE 2', cpf: '933.250.630-20' },
 ];
 
-const arquivosMock = [
+const arquivosMock: (EnvolvidoRow | ArquivoRow)[] = [
   { id: 1, nome: 'ExtratoDetalhado.csv', tipo: 'SIMBA', data: '10 Ago 2025 10:00:00', tamanho: '4.2 MB' },
   { id: 2, nome: 'Extrato_2.xlsx', tipo: 'SIMBA', data: '10 Ago 2025 10:00:00', tamanho: '21 KB' },
 ];
@@ -34,7 +40,6 @@ const arquivosMock = [
 export default function GeneralTab() {
   const router = useRouter();
 
-  // States para modais e ações
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
@@ -55,25 +60,22 @@ export default function GeneralTab() {
   });
   const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
-  // States para adicionar envolvidos
   const [novoNome, setNovoNome] = useState('');
   const [novoCpf, setNovoCpf] = useState('');
   const [envolvidos, setEnvolvidos] = useState(envolvidosMock);
   const [arquivos, setArquivos] = useState(arquivosMock);
 
-  // Navbar tabs
   const tabs = [
     { label: 'Informações gerais', path: '/casos/ViewCase/generalTab' },
     { label: 'Vínculos', path: '/casos/ViewCase/vinculos' },
     { label: 'Visualização dos dados', path: '/casos/ViewCase/dados' },
   ];
 
-  // Handlers
   const handleAddEnvolvido = () => {
-    if (novoNome && novoCpf) {
+    if (novoNome && novoCpf && (novoCpf.length === 11 || novoCpf.length === 14)) {
       const nextId =
         envolvidos.length > 0 ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1 : 1;
-      setEnvolvidos([...envolvidos, { id: nextId, nome: novoNome, cpf: novoCpf }]);
+      setEnvolvidos([...envolvidos, { id: nextId, nome: novoNome, cpf: maskCpfCnpj(novoCpf) }]);
       setNovoNome('');
       setNovoCpf('');
     }
@@ -89,44 +91,59 @@ export default function GeneralTab() {
     setShowRemoveFileModal({ open: false, index: null });
   };
 
-  // Table configs
-  const envolvidosColumns = [
-    { key: 'nome' as any, label: 'NOME', cell: (row: { id: number; nome: string; cpf: string }) => row.nome },
-    { key: 'cpf' as any, label: 'CPF / CNPJ', cell: (row: { id: number; nome: string; cpf: string }) => row.cpf },
+  const envolvidosColumns: Column<EnvolvidoRow>[] = [
+    { key: 'nome', label: 'NOME' },
+    { key: 'cpf', label: 'CPF / CNPJ' },
+  ];
+
+  const arquivosColumns: Column<ArquivoRow>[] = [
+    { key: 'nome', label: 'NOME' },
+    { key: 'tipo', label: '' },
+    { key: 'data', label: 'DATA DE INCLUSÃO' },
+    { key: 'tamanho', label: 'TAMANHO' },
+  ];
+
+  const envolvidosRowActions = [
     {
-      key: 'id' as any,
-      label: 'AÇÃO',
-      cell: (_: { id: number; nome: string; cpf: string }, idx: number) => (
-        <Button
-          icon={<TbTrash />}
-          variant="outlined"
-          size="small"
-          label=""
-          onClick={() => setShowRemoveEnvolvidoModal({ open: true, index: idx })}
-        />
-      ),
+      icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
+      label: 'Remover',
+      onClick: (_row: EnvolvidoRow, _index?: number) => {
+        const idx = envolvidos.findIndex((e) => e.id === _row.id);
+        setShowRemoveEnvolvidoModal({ open: true, index: idx });
+      },
     },
   ];
 
-  const arquivosColumns = [
-    { key: 'id' as any, label: 'NOME', cell: (row: any) => row.nome },
-    { key: 'id' as any, label: '', cell: (row: any) => <span className={styles.fileType}>{row.tipo}</span> },
-    { key: 'id' as any, label: 'DATA DE INCLUSÃO', cell: (row: any) => row.data },
-    { key: 'id' as any, label: 'TAMANHO', cell: (row: any) => row.tamanho },
+  const arquivosRowActions = [
     {
-      key: 'id' as any,
-      label: 'AÇÃO',
-      cell: (_: any, idx: number) => (
-        <Button
-          icon={<span style={{ color: 'red' }}>🗑️</span>}
-          variant="outlined"
-          size="small"
-          label=""
-          onClick={() => setShowRemoveFileModal({ open: true, index: idx })}
-        />
-      ),
+      icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
+      label: 'Remover',
+      onClick: (_row: ArquivoRow, _index?: number) => {
+        const idx = arquivos.findIndex((e) => e.id === _row.id);
+        setShowRemoveFileModal({ open: true, index: idx });
+      },
     },
   ];
+
+  function maskCpfCnpj(value: string) {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 11) {
+      // CPF: xxx.xxx.xxx-xx
+      let cpf = digits.slice(0, 11);
+      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      return cpf;
+    } else {
+      // CNPJ: xx.xxx.xxx/xxxx-xx
+      let cnpj = digits.slice(0, 14);
+      cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
+      cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      cnpj = cnpj.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+      return cnpj;
+    }
+  }
 
   return (
     <div className={styles.pageContainer}>
@@ -211,10 +228,13 @@ export default function GeneralTab() {
             />
             <input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder="Insira o CPF / CNPJ"
-              value={novoCpf}
-              onChange={(e) => setNovoCpf(e.target.value)}
+              value={maskCpfCnpj(novoCpf)}
+              onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
               className={styles.input}
+              maxLength={18} // 14 números + pontuações
             />
             <Button
               icon={<span style={{ fontWeight: 'bold', fontSize: '1.5em' }}>+</span>}
@@ -222,10 +242,17 @@ export default function GeneralTab() {
               size="small"
               label=""
               onClick={handleAddEnvolvido}
-              disabled={!novoNome || !novoCpf}
+              disabled={!novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)}
             />
-          </div>
-          <GenericTable columns={envolvidosColumns} data={envolvidos} loading={false} />
+					</div>
+					<div className={styles.GenericTable__container}>
+						<GenericTable<EnvolvidoRow>
+							columns={envolvidosColumns}
+							data={envolvidos}
+							loading={false}
+							rowActions={envolvidosRowActions}
+						/>
+					</div>
         </div>
 
         {/* Arquivos */}
@@ -246,7 +273,14 @@ export default function GeneralTab() {
             onClick={() => setShowUploadModal(true)}
             className={styles.uploadButton}
           />
-          <GenericTable columns={arquivosColumns} data={arquivos} loading={false} />
+          <div className={styles.GenericTable_container}>
+            <GenericTable<ArquivoRow>
+              columns={arquivosColumns}
+              data={arquivos as ArquivoRow[]}
+              loading={false}
+              rowActions={arquivosRowActions}
+            ></GenericTable>
+          </div>
         </div>
       </div>
 
@@ -259,9 +293,7 @@ export default function GeneralTab() {
             caseName: string;
             caseResponsable: string;
             creationDate: string;
-          }): Promise<void> | void {
-            // No implementation needed
-          }}
+          }): Promise<void> | void {}}
         />
       )}
       {showSituationModal && (
