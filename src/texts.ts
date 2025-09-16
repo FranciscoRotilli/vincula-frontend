@@ -18,6 +18,9 @@ export const texts = {
   'modal.caseName': 'Nome do caso:',
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
+  'modal.caseNumber': 'Número do caso',
+  'modal.owner': 'Responsável',
+  'modal.status': 'Número do caso',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
 } as const;

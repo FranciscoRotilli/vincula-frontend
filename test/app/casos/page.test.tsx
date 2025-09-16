@@ -64,10 +64,10 @@ describe("CasosPage", () => {
   it("should render table with correct columns", () => {
     render(renderWithClient(<CasosPage />));
     
-    expect(screen.getByText("Número do caso")).toBeInTheDocument();
-    expect(screen.getByText("Nome do caso")).toBeInTheDocument();
-    expect(screen.getByText("Responsável")).toBeInTheDocument();
-    expect(screen.getAllByText("Situação")).toHaveLength(2);
+    expect(screen.getByText(t('modal.caseNumber'))).toBeInTheDocument();
+    expect(screen.getByText(t('modal.caseName'))).toBeInTheDocument();
+    expect(screen.getByText(t('modal.owner'))).toBeInTheDocument();
+    expect(screen.getAllByText(t('modal.status'))).toHaveLength(2);
   });
 
   it("should show loading state initially", async () => {
@@ -231,8 +231,8 @@ describe("CasosPage", () => {
   it("should handle empty data state", () => {
     render(renderWithClient(<CasosPage />));
     
-    expect(screen.getByText("Número do caso")).toBeInTheDocument();
-    expect(screen.getByText("Nome do caso")).toBeInTheDocument();
+    expect(screen.getByText(t('modal.caseNumber'))).toBeInTheDocument();
+    expect(screen.getByText(t('modal.caseName'))).toBeInTheDocument();
   });
 
   it("should handle loading state", () => {

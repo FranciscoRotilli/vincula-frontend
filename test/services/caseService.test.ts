@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { addCase, getCases } from "../../src/services/caseService";
 
-// Mock environment variables
 vi.mock('../../src/services/caseService', async () => {
   const actual = await vi.importActual('../../src/services/caseService');
   return {
