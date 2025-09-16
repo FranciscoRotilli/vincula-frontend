@@ -28,7 +28,16 @@ lint:
   tags:
     - docker-linux
   interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
   script:
+    - npm ci --prefer-offline
     - npm run lint
 
 test:
@@ -38,7 +47,16 @@ test:
   tags:
     - docker-linux
   interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
   script:
+    - npm ci --prefer-offline
     - npm run test
 
 build:
@@ -50,5 +68,14 @@ build:
   tags:
     - docker-linux
   interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
   script:
+    - npm ci --prefer-offline
     - npm run build
