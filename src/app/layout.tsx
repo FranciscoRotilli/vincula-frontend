@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={poppins.variable}>
         <Providers>{children}</Providers>
       </body>
     </html>

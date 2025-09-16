@@ -45,9 +45,11 @@ export default function GenericTable<T extends { id: number | string }>({
   data,
   loading,
   pagination,
+  sorting,
   selectable = false,
   rowActions,
   onRowClick,
+  onSort
 }: GenericTableProps<T>) {
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof T>(columns[0].key);
@@ -56,19 +58,29 @@ export default function GenericTable<T extends { id: number | string }>({
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const isPaginationServerSide = !!pagination;
+  const isSortingServerSide = !!sorting;
+
+  const currentOrderBy = isSortingServerSide ? sorting.sortBy : orderBy
+  const currentOrder = isSortingServerSide ? sorting.sortDir : order
 
   const clientSideRows = useMemo(() => {
     return [...data]
-      .sort(getComparator(order, orderBy))
+      .sort(getComparator(currentOrder, currentOrderBy))
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [data, order, orderBy, page, rowsPerPage]);
+  }, [data, currentOrder, currentOrderBy, page, rowsPerPage]);
 
   const rows = isPaginationServerSide ? data : clientSideRows;
 
   const handleSort = (property: keyof T) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+    const isAsc = currentOrderBy === property && currentOrder === "asc";
+    const newDirection = isAsc ? "desc" : "asc";
+    if (isSortingServerSide) {
+      onSort?.({ sortBy: property, sortDir: newDirection })
+    } else {
+      setOrder(isAsc ? "desc" : "asc");
+      setOrderBy(property);
+    }
+    
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,18 +166,18 @@ export default function GenericTable<T extends { id: number | string }>({
                     className={styles.headTableCell}
                     key={String(column.key)}
                     align={column.align || "left"}
-                    sortDirection={orderBy === column.key ? order : false}
+                    sortDirection={currentOrderBy === column.key ? currentOrder : false}
                   >
                     <TableSortLabel
                       className={styles.tableCellLabel}
-                      active={orderBy === column.key}
-                      direction={orderBy === column.key ? order : "asc"}
+                      active={currentOrderBy === column.key}
+                      direction={currentOrderBy === column.key ? currentOrder : "asc"}
                       onClick={() => handleSort(column.key)}
                     >
                       {column.label}
-                      {orderBy === column.key && (
+                      {currentOrderBy === column.key && (
                         <Box component="span" sx={visuallyHidden}>
-                          {order === "desc"
+                          {currentOrder === "desc"
                             ? "ordenado decrescente"
                             : "ordenado crescente"}
                         </Box>
@@ -175,7 +187,7 @@ export default function GenericTable<T extends { id: number | string }>({
                 ))}
                 {rowActions && (
                   <TableCell className={styles.headTableCell} align="center">
-                    Ação
+                    {t('genericTable.action')}
                   </TableCell>
                 )}
               </TableRow>

@@ -1,6 +1,8 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import { t } from "@/texts";
+
 export default function LoginPage() {
   return (
     <>
@@ -9,7 +11,7 @@ export default function LoginPage() {
         onLogout={() => console.log("logout")}
         user={{ name: "Usuário Exemplo", role: "Admin" }}
       />
-      <div>Login</div>
+      <div>{t("login.title")}</div>
     </>
   );
 }
