@@ -7,6 +7,7 @@ export type CaseResponse = {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function addCase(name: string): Promise<any> {
     const response = await axios.post(`${API_URL}/case/`, {
     name,

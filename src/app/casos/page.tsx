@@ -1,6 +1,7 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import router from 'next/router';
 import React, { useState } from 'react';
 
 import Button from '@/components/Button';
@@ -9,11 +10,10 @@ import Footer from '@/components/Footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
+import { useCase } from '@/hooks/useCase';
 import { Column } from '@/types/Table';
 
 import styles from './page.module.css';
-import { useCase } from '@/hooks/useCase';
-import router from 'next/router';
 
 const columns: Column<(typeof data)[0]>[] = [
   { key: 'case', label: 'Caso', align: 'left' },
@@ -65,14 +65,18 @@ export default function Casos() {
       const matchesCaseNumber =
         !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
 
-      const matchesCaseName = !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
+      const matchesCaseName = !filters.caseName 
+      || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
 
       const matchesResponsible =
-        !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
+        !filters.responsible 
+        || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
 
-      const matchesSituation = !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
+      const matchesSituation = !filters.situation 
+      || item.status.toLowerCase() === filters.situation.toLowerCase();
 
-      return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
+      return matchesSearch && 
+      matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
     });
 
     setFilteredData(filtered);
@@ -82,7 +86,8 @@ export default function Casos() {
     setFilteredData(cases);
   };
 
-  const handleCreateCase = (payload: { caseName: string; caseResponsable: string; creationDate: string }) => {
+  const handleCreateCase = (payload:
+    { caseName: string; caseResponsable: string; creationDate: string }) => {
     caseMutation.mutate({name: payload.caseName},
         {onSuccess: (data) => {
           const newCase = {
@@ -115,7 +120,8 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <CreateCaseModal isOpen={isModalOpen} onClose={() =>
+          setIsModalOpen(false)} onSubmit={handleCreateCase} />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
