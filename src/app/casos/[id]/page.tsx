@@ -3,9 +3,10 @@ import React from 'react';
 import { CaseContainer } from '@/components/CaseContainer';
 import styles from '@/components/CaseContainer/CaseContainer.module.css';
 
-export default async function GeneralInfoPage({ params }: { params: { id: string } }) {
+export default async function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
-    <CaseContainer caseId={params.id}>
+    <CaseContainer caseId={id}>
       <div className={styles.pageGrid}>
         <div className={styles.leftColumn}>
           <div className={styles.card}>

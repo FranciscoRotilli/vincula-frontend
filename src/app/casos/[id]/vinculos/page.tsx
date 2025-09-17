@@ -3,14 +3,14 @@ import React from 'react';
 import { CaseContainer } from '@/components/CaseContainer';
 import { t } from '@/texts'
 
-export default async function VinculosPage({ params }: { params: { id: string } }) {
+export default async function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
-    <CaseContainer caseId={params.id}>
+    <CaseContainer caseId={id}>
       <div>
         {}
-        <h1> {t('container.vinculo')} {params.id}</h1>
+        <h1> {t('container.vinculo')} {id}</h1>
       </div>
     </CaseContainer>
   );
 }
-
