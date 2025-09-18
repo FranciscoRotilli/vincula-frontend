@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, vi } from 'vitest';
 
 // Importação corrigida para usar o alias de caminho
-import Modal from '@/components/modals/Modal';
+import Modal from '@/components/Modals';
 
 // Mock do CSS Module também usando o alias para consistência
 vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
