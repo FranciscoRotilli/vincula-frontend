@@ -172,7 +172,10 @@ export default function GenericTable<T extends { id: number | string }>({
                   </TableCell>
                 ))}
                 {rowActions && (
-                  <TableCell className={styles.headTableCell} align="center">
+                  <TableCell
+                    className={`${styles.headTableCell} ${variant === 'outlined' ? styles.outlined : ''}`}
+                    align="center"
+                  >
                     {t('genericTable.action')}
                   </TableCell>
                 )}

@@ -1,13 +1,15 @@
 import Button from '../Button';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import { MdOutlineCloudUpload } from 'react-icons/md';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 import styles from './FilesSection.module.css';
 import Table from '../GenericTable';
 import { Column } from '@/types/Table';
 import { File } from '@/types/Files';
+import { t } from '@/texts';
 
 const dataMock: any = [
-  { name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
-  { name: 'Extrato_2.xlsx', createdDate: '10 Ago 2025 10:00:00', size: '21 KB' },
+  { id: 1, name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
+  { id: 2, name: 'Extrato_2.xlsx', createdDate: '10 Ago 2025 10:00:00', size: '21 KB' },
 ];
 
 const columns: Column<File>[] = [
@@ -16,18 +18,24 @@ const columns: Column<File>[] = [
   { key: 'size', label: 'TAMANHO', align: 'left' },
 ];
 
+const rowActions = [
+  {
+    label: 'Excluir',
+    icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
+    onClick: (row: unknown) => console.log('Excluir', row),
+  },
+];
+
 export default function FilesSection() {
   return (
     <section className={styles.filesContainer}>
       <div className={styles.uploadSection}>
-        <strong>Arquivos (2)</strong>
-        <p className={styles.filesText}>
-          Os arquivos em anexo serão usados para a geração de vínculos com os investigados.
-        </p>
+        <strong>{t('files.title', { count: dataMock.length })}</strong>
+        <p className={styles.filesDescription}>{t('files.description')}</p>
         <Button
           className={styles.uploadButton}
           data-testid="upload-file-button"
-          icon={<CloudUploadOutlinedIcon />}
+          icon={<MdOutlineCloudUpload />}
           variant="contained"
           label="Upload"
           onClick={() => console.log('')}
@@ -35,7 +43,7 @@ export default function FilesSection() {
       </div>
 
       <div className={styles.tableSection}>
-        <Table columns={columns} data={dataMock} loading={false} variant="outlined" />
+        <Table columns={columns} data={dataMock} loading={false} variant="outlined" rowActions={rowActions} />
       </div>
     </section>
   );

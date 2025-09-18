@@ -8,7 +8,7 @@ export const texts = {
 
   'genericTable.noData': 'Nenhum registro encontrado.',
   'genericTable.action': 'Ação',
-  
+
   'cases.title': 'Meus Casos',
   'cases.createError': 'Erro ao criar caso. Tente novamente.',
   'cases.createSuccess': 'Caso criado com sucesso!',
@@ -22,9 +22,11 @@ export const texts = {
   'modal.owner': 'Responsável',
   'modal.status': 'Número do caso',
 
+  'files.title': 'Arquivos ({count})',
+  'files.description': 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
+
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
 } as const;
-
 
 export type TextKey = keyof typeof texts;
 
