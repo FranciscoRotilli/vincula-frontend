@@ -20,9 +20,9 @@ const columns: Column<File>[] = [
 
 const rowActions = [
   {
-    label: 'Excluir',
+    label: 'Delete',
     icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
-    onClick: (row: unknown) => console.log('Excluir', row),
+    onClick: (row: unknown) => console.log('Delete', row),
   },
 ];
 

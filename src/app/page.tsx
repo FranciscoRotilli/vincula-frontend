@@ -1,9 +1,9 @@
 'use client';
 
-import { Lock,Person } from '@mui/icons-material';
+import { Lock, Person } from '@mui/icons-material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { type ChangeEvent, type FormEvent,useState } from 'react';
+import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -11,6 +11,7 @@ import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
 import styles from './page.module.css';
+import FilesSection from '@/components/FilesSection';
 
 type Errors = { usuario?: string; senha?: string };
 
@@ -59,56 +60,7 @@ export default function LoginPage() {
 
       <section className={styles.center}>
         <div className={styles.card}>
-          <div className={styles.logoGroup}>
-            <div className={styles.logoMprs}>
-              <Image
-                src="/mprs-logo.svg"
-                alt="MPRS - Ministério Público do Rio Grande do Sul"
-                width={300}
-                height={217}
-                priority
-              />
-            </div>
-
-            <div className={styles.logoVincula}>
-              <Image src="/vincula.svg" alt="VINCULA" width={400} height={119} />
-            </div>
-          </div>
-
-          <form className={styles.form} onSubmit={onSubmit} noValidate>
-            <Input
-              value={usuario}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setUsuario(e.target.value)}
-              placeholder="Insira o usuário"
-              label="Usuário"
-              required
-              error={errors.usuario}
-              startIcon={<Person data-testid="icon-person"/>}
-              data-testid="username-input"
-            />
-
-            <Input
-              type="password"
-              value={senha}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSenha(e.target.value)}
-              placeholder="Insira a senha"
-              label="Senha"
-              required
-              error={errors.senha}
-              startIcon={<Lock data-testid="lock-icon" />}
-              data-testid="password-input"
-            />
-
-            <div className={styles.buttonSpacer} />
-
-            <Button
-              type="submit"
-              label={loginMutation.isPending ? 'Entrando...' : 'Login'}
-              disabled={loginMutation.isPending}
-              onClick={() => {}}
-              data-testid='login-button'
-            />
-          </form>
+          <FilesSection />
         </div>
       </section>
     </main>
