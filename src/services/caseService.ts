@@ -1,46 +1,70 @@
-import axios from 'axios';
-
 import { ApiResponse, ApiSortingParams, FilterParams, PaginationParams } from '@/types/Cases';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export type CaseResponse = {
-    caseName: string
+  caseName: string;
+};
+
+function toQueryString(params: Record<string, unknown>) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null) return;
+    if (Array.isArray(v)) v.forEach((item) => search.append(k, String(item)));
+    else search.set(k, String(v));
+  });
+  const qs = search.toString();
+  return qs ? `?${qs}` : '';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function addCase(name: string): Promise<any> {
-    const response = await axios.post(`${API_URL}/case/`, {
-    name,
-  }, 
-  {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`, // header igual ao Swagger
+export async function addCase(name: string): Promise<CaseResponse> {
+  const resp = await fetch('/api/cases', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!resp.ok) {
+    let err: unknown;
+    try {
+      err = await resp.json();
+    } catch {
+      /* noop */
     }
-  },
+    throw new Error(
+      typeof err === 'object' && err && 'message' in (err as any)
+        ? (err as any).message
+        : `Falha ao criar caso (status ${resp.status})`
     );
-  return response.data;
-};
+  }
+
+  return resp.json();
+}
 
 export async function getCases(
   paginationParams: PaginationParams,
   filterParams: FilterParams,
   sortingParams: ApiSortingParams
 ): Promise<ApiResponse> {
-  
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-    params: {
-      ...paginationParams,
-      ...filterParams,
-      ...sortingParams
-    }
-  }
-  const response = await axios.get(`${API_URL}/case/`, config)
+  const qs = toQueryString({ ...paginationParams, ...filterParams, ...sortingParams });
 
-  return response.data;
+  const resp = await fetch(`/api/cases${qs}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+
+  if (!resp.ok) {
+    let err: unknown;
+    try {
+      err = await resp.json();
+    } catch {
+      /* noop */
+    }
+    throw new Error(
+      typeof err === 'object' && err && 'message' in (err as any)
+        ? (err as any).message
+        : `Falha ao listar casos (status ${resp.status})`
+    );
+  }
+
+  return resp.json();
 }

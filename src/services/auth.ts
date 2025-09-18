@@ -1,19 +1,20 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-export type LoginResponse = {
-  user: string;
-  role: string;
-  access_token: string;
-  refresh_token: string;
-};
+import { LoginResponse } from '@/types/User';
 
 export async function login(username: string, password: string): Promise<LoginResponse> {
-  const response = await axios.post(`${API_URL}/auth/login`, {
-    username,
-    password,
+  const resp = await fetch('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
   });
+  if (!resp.ok) throw new Error('Credenciais inválidas');
+  return resp.json();
+}
 
-  return response.data;
+export async function logout() {
+  await fetch('/api/auth/logout', { method: 'POST' });
+}
+
+export async function getCurrentUser() {
+  const resp = await fetch('/api/me');
+  if (!resp.ok) return null;
+  return resp.json();
 }

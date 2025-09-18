@@ -1,20 +1,18 @@
 'use client';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import Input from '@/components/Input';
 import Modal from '@/components/Modals';
 import modalStyles from '@/components/Modals/Modal.module.css';
 import { t } from '@/texts';
+import { CurrentUser } from '@/types/User';
+import { getCurrentUser } from '@/services/auth';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: {
-    caseName: string;
-  }) => Promise<void> | void;
+  onSubmit: (payload: { caseName: string }) => Promise<void> | void;
 };
-
-const CASE_RESPONSABLE = 'Flavia';
 
 const formatDate = (d: Date) => {
   const dd = String(d.getDate()).padStart(2, '0');
@@ -25,6 +23,16 @@ const formatDate = (d: Date) => {
 
 export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCaseModalProps) {
   const [caseName, setCaseName] = useState('');
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  useEffect(() => {
+    async function fetchUser() {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    }
+    fetchUser();
+  }, []);
+
+  const CASE_RESPONSABLE = user ? user.username : '';
 
   const creationDate = useMemo(() => (isOpen ? new Date() : null), [isOpen]);
   const creationDateFormated = creationDate ? formatDate(creationDate) : '';
@@ -56,14 +64,20 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       cancelButton="Cancelar"
     >
       <div className={modalStyles.formStack}>
-        <label>{t("modal.caseName")}</label>
-        <Input placeholder={'Digite o nome do caso'} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
-        
-        <label>{t("modal.responsibleName")}</label>
-        <Input placeholder={''} disabled value={CASE_RESPONSABLE} />
-        
-        <label>{t("modal.creationDate")}</label>
-        <Input placeholder={''} disabled value={creationDateFormated} />
+        <div className={modalStyles.formGroup}>
+          <label>{t('modal.caseName')}</label>
+          <Input placeholder={'Digite o nome do caso'} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
+        </div>
+
+        <div className={modalStyles.formGroup}>
+          <label>{t('modal.responsibleName')}</label>
+          <Input placeholder={''} disabled value={CASE_RESPONSABLE} />
+        </div>
+
+        <div className={modalStyles.formGroup}>
+          <label>{t('modal.creationDate')}</label>
+          <Input placeholder={''} disabled value={creationDateFormated} />
+        </div>
       </div>
     </Modal>
   );
