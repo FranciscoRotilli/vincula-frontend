@@ -13,7 +13,11 @@ export function useCase() {
   });
 }
 
-export function useCases(pagination: PaginationParams, filters: FilterParams, sorting: ApiSortingParams) {
+export function useCases(
+  pagination: PaginationParams,
+  filters: FilterParams,
+  sorting: ApiSortingParams
+) {
   return useQuery<ApiResponse, Error>({
     queryKey: ['cases', pagination, filters, sorting],
     queryFn: () => getCases(pagination, filters, sorting),
