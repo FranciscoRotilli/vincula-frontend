@@ -173,7 +173,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
   return (
     <div className={styles.addfileTheme}>
-      <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar arquivo" size="medium">
+      <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar arquivo" size="medium" data-testid="modal-add-file">
         <div className={`${styles.form} addfileScope`}>
           <div className={styles.row}>
             <div className={styles.field}>
