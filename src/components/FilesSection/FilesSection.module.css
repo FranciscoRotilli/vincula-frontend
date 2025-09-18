@@ -1,0 +1,17 @@
+.filesContainer {
+  width: 100%;
+}
+
+.uploadSection {
+  padding: 1.4rem 0 2.8rem 1.3rem;
+}
+
+.filesText {
+  margin-top: 0.6rem;
+  max-width: 30rem;
+}
+
+.uploadButton {
+  margin-top: 1.1rem;
+  max-width: 8rem;
+}
