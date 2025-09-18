@@ -1,7 +1,7 @@
+import Image from 'next/image';
 import React, { ReactNode, useEffect } from 'react';
 
 import styles from './Modal.module.css';
-import Image from 'next/image';
 
 type ModalProps = {
   isOpen: boolean;
