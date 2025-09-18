@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { tryRefreshAndGetAccess } from '@/lib/auth-refresh';
 
 export async function POST() {

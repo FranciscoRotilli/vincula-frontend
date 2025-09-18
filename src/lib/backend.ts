@@ -1,9 +1,13 @@
 import { cookies } from 'next/headers';
+
 import { tryRefreshAndGetAccess } from './auth-refresh';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-export async function apiFetch(path: string, init?: RequestInit & { asJson?: boolean }): Promise<Response> {
+export async function apiFetch(
+  path: string,
+  init?: RequestInit & { asJson?: boolean }
+): Promise<Response> {
   const jar = await cookies();
   const access = jar.get('access_token')?.value;
 

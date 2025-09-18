@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { apiFetch } from '@/lib/backend';
 
 export async function GET(req: NextRequest) {

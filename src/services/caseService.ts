@@ -4,6 +4,10 @@ export type CaseResponse = {
   caseName: string;
 };
 
+type ErrorWithMessage = {
+  message: string;
+};
+
 function toQueryString(params: Record<string, unknown>) {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
@@ -30,8 +34,8 @@ export async function addCase(name: string): Promise<CaseResponse> {
       /* noop */
     }
     throw new Error(
-      typeof err === 'object' && err && 'message' in (err as any)
-        ? (err as any).message
+      typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
+        ? (err as ErrorWithMessage).message
         : `Falha ao criar caso (status ${resp.status})`
     );
   }
@@ -60,8 +64,8 @@ export async function getCases(
       /* noop */
     }
     throw new Error(
-      typeof err === 'object' && err && 'message' in (err as any)
-        ? (err as any).message
+      typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
+        ? (err as ErrorWithMessage).message
         : `Falha ao listar casos (status ${resp.status})`
     );
   }

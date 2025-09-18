@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
-import { getTokensFromCookies } from '@/lib/auth-cookies';
 import { jwtVerify } from 'jose';
+import { NextResponse } from 'next/server';
+
+import { getTokensFromCookies } from '@/lib/auth-cookies';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 

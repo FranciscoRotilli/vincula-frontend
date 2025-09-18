@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { getCurrentUser, logout } from '@/services/auth';
+import { CurrentUser } from '@/types/User';
 
 import Navbar from './index';
-import { CurrentUser } from '@/types/User';
 
 export default function NavbarContainer() {
   const router = useRouter();

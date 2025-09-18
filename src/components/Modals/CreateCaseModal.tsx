@@ -4,9 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Input from '@/components/Input';
 import Modal from '@/components/Modals';
 import modalStyles from '@/components/Modals/Modal.module.css';
+import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CurrentUser } from '@/types/User';
-import { getCurrentUser } from '@/services/auth';
 
 type CreateCaseModalProps = {
   isOpen: boolean;

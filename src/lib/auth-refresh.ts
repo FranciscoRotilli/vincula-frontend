@@ -1,4 +1,4 @@
-import { setAccessCookie, getTokensFromCookies } from './auth-cookies';
+import { getTokensFromCookies, setAccessCookie } from './auth-cookies';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
