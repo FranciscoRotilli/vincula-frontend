@@ -3,15 +3,16 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import styles from './FilesSection.module.css';
 import Table from '../GenericTable';
 import { Column } from '@/types/Table';
+import { File } from '@/types/Files';
 
 const dataMock: any = [
-  { name: 'ExtratoDetalhado.csv', inclusionDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
-  { name: 'Extrato_2.xlsx', inclusionDate: '10 Ago 2025 10:00:00', size: '21 KB' },
+  { name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
+  { name: 'Extrato_2.xlsx', createdDate: '10 Ago 2025 10:00:00', size: '21 KB' },
 ];
 
-const columns: Column<(typeof dataMock)[0]>[] = [
+const columns: Column<File>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
-  { key: 'inclusionDate', label: 'DATA DE INCLUSÃO', align: 'left' },
+  { key: 'createdDate', label: 'DATA DE INCLUSÃO', align: 'left' },
   { key: 'size', label: 'TAMANHO', align: 'left' },
 ];
 
@@ -34,7 +35,7 @@ export default function FilesSection() {
       </div>
 
       <div className={styles.tableSection}>
-        <Table columns={columns} data={dataMock} loading={false} />
+        <Table columns={columns} data={dataMock} loading={false} variant="outlined" />
       </div>
     </section>
   );

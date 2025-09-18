@@ -40,7 +40,7 @@ function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
   const apiParams: FilterParams = {
     status: uiFilters.situation,
     owner: uiFilters.responsible,
-    name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber
+    name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber,
   };
 
   return apiParams;
@@ -49,41 +49,40 @@ function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
 function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams {
   return {
     sort_by: uiSorting.sortBy as 'name' | 'status' | 'creation_date',
-    sort_dir: uiSorting.sortDir
+    sort_dir: uiSorting.sortDir,
   };
 }
 
 export default function Casos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [pagination, setPagination] = useState({ page: 1, limit: 10 })
-  const [filters, setFilters] = useState<FilterValues>({})
+  const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+  const [filters, setFilters] = useState<FilterValues>({});
   const apiFilterParams = mapUiFiltersToApiParams(filters);
   const [sorting, setSorting] = useState<Sorting<CaseItem>>({
     sortBy: 'creation_date',
-    sortDir: 'desc'
-  })
+    sortDir: 'desc',
+  });
   const apiSortingParams = mapUiSortingToApiParams(sorting);
 
-  const { data: apiResponse, isLoading, refetch } = useCases(
-    pagination, apiFilterParams, apiSortingParams)
+  const { data: apiResponse, isLoading, refetch } = useCases(pagination, apiFilterParams, apiSortingParams);
 
-  const cases = apiResponse?.items || []
+  const cases = apiResponse?.items || [];
 
   const caseMutation = useCase();
 
   const handleFilter = (newFilters: FilterValues) => {
-    setFilters(newFilters)
-    setPagination(p => ({ ...p,page: 1 }))
+    setFilters(newFilters);
+    setPagination((p) => ({ ...p, page: 1 }));
   };
 
   const handleSortChange = (newSorting: Sorting<CaseItem>) => {
-    setSorting(newSorting)
-  }
+    setSorting(newSorting);
+  };
 
   const handleClear = () => {
-    setFilters({})
-    setPagination(p => ({ ...p,page: 1 }))
+    setFilters({});
+    setPagination((p) => ({ ...p, page: 1 }));
   };
 
   const handlePageChange = (newPage: number, newLimit: number) => {
@@ -95,18 +94,15 @@ export default function Casos() {
       name: payload.caseName,
     };
 
-    caseMutation.mutate(
-      apiPayload,
-      {
-        onSuccess: (_data) => {
-          setIsModalOpen(false);
-          refetch();
-        },
-        onError: (error) => {
-          console.error('Erro ao criar caso:', error);
-        }
-      }
-    );
+    caseMutation.mutate(apiPayload, {
+      onSuccess: (_data) => {
+        setIsModalOpen(false);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Erro ao criar caso:', error);
+      },
+    });
   };
 
   return (
@@ -124,17 +120,14 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateCase}
-        />
+        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
             columns={columns}
             data={cases}
             loading={isLoading}
+            variant="ghost"
             selectable={false}
             rowActions={rowActions}
             pagination={{

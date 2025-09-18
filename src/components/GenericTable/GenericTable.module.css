@@ -1,5 +1,6 @@
 .tablePaper {
   width: 100%;
+  box-shadow: none !important;
 }
 
 .tableContainer {
@@ -23,6 +24,11 @@
 .headTableCell {
   color: var(--orange-primary) !important;
   font-weight: bold !important;
+}
+
+.outlined {
+  border-bottom: 2px solid var(--orange-primary) !important;
+  border-top: 2px solid var(--orange-primary) !important;
 }
 
 .tableCellLabel {
