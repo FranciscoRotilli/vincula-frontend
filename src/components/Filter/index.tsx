@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
+import { t } from '@/texts';
+
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
@@ -13,7 +15,7 @@ export type FilterValues = {
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
-  situation?: string;
+  situation?: 'Em andamento' | 'Suspenso' | 'Encerrado';
 };
 
 export type SituationOption = { value: string; label: string };
@@ -33,7 +35,7 @@ const Filter: React.FC<FilterProps> = ({
   defaultValues = {},
   situations,
   disabled = false,
-  loading = false,
+  // loading = false, // Commented out - not being used
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
@@ -62,31 +64,33 @@ const Filter: React.FC<FilterProps> = ({
     onClear && onClear();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleFilter();
-  };
+  // Commented out - not being used currently
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter') handleFilter();
+  // };
 
-  function handleChange(
-    _arg0: string
-  ):
-    | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
-        ((event: React.ChangeEvent<HTMLInputElement>) => void))
-    | undefined {
-    return _arg0
-      ? (event) =>
-          setFilters((prev) => ({
-            ...prev,
-            [_arg0]: event.target.value,
-          }))
-      : undefined;
-  }
+  // Commented out - not being used currently
+  // function handleChange(
+  //   _arg0: string
+  // ):
+  //   | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
+  //       ((event: React.ChangeEvent<HTMLInputElement>) => void))
+  //   | undefined {
+  //   return _arg0
+  //     ? (event) =>
+  //         setFilters((prev) => ({
+  //           ...prev,
+  //           [_arg0]: event.target.value,
+  //         }))
+  //     : undefined;
+  // }
 
   return (
     <div className={styles.filterContainer}>
       <div className={styles.fieldsRow}>
         <Input
           placeholder="Insira o número do caso"
-          label="Número do caso"
+          label={t('modal.caseNumber')}
           value={filters.caseNumber || ''}
           onChange={handleInputChange('caseNumber')}
           disabled={disabled}
@@ -94,7 +98,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <Input
           placeholder="Insira o nome do caso"
-          label="Nome do caso"
+          label={t('modal.caseName')}
           value={filters.caseName || ''}
           onChange={handleInputChange('caseName')}
           disabled={disabled}
@@ -102,7 +106,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <Input
           placeholder="Insira o responsável"
-          label="Responsável"
+          label={t('modal.owner')}
           value={filters.responsible || ''}
           onChange={handleInputChange('responsible')}
           disabled={disabled}
@@ -110,7 +114,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <div className={styles.inputWrapper}>
           <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            Situação
+            {t("filter.situation")}
           </label>
           <CustomSelect
             options={situations}

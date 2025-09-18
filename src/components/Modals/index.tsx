@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 
 import styles from './Modal.module.css';
+import Image from 'next/image';
 
 type ModalProps = {
   isOpen: boolean;
@@ -74,9 +75,11 @@ const Modal = ({
             </button>
           </header>
         )}
+        <div className={styles.body}>
+          {isError && <Image src="/error.svg" alt="Error" width={50} height={50} className={styles.errorIcon} />}
 
-        <main className={styles.content}>{children}</main>
-
+          <main className={styles.content}>{children}</main>
+        </div>
         {(cancelButton || actionButton) && (
           <footer className={styles.footer}>
             {cancelButton && (

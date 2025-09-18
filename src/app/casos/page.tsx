@@ -9,29 +9,18 @@ import Footer from '@/components/Footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
-import { useCase } from '@/hooks/useCase';
-import { Column } from '@/types/Table';
+import { useCase, useCases } from '@/hooks/useCase';
+import { t } from '@/texts';
+import { ApiSortingParams, CaseItem, FilterParams } from '@/types/Cases';
+import { Column, Sorting } from '@/types/Table';
 
 import styles from './page.module.css';
 
-const columns: Column<(typeof data)[0]>[] = [
-  { key: 'case', label: 'Caso', align: 'left' },
-  { key: 'responsible', label: 'Responsável', align: 'left' },
+const columns: Column<CaseItem>[] = [
+  { key: 'name', label: 'Caso', align: 'left' },
+  { key: 'owner', label: 'Responsável', align: 'left' },
   { key: 'status', label: 'Situação', align: 'left' },
-  { key: 'openedAt', label: 'Data de Abertura', align: 'left' },
-];
-
-const data = [
-  { id: 1, case: 'Caso 001', responsible: 'João Silva', status: 'Aberto', openedAt: '2025-08-20' },
-  { id: 2, case: 'Caso 002', responsible: 'Maria Souza', status: 'Em andamento', openedAt: '2025-08-21' },
-  { id: 3, case: 'Caso 003', responsible: 'Pedro Santos', status: 'Concluído', openedAt: '2025-08-22' },
-  { id: 4, case: 'Caso 004', responsible: 'Ana Oliveira', status: 'Aberto', openedAt: '2025-08-23' },
-  { id: 5, case: 'Caso 005', responsible: 'Carlos Pereira', status: 'Em andamento', openedAt: '2025-08-24' },
-  { id: 6, case: 'Caso 006', responsible: 'Fernanda Lima', status: 'Concluído', openedAt: '2025-08-25' },
-  { id: 7, case: 'Caso 007', responsible: 'Ricardo Alves', status: 'Aberto', openedAt: '2025-08-26' },
-  { id: 8, case: 'Caso 008', responsible: 'Juliana Costa', status: 'Em andamento', openedAt: '2025-08-27' },
-  { id: 9, case: 'Caso 009', responsible: 'Marcos Rocha', status: 'Concluído', openedAt: '2025-08-28' },
-  { id: 10, case: 'Caso 010', responsible: 'Patrícia Martins', status: 'Aberto', openedAt: '2025-08-29' },
+  { key: 'creation_date', label: 'Data de Abertura', align: 'left' },
 ];
 
 const rowActions = [
@@ -47,73 +36,80 @@ const situations = [
   { value: 'Concluído', label: 'Concluído' },
 ];
 
+function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
+  const apiParams: FilterParams = {
+    status: uiFilters.situation,
+    owner: uiFilters.responsible,
+    name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber,
+  };
+
+  return apiParams;
+}
+
+function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams {
+  return {
+    sort_by: uiSorting.sortBy as 'name' | 'status' | 'creation_date',
+    sort_dir: uiSorting.sortDir,
+  };
+}
+
 export default function Casos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cases, setCases] = useState(data);
-  const [filteredData, setFilteredData] = useState(data);
+
+  const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+  const [filters, setFilters] = useState<FilterValues>({});
+  const apiFilterParams = mapUiFiltersToApiParams(filters);
+  const [sorting, setSorting] = useState<Sorting<CaseItem>>({
+    sortBy: 'creation_date',
+    sortDir: 'desc',
+  });
+  const apiSortingParams = mapUiSortingToApiParams(sorting);
+
+  const { data: apiResponse, isLoading, refetch } = useCases(pagination, apiFilterParams, apiSortingParams);
+
+  const cases = apiResponse?.items || [];
 
   const caseMutation = useCase();
 
-  const handleFilter = (filters: FilterValues) => {
-    const filtered = cases.filter((item) => {
-      const search = filters.search?.toLowerCase();
-      const caseNumber = filters.caseNumber?.toLowerCase();
-      const caseName = filters.caseName?.toLowerCase();
-      const responsible = filters.responsible?.toLowerCase();
-      const situation = filters.situation?.toLowerCase();
+  const handleFilter = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    setPagination((p) => ({ ...p, page: 1 }));
+  };
 
-      const itemCase = item.case.toLowerCase();
-      const itemResponsible = item.responsible.toLowerCase();
-      const itemStatus = item.status.toLowerCase();
-
-      const matchesSearch =
-        !search || itemCase.includes(search) || itemResponsible.includes(search);
-      const matchesCaseNumber = !caseNumber || itemCase.includes(caseNumber);
-      const matchesCaseName = !caseName || itemCase.includes(caseName);
-      const matchesResponsible = !responsible || itemResponsible.includes(responsible);
-      const matchesSituation = !situation || itemStatus === situation;
-
-      return (
-        matchesSearch &&
-        matchesCaseNumber &&
-        matchesCaseName &&
-        matchesResponsible &&
-        matchesSituation
-      );
-    });
-
-    setFilteredData(filtered);
+  const handleSortChange = (newSorting: Sorting<CaseItem>) => {
+    setSorting(newSorting);
   };
 
   const handleClear = () => {
-    setFilteredData(cases);
+    setFilters({});
+    setPagination((p) => ({ ...p, page: 1 }));
   };
 
-  const handleCreateCase = (payload: {
-    caseName: string; caseResponsable: string; creationDate: string
-  }) => {
-    caseMutation.mutate({name: payload.caseName},
-        {onSuccess: (data) => {
-          const newCase = {
-          id: cases.length + 1,
-          case: payload.caseName,
-          responsible: payload.caseResponsable,
-          status: 'Aberto',
-          openedAt: payload.creationDate,
-        };
-          const updatedCases = [...cases, newCase];
-          setCases(updatedCases);
-          setFilteredData(updatedCases);
-          setIsModalOpen(false);
-        }},
-    )
+  const handlePageChange = (newPage: number, newLimit: number) => {
+    setPagination({ page: newPage + 1, limit: newLimit });
+  };
+
+  const handleCreateCase = (payload: { caseName: string }) => {
+    const apiPayload: { name: string } = {
+      name: payload.caseName,
+    };
+
+    caseMutation.mutate(apiPayload, {
+      onSuccess: (_data) => {
+        setIsModalOpen(false);
+        refetch();
+      },
+      onError: (error) => {
+        console.error('Erro ao criar caso:', error);
+      },
+    });
   };
 
   return (
     <div>
       <NavbarContainer />
       <main className={styles.main}>
-        <h1 className={styles.pageTitle}>Meus Casos</h1>
+        <h1 className={styles.pageTitle}>{t('cases.title')}</h1>
         <div className={styles.btnContainer}>
           <Button
             label="ADICIONAR CASO"
@@ -124,16 +120,23 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal isOpen={isModalOpen} onClose={() =>
-          setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
             columns={columns}
-            data={filteredData}
-            loading={false}
+            data={cases}
+            loading={isLoading}
             selectable={false}
             rowActions={rowActions}
+            pagination={{
+              totalItems: apiResponse?.total ?? 0,
+              pageSize: pagination.limit,
+              currentPage: pagination.page - 1,
+              onPageChange: handlePageChange,
+            }}
+            sorting={sorting}
+            onSort={handleSortChange}
           />
         </div>
       </main>
