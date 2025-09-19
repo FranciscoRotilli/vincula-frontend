@@ -25,7 +25,7 @@ const columns: Column<File>[] = [
 
 export default function FilesSection() {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const [isCreateCaseModalOpen, setIsCreateCaseModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // usar quando o modal de upload estiver pronto
 
   const rowActions = [
     {
@@ -46,7 +46,7 @@ export default function FilesSection() {
           icon={<MdOutlineCloudUpload />}
           variant="contained"
           label="Upload"
-          onClick={() => setIsCreateCaseModalOpen(true)}
+          onClick={() => setIsUploadModalOpen(true)}
         />
       </div>
 
@@ -59,12 +59,6 @@ export default function FilesSection() {
         onClose={() => setIsRemoveModalOpen(false)}
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
-      />
-
-      <CreateCaseModal
-        isOpen={isCreateCaseModalOpen}
-        onClose={() => setIsCreateCaseModalOpen(false)}
-        onSubmit={async () => {}}
       />
     </section>
   );

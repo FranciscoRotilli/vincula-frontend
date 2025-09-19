@@ -9,13 +9,14 @@ import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
+import { CaseStatus } from '@/types/Cases';
 
 export type FilterValues = {
   search?: string;
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
-  situation?: 'Em andamento' | 'Suspenso' | 'Encerrado';
+  situation?: CaseStatus;
 };
 
 export type SituationOption = { value: string; label: string };
@@ -39,14 +40,12 @@ const Filter: React.FC<FilterProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
-  const handleInputChange =
-    (field: keyof FilterValues) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
+  const handleInputChange = (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
 
   const handleSelectChange = (field: keyof FilterValues) => (value: string | null) => {
     setFilters((prev) => ({
@@ -114,7 +113,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <div className={styles.inputWrapper}>
           <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            {t("filter.situation")}
+            {t('filter.situation')}
           </label>
           <CustomSelect
             options={situations}

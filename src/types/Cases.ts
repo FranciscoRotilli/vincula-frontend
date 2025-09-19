@@ -1,10 +1,6 @@
 import { File } from './Files';
 
-enum CaseStatus {
-  'Em andamento',
-  'Suspenso',
-  'Encerrado',
-}
+export type CaseStatus = 'Em andamento' | 'Suspenso' | 'Encerrado';
 
 export type CaseItem = {
   id: string;
