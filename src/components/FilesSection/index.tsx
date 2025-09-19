@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Button from '../Button';
 import { MdOutlineCloudUpload } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
@@ -8,6 +9,8 @@ import Table from '../GenericTable';
 import { Column } from '@/types/Table';
 import { File } from '@/types/Files';
 import { t } from '@/texts';
+import RemoveModal from '../Modals/RemoveModal';
+import CreateCaseModal from '../Modals/CreateCaseModal';
 
 const dataMock: any = [
   { id: 1, name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
@@ -20,15 +23,18 @@ const columns: Column<File>[] = [
   { key: 'size', label: 'TAMANHO', align: 'left' },
 ];
 
-const rowActions = [
-  {
-    label: 'Delete',
-    icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
-    onClick: (row: unknown) => console.log('Delete', row),
-  },
-];
-
 export default function FilesSection() {
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [isCreateCaseModalOpen, setIsCreateCaseModalOpen] = useState(false);
+
+  const rowActions = [
+    {
+      label: 'Delete',
+      icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
+      onClick: () => setIsRemoveModalOpen(true),
+    },
+  ];
+
   return (
     <section className={styles.filesContainer}>
       <div className={styles.uploadSection}>
@@ -40,13 +46,26 @@ export default function FilesSection() {
           icon={<MdOutlineCloudUpload />}
           variant="contained"
           label="Upload"
-          onClick={() => console.log('')}
+          onClick={() => setIsCreateCaseModalOpen(true)}
         />
       </div>
 
       <div className={styles.tableSection}>
         <Table columns={columns} data={dataMock} loading={false} variant="outlined" rowActions={rowActions} />
       </div>
+
+      <RemoveModal
+        isOpen={isRemoveModalOpen}
+        onClose={() => setIsRemoveModalOpen(false)}
+        title={t('removeFileModal.title')}
+        description={t('removeFileModal.description')}
+      />
+
+      <CreateCaseModal
+        isOpen={isCreateCaseModalOpen}
+        onClose={() => setIsCreateCaseModalOpen(false)}
+        onSubmit={async () => {}}
+      />
     </section>
   );
 }

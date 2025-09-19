@@ -21,6 +21,10 @@ export const texts = {
   'modal.caseNumber': 'Número do caso',
   'modal.owner': 'Responsável',
   'modal.status': 'Número do caso',
+
+  'removeFileModal.title': 'Remover arquivo?',
+  'removeFileModal.description': 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
+
   'container.vis': 'Página de Visualização dos dados:',
   'container.vinculo': 'Página de Vínculos do Caso:',
 
