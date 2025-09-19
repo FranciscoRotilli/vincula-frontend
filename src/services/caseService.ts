@@ -47,7 +47,7 @@ export async function getCases(
   return response.data;
 }
 
-export async function getCase(caseId: string): Promise<CompleteCaseResponse> {
+export async function getCaseById(caseId: string): Promise<CompleteCaseResponse> {
   const response = await axios.get(`${API_URL}/case/${caseId}`, {
     headers: {
       'Content-Type': 'application/json',

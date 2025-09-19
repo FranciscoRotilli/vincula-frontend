@@ -11,6 +11,7 @@ import { File } from '@/types/Files';
 import { t } from '@/texts';
 import RemoveModal from '../Modals/RemoveModal';
 import CreateCaseModal from '../Modals/CreateCaseModal';
+import { useCaseById } from '@/hooks/useCase';
 
 const dataMock: any = [
   { id: 1, name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
@@ -23,9 +24,15 @@ const columns: Column<File>[] = [
   { key: 'size', label: 'TAMANHO', align: 'left' },
 ];
 
-export default function FilesSection() {
+type FilesSectionProps = {
+  caseId: string;
+};
+
+export default function FilesSection({ caseId }: FilesSectionProps) {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // usar quando o modal de upload estiver pronto
+
+  const { data: caseData, isLoading } = useCaseById(caseId);
 
   const rowActions = [
     {
@@ -38,7 +45,7 @@ export default function FilesSection() {
   return (
     <section className={styles.filesContainer}>
       <div className={styles.uploadSection}>
-        <strong>{t('files.title', { count: dataMock.length })}</strong>
+        <strong>{t('files.title', { count: caseData?.archives?.length ?? 0 })}</strong>
         <p className={styles.filesDescription}>{t('files.description')}</p>
         <Button
           className={styles.uploadButton}
@@ -51,7 +58,13 @@ export default function FilesSection() {
       </div>
 
       <div className={styles.tableSection}>
-        <Table columns={columns} data={dataMock} loading={false} variant="outlined" rowActions={rowActions} />
+        <Table
+          columns={columns}
+          data={caseData?.archives ?? []}
+          loading={isLoading}
+          variant="outlined"
+          rowActions={rowActions}
+        />
       </div>
 
       <RemoveModal

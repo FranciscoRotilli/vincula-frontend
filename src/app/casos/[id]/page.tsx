@@ -35,7 +35,7 @@ export default async function GeneralInfoPage({ params }: { params: Promise<{ id
           </div>
 
           <div className={styles.card}>
-            <FilesSection />
+            <FilesSection caseId={id} />
           </div>
         </div>
       </div>
