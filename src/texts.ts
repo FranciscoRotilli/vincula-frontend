@@ -21,6 +21,8 @@ export const texts = {
   'modal.caseNumber': 'Número do caso',
   'modal.owner': 'Responsável',
   'modal.status': 'Número do caso',
+  'container.vis': 'Página de Visualização dos dados:',
+  'container.vinculo': 'Página de Vínculos do Caso:',
 
   'files.title': 'Arquivos ({count})',
   'files.description': 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',

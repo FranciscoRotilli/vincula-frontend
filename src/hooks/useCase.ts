@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { addCase, CaseResponse,getCases } from '@/services/caseService';
+import { addCase, CaseResponse, getCases } from '@/services/caseService';
 import { ApiResponse, ApiSortingParams, FilterParams, PaginationParams } from '@/types/Cases';
 
 type AddCaseInput = {
@@ -9,7 +9,7 @@ type AddCaseInput = {
 
 export function useCase() {
   return useMutation<CaseResponse, Error, AddCaseInput>({
-    mutationFn: ({ name }) => addCase (name),
+    mutationFn: ({ name }) => addCase(name),
   });
 }
 
@@ -21,5 +21,5 @@ export function useCases(
   return useQuery<ApiResponse, Error>({
     queryKey: ['cases', pagination, filters, sorting],
     queryFn: () => getCases(pagination, filters, sorting),
-  })
+  });
 }
