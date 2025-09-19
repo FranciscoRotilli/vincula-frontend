@@ -16,7 +16,7 @@ const dataMock: any = [
 
 const columns: Column<File>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
-  { key: 'createdDate', label: 'DATA DE INCLUSÃO', align: 'left' },
+  { key: 'creation_date', label: 'DATA DE INCLUSÃO', align: 'left' },
   { key: 'size', label: 'TAMANHO', align: 'left' },
 ];
 
