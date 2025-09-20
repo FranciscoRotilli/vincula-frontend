@@ -1,11 +1,11 @@
 'use client';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React, { useId, useRef, useState } from 'react';
 
 import Modal from '@/components/Modals';
-import styles from './AddFileModal.module.css';
 
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import styles from './AddFileModal.module.css';
 
 type AddFileModalProps = {
   isOpen: boolean;

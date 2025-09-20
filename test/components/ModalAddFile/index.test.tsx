@@ -1,14 +1,20 @@
+import '@testing-library/jest-dom';
+
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { vi } from 'vitest';
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 import AddFileModal from '@/components/ModalAddFile';
 
 const makeFile = (name: string, type: string) => new File([new Blob(['x'], { type })], name, { type });
 
 const openModal = (overrides: Partial<React.ComponentProps<typeof AddFileModal>> = {}) => {
-  const props = { isOpen: true, onClose: vi.fn(), onSubmit: vi.fn(), ...overrides } as React.ComponentProps<typeof AddFileModal>;
+  const props = {
+    isOpen: true,
+    onClose: vi.fn(),
+    onSubmit: vi.fn(),
+    ...overrides,
+  } as React.ComponentProps<typeof AddFileModal>;
   render(<AddFileModal {...props} />);
   return props;
 };
