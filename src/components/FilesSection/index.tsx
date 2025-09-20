@@ -14,6 +14,7 @@ import Button from '../Button';
 import Table from '../GenericTable';
 import RemoveModal from '../Modals/RemoveModal';
 import styles from './FilesSection.module.css';
+import AddFileModal from '../ModalAddFile';
 
 const columns: Column<File>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
@@ -28,9 +29,7 @@ type FilesSectionProps = {
 export default function FilesSection({ caseId }: FilesSectionProps) {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [fileToRemove, setFileToRemove] = useState<File | null>(null);
-
-  // usar quando o modal de upload estiver pronto
-  const [_isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const { data: caseData, isLoading } = useCaseById(caseId);
   const removeFileMutation = useRemoveFile(caseId);
@@ -82,6 +81,11 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         />
       </div>
 
+      <AddFileModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSubmit={() => console.log('Add file')}
+      />
       <RemoveModal
         isOpen={isRemoveModalOpen}
         onClose={() => setIsRemoveModalOpen(false)}

@@ -1,5 +1,6 @@
 'use client';
 
+import { MdClose } from 'react-icons/md';
 import Modal from '@mui/material/Modal';
 import Image from 'next/image';
 
@@ -24,6 +25,10 @@ export default function RemoveModal({
   return (
     <Modal open={isOpen} onClose={onClose}>
       <div className={styles.modalContainer}>
+        <div className={styles.closeButtonContainer}>
+          <MdClose size={22} onClick={onClose} className={styles.closeButton} />
+        </div>
+
         <Image src="/remove-modal-icon.svg" alt={`Ícone para "${title}"`} width={258} height={84} />
 
         <h2 className={styles.title}>{title}</h2>
