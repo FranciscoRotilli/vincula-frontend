@@ -10,7 +10,6 @@ import Input from '@/components/Input';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
-import GeneralTab from './casos/viewCase';
 import styles from './page.module.css';
 
 type Errors = { usuario?: string; senha?: string };
@@ -58,11 +57,6 @@ export default function LoginPage() {
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
 			</div>
-			
-			<div>
-				<GeneralTab caseId={''}></GeneralTab>
-			</div>
-
       <section className={styles.center}>
         <div className={styles.card}>
           <div className={styles.logoGroup}>
