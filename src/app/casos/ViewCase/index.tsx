@@ -5,7 +5,6 @@ import { FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
-import { CaseContainer } from '@/components/CaseContainer';
 import GenericTable from '@/components/GenericTable';
 import Modal from '@/components/Modals';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
@@ -16,6 +15,7 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
+import { t } from '@/texts';
 import { CaseItem } from '@/types/Cases';
 import { Column } from '@/types/Table';
 
@@ -195,55 +195,54 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
   }
 
   return (
-
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails}>
             <h2>{caseDetails.name}</h2>
             <div className={styles.detailsRow}>
               <div>
-                <strong>{'Responsável:'}</strong> {caseDetails.owner}
+                <strong>{t('modal.owner')}</strong> {caseDetails.owner}
               </div>
               <div>
-                <strong>{'Data de Criação:'}</strong> {caseDetails.creation_date}
+                <strong>{t('modal.creationDate')}</strong> {caseDetails.creation_date}
               </div>
               <div>
-                <strong>{'Situação:'}</strong> {caseDetails.status}
+                <strong>{t('filter.situation')}</strong> {caseDetails.status}
               </div>
             </div>
             <div className={styles.detailsRow}>
               <div>
-                <strong>{'Código do caso:'}</strong> {caseDetails.id}
+                <strong>{t('modal.caseNumber')}</strong> {caseDetails.id}
               </div>
             </div>
           </div>
 
           <div className={styles.actionsBox}>
             <h1 className={styles.sectionHeader}>
-              <text>{'Ações'}</text>
+              {t('cases.title.actions', { defaultValue: 'Ações' })}
             </h1>
             <div className={styles.actionsRow}>
               <Button
                 size="large"
-                label="Alterar nome"
+                label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
                 size="large"
-                label="Alterar situação"
+                label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
                 size="large"
-                label="Permitir visualização"
+                label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
                 size="large"
-                label="Excluir caso"
+                label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
               />
@@ -253,16 +252,16 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <div className={styles.envolvidosBox}>
             <div className={styles.sectionHeader}>
               <strong>
-                {'Investigados'} ({envolvidos.length})
+                {t('cases.title.investigated', { defaultValue: 'Investigados' })} ({envolvidos.length})
               </strong>
             </div>
             <div className={styles.sectionDescription}>
-              {'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.'}
+              {t('cases.title.investigatedDesc', { defaultValue: 'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.' })}
             </div>
             <div className={styles.addEnvolvidoRow}>
               <input
                 type="text"
-                placeholder="Insira o nome"
+                placeholder={t('cases.title.inputName', { defaultValue: 'Insira o nome' })}
                 value={novoNome}
                 onChange={(e) => setNovoNome(e.target.value)}
                 className={styles.input}
@@ -271,7 +270,7 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                placeholder="Insira o CPF / CNPJ"
+                placeholder={t('cases.title.inputCpfCnpj', { defaultValue: 'Insira o CPF / CNPJ' })}
                 value={maskCpfCnpj(novoCpf)}
                 onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
                 className={styles.input}
@@ -303,17 +302,17 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <div className={styles.arquivosBox}>
             <div className={styles.sectionHeader}>
               <strong>
-                {'Arquivos'} ({arquivos.length})
+                {t('cases.title.files', { defaultValue: 'Arquivos' })} ({arquivos.length})
               </strong>
             </div>
             <div className={styles.sectionDescription}>
-              {'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.'}
+              {t('cases.title.filesDesc', { defaultValue: 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.' })}
             </div>
             <Button
               icon={<FiUpload />}
               variant="contained"
               size="small"
-              label="Upload"
+              label={t('cases.title.upload', { defaultValue: 'Upload' })}
               onClick={() => setShowUploadModal(true)}
               className={styles.uploadButton}
             />
@@ -342,41 +341,41 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <Modal
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
-            title="Alterar situação"
+            title={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
           >
             <select
               value={novaSituacao}
               onChange={(e) => setNovaSituacao(e.target.value as CaseItem['status'])}
               className={styles.input}
             >
-              <option value="">{"Selecione a situação"}</option>
-              <option value="Em andamento">{"Em andamento"}</option>
-              <option value="Suspenso">{"Suspenso"}</option>
-              <option value="Encerrado">{"Encerrado"}</option>
+              <option value="">{t('cases.title.selectSituation', { defaultValue: 'Selecione a situação' })}</option>
+              <option value="Em andamento">{t('cases.title.situationOngoing', { defaultValue: 'Em andamento' })}</option>
+              <option value="Suspenso">{t('cases.title.situationSuspended', { defaultValue: 'Suspenso' })}</option>
+              <option value="Encerrado">{t('cases.title.situationClosed', { defaultValue: 'Encerrado' })}</option>
             </select>
             <Button
-              label="Salvar"
+              label={t('cases.title.save', { defaultValue: 'Salvar' })}
               variant="contained"
               onClick={handleUpdateSituation}
               disabled={!novaSituacao}
             />
             <Button
-              label="Cancelar"
+              label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
               variant="outlined"
               onClick={() => setShowSituationModal(false)}
             />
           </Modal>
         )}
         {showDeleteCaseModal && (
-          <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title="Excluir caso">
+          <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title={t('cases.title.delete', { defaultValue: 'Excluir caso' })}>
             <div>
-              <p>{'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <p>{t('cases.title.deleteWarning', { defaultValue: 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.' })}</p>
               <Button
-                label="Excluir"
+                label={t('cases.title.delete', { defaultValue: 'Excluir' })}
                 variant="contained"
                 onClick={handleDeleteCase}
               />
-              <Button label="Cancelar" variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
+              <Button label={t('cases.title.cancel', { defaultValue: 'Cancelar' })} variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
             </div>
           </Modal>
         )}
@@ -384,17 +383,17 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <Modal
             isOpen={showRemoveFileModal.open}
             onClose={() => setShowRemoveFileModal({ open: false, index: null })}
-            title="Remover arquivo?"
+            title={t('cases.title.removeFile', { defaultValue: 'Remover arquivo?' })}
           >
             <div>
-              <p>{'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <p>{t('cases.title.removeFileWarning', { defaultValue: 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.' })}</p>
               <Button
-                label="Remover"
+                label={t('cases.title.remove', { defaultValue: 'Remover' })}
                 variant="contained"
                 onClick={() => handleRemoveArquivo(showRemoveFileModal.index!)}
               />
               <Button
-                label="Cancelar"
+                label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
                 variant="outlined"
                 onClick={() => setShowRemoveFileModal({ open: false, index: null })}
               />
@@ -405,17 +404,17 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <Modal
             isOpen={showRemoveEnvolvidoModal.open}
             onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-            title="Remover investigado?"
+            title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
           >
             <div>
-              <p>{'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <p>{t('cases.title.removeInvestigatedWarning', { defaultValue: 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.' })}</p>
               <Button
-                label="Remover"
+                label={t('cases.title.remove', { defaultValue: 'Remover' })}
                 variant="contained"
                 onClick={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
               />
               <Button
-                label="Cancelar"
+                label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
                 variant="outlined"
                 onClick={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
               />
@@ -426,7 +425,7 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           <Modal
             isOpen={showUploadModal}
             onClose={() => setShowUploadModal(false)}
-            title="Adicionar arquivo"
+            title={t('cases.title.addFile', { defaultValue: 'Adicionar arquivo' })}
             children={undefined}
           >
           </Modal>
