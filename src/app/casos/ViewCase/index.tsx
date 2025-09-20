@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
@@ -167,45 +168,46 @@ export default function GeneralTab() {
           <h2>{caseDetails.nome}</h2>
           <div className={styles.detailsRow}>
             <div>
-              <strong>Responsável:</strong> {caseDetails.responsavel}
+              <strong>{'Responsável:'}</strong> {caseDetails.responsavel}
             </div>
             <div>
-              <strong>Data de Criação:</strong> {caseDetails.dataCriacao}
+              <strong>{'Data de Criação:'}</strong> {caseDetails.dataCriacao}
             </div>
             <div>
-              <strong>Situação:</strong> {caseDetails.situacao}
+              <strong>{'Situação:'}</strong> {caseDetails.situacao}
             </div>
           </div>
           <div className={styles.detailsRow}>
             <div>
-              <strong>Data de Atualização:</strong> {caseDetails.dataAtualizacao}
+              <strong>{'Data de Atualização:'}</strong> {caseDetails.dataAtualizacao}
             </div>
             <div>
-              <strong>Código do caso:</strong> {caseDetails.codigo}
+              <strong>{'Código do caso:'}</strong> {caseDetails.codigo}
             </div>
           </div>
         </div>
 
         {/* Botões de ação */}
         <div className={styles.actionsBox}>
-          <div className={styles.sectionHeader}>
-            <strong>{'Ações'}</strong>
+          <h1 className={styles.sectionHeader}>
+            <text>{'Ações'}</text>
+          </h1>
+          <div className={styles.actionsRow}>
+            <Button size="large" label="Alterar nome" variant="contained" onClick={() => setShowNameModal(true)} />
+            <Button
+              size="large"
+              label="Alterar situação"
+              variant="contained"
+              onClick={() => setShowSituationModal(true)}
+            />
+            <Button
+              size="large"
+              label="Permitir visualização"
+              variant="contained"
+              onClick={() => setVisualizacaoPermitida((v) => !v)}
+            />
+            <Button size="large" label="Excluir caso" variant="outlined" onClick={() => setShowDeleteCaseModal(true)} />
           </div>
-
-          <Button size="large" label="Alterar nome" variant="contained" onClick={() => setShowNameModal(true)} />
-          <Button
-            size="large"
-            label="Alterar situação"
-            variant="contained"
-            onClick={() => setShowSituationModal(true)}
-          />
-          <Button
-            size="large"
-            label="Permitir visualização"
-            variant="contained"
-            onClick={() => setVisualizacaoPermitida((v) => !v)}
-          />
-          <Button size="large" label="Excluir caso" variant="outlined" onClick={() => setShowDeleteCaseModal(true)} />
         </div>
 
         {/* Envolvidos */}
@@ -244,15 +246,15 @@ export default function GeneralTab() {
               onClick={handleAddEnvolvido}
               disabled={!novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)}
             />
-					</div>
-					<div className={styles.GenericTable__container}>
-						<GenericTable<EnvolvidoRow>
-							columns={envolvidosColumns}
-							data={envolvidos}
-							loading={false}
-							rowActions={envolvidosRowActions}
-						/>
-					</div>
+          </div>
+          <div className={styles.GenericTable__container}>
+            <GenericTable<EnvolvidoRow>
+              columns={envolvidosColumns}
+              data={envolvidos}
+              loading={false}
+              rowActions={envolvidosRowActions}
+            />
+          </div>
         </div>
 
         {/* Arquivos */}
@@ -263,17 +265,17 @@ export default function GeneralTab() {
             </strong>
           </div>
           <div className={styles.sectionDescription}>
-            Os arquivos em anexo serão usados para a geração de vínculos com os investigados.
+            {'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.'}
           </div>
           <Button
-            icon={<span style={{ fontSize: '1.2em' }}>📤</span>}
+            icon={<FiUpload />}
             variant="contained"
             size="small"
             label="Upload"
             onClick={() => setShowUploadModal(true)}
             className={styles.uploadButton}
           />
-          <div className={styles.GenericTable_container}>
+          <div className={styles.GenericTable__container}>
             <GenericTable<ArquivoRow>
               columns={arquivosColumns}
               data={arquivos as ArquivoRow[]}
@@ -309,7 +311,7 @@ export default function GeneralTab() {
       {showDeleteCaseModal && (
         <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title="Excluir caso">
           <div>
-            <p>Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.</p>
+            <p>{'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.'}</p>
             <Button
               label="Excluir"
               variant="contained"
@@ -328,7 +330,7 @@ export default function GeneralTab() {
           title="Remover arquivo?"
         >
           <div>
-            <p>Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.</p>
+            <p>{'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.'}</p>
             <Button
               label="Remover"
               variant="contained"
@@ -349,7 +351,7 @@ export default function GeneralTab() {
           title="Remover investigado?"
         >
           <div>
-            <p>Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.</p>
+            <p>{'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.'}</p>
             <Button
               label="Remover"
               variant="contained"
