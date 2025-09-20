@@ -1,9 +1,9 @@
 'use client';
 
-import { Lock,Person } from '@mui/icons-material';
+import { Lock, Person } from '@mui/icons-material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { type ChangeEvent, type FormEvent,useState } from 'react';
+import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -83,7 +83,7 @@ export default function LoginPage() {
               label="Usuário"
               required
               error={errors.usuario}
-              startIcon={<Person data-testid="icon-person"/>}
+              startIcon={<Person data-testid="icon-person" />}
               data-testid="username-input"
             />
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
               label={loginMutation.isPending ? 'Entrando...' : 'Login'}
               disabled={loginMutation.isPending}
               onClick={() => {}}
-              data-testid='login-button'
+              data-testid="login-button"
             />
           </form>
         </div>

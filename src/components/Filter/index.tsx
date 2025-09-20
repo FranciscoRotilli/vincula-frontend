@@ -4,6 +4,7 @@ import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { t } from '@/texts';
+import { CaseStatus } from '@/types/Cases';
 
 import Button from '../Button';
 import Input from '../Input';
@@ -15,7 +16,7 @@ export type FilterValues = {
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
-  situation?: 'Em andamento' | 'Suspenso' | 'Encerrado';
+  situation?: CaseStatus;
 };
 
 export type SituationOption = { value: string; label: string };
@@ -40,8 +41,7 @@ const Filter: React.FC<FilterProps> = ({
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
   const handleInputChange =
-    (field: keyof FilterValues) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
       setFilters((prev) => ({
         ...prev,
         [field]: e.target.value,
@@ -114,7 +114,7 @@ const Filter: React.FC<FilterProps> = ({
         />
         <div className={styles.inputWrapper}>
           <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            {t("filter.situation")}
+            {t('filter.situation')}
           </label>
           <CustomSelect
             options={situations}

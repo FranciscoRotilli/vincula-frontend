@@ -21,8 +21,15 @@ export const texts = {
   'modal.caseNumber': 'Número do caso',
   'modal.owner': 'Responsável',
   'modal.status': 'Número do caso',
+
+  'removeFileModal.title': 'Remover arquivo?',
+  'removeFileModal.description': 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
+
   'container.vis': 'Página de Visualização dos dados:',
   'container.vinculo': 'Página de Vínculos do Caso:',
+
+  'files.title': 'Arquivos ({count})',
+  'files.description': 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
 } as const;

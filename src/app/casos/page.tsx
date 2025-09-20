@@ -65,11 +65,11 @@ export default function Casos() {
   });
   const apiSortingParams = mapUiSortingToApiParams(sorting);
 
-  const { data: apiResponse, isLoading, refetch } = useCases(
-    pagination,
-    apiFilterParams,
-    apiSortingParams
-  );
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useCases(pagination, apiFilterParams, apiSortingParams);
 
   const cases = apiResponse?.items || [];
 
@@ -135,6 +135,7 @@ export default function Casos() {
             columns={columns}
             data={cases}
             loading={isLoading}
+            variant="ghost"
             selectable={false}
             rowActions={rowActions}
             pagination={{

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import styles from '@/components/CaseContainer/CaseContainer.module.css';
+import FilesSection from '@/components/FilesSection';
 
 export default async function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -34,16 +35,10 @@ export default async function GeneralInfoPage({ params }: { params: Promise<{ id
           </div>
 
           <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}></h3>
-            </div>
-            <div className={styles.cardBody}>
-              <p className={styles.cardPlaceholder}></p>
-            </div>
+            <FilesSection caseId={id} />
           </div>
         </div>
       </div>
     </CaseContainer>
   );
 }
-
