@@ -4,12 +4,12 @@ import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { t } from '@/texts';
+import { CaseStatus } from '@/types/Cases';
 
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
-import { CaseStatus } from '@/types/Cases';
 
 export type FilterValues = {
   search?: string;
@@ -40,12 +40,13 @@ const Filter: React.FC<FilterProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
-  const handleInputChange = (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-  };
+  const handleInputChange =
+    (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
+    };
 
   const handleSelectChange = (field: keyof FilterValues) => (value: string | null) => {
     setFilters((prev) => ({

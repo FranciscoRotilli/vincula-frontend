@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 
-import { CasesResponse, ApiSortingParams, FilterParams, PaginationParams, CompleteCaseResponse } from '@/types/Cases';
+import { ApiSortingParams, CasesResponse, CompleteCaseResponse,FilterParams, PaginationParams } from '@/types/Cases';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

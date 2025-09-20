@@ -1,23 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '../Button';
 import { MdOutlineCloudUpload } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import styles from './FilesSection.module.css';
-import Table from '../GenericTable';
-import { Column } from '@/types/Table';
-import { File } from '@/types/Files';
-import { t } from '@/texts';
-import RemoveModal from '../Modals/RemoveModal';
-import CreateCaseModal from '../Modals/CreateCaseModal';
+
 import { useCaseById } from '@/hooks/useCase';
 import { useRemoveFile } from '@/hooks/useFile';
+import { t } from '@/texts';
+import { File } from '@/types/Files';
+import { Column } from '@/types/Table';
 
-const dataMock: any = [
-  { id: 1, name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
-  { id: 2, name: 'Extrato_2.xlsx', createdDate: '10 Ago 2025 10:00:00', size: '21 KB' },
-];
+import Button from '../Button';
+import Table from '../GenericTable';
+import RemoveModal from '../Modals/RemoveModal';
+import styles from './FilesSection.module.css';
 
 const columns: Column<File>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
@@ -32,7 +28,9 @@ type FilesSectionProps = {
 export default function FilesSection({ caseId }: FilesSectionProps) {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [fileToRemove, setFileToRemove] = useState<File | null>(null);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // usar quando o modal de upload estiver pronto
+
+  // usar quando o modal de upload estiver pronto
+  const [_isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const { data: caseData, isLoading } = useCaseById(caseId);
   const removeFileMutation = useRemoveFile(caseId);

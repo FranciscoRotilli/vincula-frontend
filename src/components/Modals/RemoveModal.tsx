@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Image from 'next/image';
-import Button from '../Button';
 
+import Button from '../Button';
 import styles from './RemoveModal.module.css';
 
 interface RemoveModalProps {
@@ -15,7 +14,13 @@ interface RemoveModalProps {
   onRemove: () => void;
 }
 
-export default function RemoveModal({ title, description, isOpen, onClose, onRemove }: RemoveModalProps) {
+export default function RemoveModal({
+  title,
+  description,
+  isOpen,
+  onClose,
+  onRemove,
+}: RemoveModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <div className={styles.modalContainer}>
@@ -26,7 +31,12 @@ export default function RemoveModal({ title, description, isOpen, onClose, onRem
         <p className={styles.description}>{description}</p>
 
         <div className={styles.buttons}>
-          <Button label="Remover" variant="contained" className={styles.removeButton} onClick={onRemove} />
+          <Button
+            label="Remover"
+            variant="contained"
+            className={styles.removeButton}
+            onClick={onRemove}
+          />
           <Button label="Cancelar" variant="error" onClick={onClose} />
         </div>
       </div>

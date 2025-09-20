@@ -65,7 +65,11 @@ export default function Casos() {
   });
   const apiSortingParams = mapUiSortingToApiParams(sorting);
 
-  const { data: apiResponse, isLoading, refetch } = useCases(pagination, apiFilterParams, apiSortingParams);
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useCases(pagination, apiFilterParams, apiSortingParams);
 
   const cases = apiResponse?.items || [];
 
@@ -120,7 +124,11 @@ export default function Casos() {
             className="btnAdicionarCaso"
           />
         </div>
-        <CreateCaseModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleCreateCase} />
+        <CreateCaseModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleCreateCase}
+        />
         <div className={styles.tableContainer}>
           <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
           <Table
