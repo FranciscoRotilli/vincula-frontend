@@ -12,9 +12,9 @@ import { Column } from '@/types/Table';
 
 import Button from '../Button';
 import Table from '../GenericTable';
+import AddFileModal from '../ModalAddFile';
 import RemoveModal from '../Modals/RemoveModal';
 import styles from './FilesSection.module.css';
-import AddFileModal from '../ModalAddFile';
 
 const columns: Column<File>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
