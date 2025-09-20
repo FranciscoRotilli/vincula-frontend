@@ -10,8 +10,8 @@ import Input from '@/components/Input';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
+import GeneralTab from './casos/viewCase/index';
 import styles from './page.module.css';
-import GeneralTab from './casos/ViewCase/generalTab';
 
 type Errors = { usuario?: string; senha?: string };
 
@@ -39,6 +39,7 @@ export default function LoginPage() {
     loginMutation.mutate(
       { username: usuario, password: senha },
       {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onSuccess: (data : any) => {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
@@ -59,7 +60,7 @@ export default function LoginPage() {
 			</div>
 			
 			<div>
-				<GeneralTab></GeneralTab>
+				<GeneralTab caseId={''}></GeneralTab>
 			</div>
 
       <section className={styles.center}>

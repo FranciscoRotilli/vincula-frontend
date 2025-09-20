@@ -45,3 +45,72 @@ export async function getCases(
 
   return response.data;
 }
+
+export async function getCaseById(caseId: string) {
+  const response = await axios.get(
+    `${API_URL}/case/${caseId}/`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function updateCaseName(caseId: string, name: string) {
+  const response = await axios.patch(
+    `${API_URL}/case/${caseId}/`,
+    { name },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function updateCaseSituation(caseId: string, situation: string) {
+  const response = await axios.patch(
+    `${API_URL}/case/${caseId}/`,
+    { situation },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function updateCaseCanView(caseId: string, canView: boolean) {
+  const response = await axios.patch(
+    `${API_URL}/case/${caseId}/`,
+    { canView },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+export async function deleteCase(caseId: string) {
+  const response = await axios.delete(
+    `${API_URL}/case/${caseId}/`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    }
+  );
+  return response.data;
+}
+

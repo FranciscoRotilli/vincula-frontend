@@ -1,27 +1,25 @@
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
+import { CaseContainer } from '@/components/CaseContainer';
 import GenericTable from '@/components/GenericTable';
 import Modal from '@/components/Modals';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+import {
+  useCaseById,
+  useDeleteCase,
+  useUpdateCaseCanView,
+  useUpdateCaseName,
+  useUpdateCaseSituation,
+} from '@/hooks/useCase';
+import { CaseItem } from '@/types/Cases';
 import { Column } from '@/types/Table';
 
 import styles from './generalTab.module.css';
-
-// Mock
-const caseDetails = {
-  nome: 'Operação Ratatouille',
-  responsavel: 'Cicrano',
-  dataCriacao: '10 de Agosto 2025',
-  situacao: 'Em andamento',
-  codigo: '#000010',
-  dataAtualizacao: '-',
-};
 
 type EnvolvidoRow = { id: number; nome: string; cpf: string };
 type ArquivoRow = { id: number; nome: string; tipo: string; data: string; tamanho: string };
@@ -38,9 +36,7 @@ const arquivosMock: (EnvolvidoRow | ArquivoRow)[] = [
   { id: 2, nome: 'Extrato_2.xlsx', tipo: 'SIMBA', data: '10 Ago 2025 10:00:00', tamanho: '21 KB' },
 ];
 
-export default function GeneralTab() {
-  const router = useRouter();
-
+export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
@@ -66,11 +62,56 @@ export default function GeneralTab() {
   const [envolvidos, setEnvolvidos] = useState(envolvidosMock);
   const [arquivos, setArquivos] = useState(arquivosMock);
 
-  const tabs = [
-    { label: 'Informações gerais', path: '/casos/ViewCase/generalTab' },
-    { label: 'Vínculos', path: '/casos/ViewCase/vinculos' },
-    { label: 'Visualização dos dados', path: '/casos/ViewCase/dados' },
-  ];
+  const updateNameMutation = useUpdateCaseName();
+  const updateSituationMutation = useUpdateCaseSituation();
+  const updateCanViewMutation = useUpdateCaseCanView();
+  const deleteCaseMutation = useDeleteCase();
+
+  const { data: caseDetails, isLoading, isError } = useCaseById(caseId);
+
+  const [novoNomeCaso, setNovoNomeCaso] = useState('');
+  const [novaSituacao, setNovaSituacao] = useState('');
+
+  const handleUpdateName = async () => {
+    updateNameMutation.mutate(
+      { caseId, name: novoNomeCaso },
+      {
+        onSuccess: () => {
+          setShowNameModal(false);
+        },
+      }
+    );
+  };
+
+  const handleUpdateSituation = async () => {
+    updateSituationMutation.mutate(
+      { caseId, situation: novaSituacao as CaseItem['status'] },
+      {
+        onSuccess: () => {
+          setShowSituationModal(false);
+        },
+      }
+    );
+  };
+
+  const handleToggleCanView = () => {
+    updateCanViewMutation.mutate(
+      { caseId, canView: !visualizacaoPermitida },
+      {
+        onSuccess: () => {
+          setVisualizacaoPermitida((v) => !v);
+        },
+      }
+    );
+  };
+
+  const handleDeleteCase = () => {
+    deleteCaseMutation.mutate(caseId, {
+      onSuccess: () => {
+        setShowDeleteCaseModal(false);
+      },
+    });
+  };
 
   const handleAddEnvolvido = () => {
     if (novoNome && novoCpf && (novoCpf.length === 11 || novoCpf.length === 14)) {
@@ -146,235 +187,251 @@ export default function GeneralTab() {
     }
   }
 
+  if (isLoading) {
+    return <div>{"Carregando..."}</div>;
+  }
+  if (isError || !caseDetails) {
+    return <div>{"Erro ao carregar detalhes do caso."}</div>;
+  }
+
   return (
-    <div className={styles.pageContainer}>
-      {/* Navbar */}
-      <nav className={styles.navbar}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.label}
-            className={styles.navTab}
-            onClick={() => router.push(tab.path)}
-            aria-current={tab.path === '/casos/ViewCase/generalTab' ? 'page' : undefined}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+    <CaseContainer caseId={caseId}>
+      <div className={styles.pageContainer}>
+        <div className={styles.gridContainer}>
+          <div className={styles.caseDetails}>
+            <h2>{caseDetails.name}</h2>
+            <div className={styles.detailsRow}>
+              <div>
+                <strong>{'Responsável:'}</strong> {caseDetails.owner}
+              </div>
+              <div>
+                <strong>{'Data de Criação:'}</strong> {caseDetails.creation_date}
+              </div>
+              <div>
+                <strong>{'Situação:'}</strong> {caseDetails.status}
+              </div>
+            </div>
+            <div className={styles.detailsRow}>
+              <div>
+                <strong>{'Código do caso:'}</strong> {caseDetails.id}
+              </div>
+            </div>
+          </div>
 
-      <div className={styles.gridContainer}>
-        {/* Detalhes do caso */}
-        <div className={styles.caseDetails}>
-          <h2>{caseDetails.nome}</h2>
-          <div className={styles.detailsRow}>
-            <div>
-              <strong>{'Responsável:'}</strong> {caseDetails.responsavel}
-            </div>
-            <div>
-              <strong>{'Data de Criação:'}</strong> {caseDetails.dataCriacao}
-            </div>
-            <div>
-              <strong>{'Situação:'}</strong> {caseDetails.situacao}
+          <div className={styles.actionsBox}>
+            <h1 className={styles.sectionHeader}>
+              <text>{'Ações'}</text>
+            </h1>
+            <div className={styles.actionsRow}>
+              <Button
+                size="large"
+                label="Alterar nome"
+                variant="contained"
+                onClick={() => setShowNameModal(true)}
+              />
+              <Button
+                size="large"
+                label="Alterar situação"
+                variant="contained"
+                onClick={() => setShowSituationModal(true)}
+              />
+              <Button
+                size="large"
+                label="Permitir visualização"
+                variant="contained"
+                onClick={handleToggleCanView}
+              />
+              <Button
+                size="large"
+                label="Excluir caso"
+                variant="outlined"
+                onClick={() => setShowDeleteCaseModal(true)}
+              />
             </div>
           </div>
-          <div className={styles.detailsRow}>
-            <div>
-              <strong>{'Data de Atualização:'}</strong> {caseDetails.dataAtualizacao}
-            </div>
-            <div>
-              <strong>{'Código do caso:'}</strong> {caseDetails.codigo}
-            </div>
-          </div>
-        </div>
 
-        {/* Botões de ação */}
-        <div className={styles.actionsBox}>
-          <h1 className={styles.sectionHeader}>
-            <text>{'Ações'}</text>
-          </h1>
-          <div className={styles.actionsRow}>
-            <Button size="large" label="Alterar nome" variant="contained" onClick={() => setShowNameModal(true)} />
-            <Button
-              size="large"
-              label="Alterar situação"
-              variant="contained"
-              onClick={() => setShowSituationModal(true)}
-            />
-            <Button
-              size="large"
-              label="Permitir visualização"
-              variant="contained"
-              onClick={() => setVisualizacaoPermitida((v) => !v)}
-            />
-            <Button size="large" label="Excluir caso" variant="outlined" onClick={() => setShowDeleteCaseModal(true)} />
+          <div className={styles.envolvidosBox}>
+            <div className={styles.sectionHeader}>
+              <strong>
+                {'Investigados'} ({envolvidos.length})
+              </strong>
+            </div>
+            <div className={styles.sectionDescription}>
+              {'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.'}
+            </div>
+            <div className={styles.addEnvolvidoRow}>
+              <input
+                type="text"
+                placeholder="Insira o nome"
+                value={novoNome}
+                onChange={(e) => setNovoNome(e.target.value)}
+                className={styles.input}
+              />
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="Insira o CPF / CNPJ"
+                value={maskCpfCnpj(novoCpf)}
+                onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
+                className={styles.input}
+                maxLength={18}
+              />
+              <Button
+                icon={<span style={{ fontWeight: 'bold', fontSize: '1.5em' }}>+</span>}
+                variant="contained"
+                size="small"
+                label=""
+                onClick={handleAddEnvolvido}
+                disabled={
+                  !novoNome ||
+                  !novoCpf ||
+                  !(novoCpf.length === 11 || novoCpf.length === 14)
+                }
+              />
+            </div>
+            <div className={styles.GenericTable__container}>
+              <GenericTable<EnvolvidoRow>
+                columns={envolvidosColumns}
+                data={envolvidos}
+                loading={false}
+                rowActions={envolvidosRowActions}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Envolvidos */}
-        <div className={styles.envolvidosBox}>
-          <div className={styles.sectionHeader}>
-            <strong>
-              {'Investigados'} ({envolvidos.length})
-            </strong>
-          </div>
-          <div className={styles.sectionDescription}>
-            {'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.'}
-          </div>
-          <div className={styles.addEnvolvidoRow}>
-            <input
-              type="text"
-              placeholder="Insira o nome"
-              value={novoNome}
-              onChange={(e) => setNovoNome(e.target.value)}
-              className={styles.input}
-            />
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="Insira o CPF / CNPJ"
-              value={maskCpfCnpj(novoCpf)}
-              onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
-              className={styles.input}
-              maxLength={18} // 14 números + pontuações
-            />
+          <div className={styles.arquivosBox}>
+            <div className={styles.sectionHeader}>
+              <strong>
+                {'Arquivos'} ({arquivos.length})
+              </strong>
+            </div>
+            <div className={styles.sectionDescription}>
+              {'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.'}
+            </div>
             <Button
-              icon={<span style={{ fontWeight: 'bold', fontSize: '1.5em' }}>+</span>}
+              icon={<FiUpload />}
               variant="contained"
               size="small"
-              label=""
-              onClick={handleAddEnvolvido}
-              disabled={!novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)}
+              label="Upload"
+              onClick={() => setShowUploadModal(true)}
+              className={styles.uploadButton}
             />
-          </div>
-          <div className={styles.GenericTable__container}>
-            <GenericTable<EnvolvidoRow>
-              columns={envolvidosColumns}
-              data={envolvidos}
-              loading={false}
-              rowActions={envolvidosRowActions}
-            />
+            <div className={styles.GenericTable__container}>
+              <GenericTable<ArquivoRow>
+                columns={arquivosColumns}
+                data={arquivos as ArquivoRow[]}
+                loading={false}
+                rowActions={arquivosRowActions}
+              ></GenericTable>
+            </div>
           </div>
         </div>
 
-        {/* Arquivos */}
-        <div className={styles.arquivosBox}>
-          <div className={styles.sectionHeader}>
-            <strong>
-              {'Arquivos'} ({arquivos.length})
-            </strong>
-          </div>
-          <div className={styles.sectionDescription}>
-            {'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.'}
-          </div>
-          <Button
-            icon={<FiUpload />}
-            variant="contained"
-            size="small"
-            label="Upload"
-            onClick={() => setShowUploadModal(true)}
-            className={styles.uploadButton}
+        {showNameModal && (
+          <CreateCaseModal
+            isOpen={showNameModal}
+            onClose={() => setShowNameModal(false)}
+            onSubmit={async ({ caseName }) => {
+              setNovoNomeCaso(caseName);
+              handleUpdateName();
+            }}
           />
-          <div className={styles.GenericTable__container}>
-            <GenericTable<ArquivoRow>
-              columns={arquivosColumns}
-              data={arquivos as ArquivoRow[]}
-              loading={false}
-              rowActions={arquivosRowActions}
-            ></GenericTable>
-          </div>
-        </div>
+        )}
+        {showSituationModal && (
+          <Modal
+            isOpen={showSituationModal}
+            onClose={() => setShowSituationModal(false)}
+            title="Alterar situação"
+          >
+            <select
+              value={novaSituacao}
+              onChange={(e) => setNovaSituacao(e.target.value as CaseItem['status'])}
+              className={styles.input}
+            >
+              <option value="">{"Selecione a situação"}</option>
+              <option value="Em andamento">{"Em andamento"}</option>
+              <option value="Suspenso">{"Suspenso"}</option>
+              <option value="Encerrado">{"Encerrado"}</option>
+            </select>
+            <Button
+              label="Salvar"
+              variant="contained"
+              onClick={handleUpdateSituation}
+              disabled={!novaSituacao}
+            />
+            <Button
+              label="Cancelar"
+              variant="outlined"
+              onClick={() => setShowSituationModal(false)}
+            />
+          </Modal>
+        )}
+        {showDeleteCaseModal && (
+          <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title="Excluir caso">
+            <div>
+              <p>{'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <Button
+                label="Excluir"
+                variant="contained"
+                onClick={handleDeleteCase}
+              />
+              <Button label="Cancelar" variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
+            </div>
+          </Modal>
+        )}
+        {showRemoveFileModal.open && (
+          <Modal
+            isOpen={showRemoveFileModal.open}
+            onClose={() => setShowRemoveFileModal({ open: false, index: null })}
+            title="Remover arquivo?"
+          >
+            <div>
+              <p>{'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <Button
+                label="Remover"
+                variant="contained"
+                onClick={() => handleRemoveArquivo(showRemoveFileModal.index!)}
+              />
+              <Button
+                label="Cancelar"
+                variant="outlined"
+                onClick={() => setShowRemoveFileModal({ open: false, index: null })}
+              />
+            </div>
+          </Modal>
+        )}
+        {showRemoveEnvolvidoModal.open && (
+          <Modal
+            isOpen={showRemoveEnvolvidoModal.open}
+            onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            title="Remover investigado?"
+          >
+            <div>
+              <p>{'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.'}</p>
+              <Button
+                label="Remover"
+                variant="contained"
+                onClick={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+              />
+              <Button
+                label="Cancelar"
+                variant="outlined"
+                onClick={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+              />
+            </div>
+          </Modal>
+        )}
+        {showUploadModal && (
+          <Modal
+            isOpen={showUploadModal}
+            onClose={() => setShowUploadModal(false)}
+            title="Adicionar arquivo"
+            children={undefined}
+          >
+          </Modal>
+        )}
       </div>
-
-      {/* Modais */}
-      {showNameModal && (
-        <CreateCaseModal
-          isOpen={showNameModal}
-          onClose={() => setShowNameModal(false)}
-          onSubmit={function (_payload: {
-            caseName: string;
-            caseResponsable: string;
-            creationDate: string;
-          }): Promise<void> | void {}}
-        />
-      )}
-      {showSituationModal && (
-        <Modal
-          isOpen={showSituationModal}
-          onClose={() => setShowSituationModal(false)}
-          title="Alterar situação"
-          children={undefined}
-        >
-          {/* Conteúdo do modal de situação */}
-        </Modal>
-      )}
-      {showDeleteCaseModal && (
-        <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title="Excluir caso">
-          <div>
-            <p>{'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.'}</p>
-            <Button
-              label="Excluir"
-              variant="contained"
-              onClick={() => {
-                /* requisição de exclusão */
-              }}
-            />
-            <Button label="Cancelar" variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
-          </div>
-        </Modal>
-      )}
-      {showRemoveFileModal.open && (
-        <Modal
-          isOpen={showRemoveFileModal.open}
-          onClose={() => setShowRemoveFileModal({ open: false, index: null })}
-          title="Remover arquivo?"
-        >
-          <div>
-            <p>{'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.'}</p>
-            <Button
-              label="Remover"
-              variant="contained"
-              onClick={() => handleRemoveArquivo(showRemoveFileModal.index!)}
-            />
-            <Button
-              label="Cancelar"
-              variant="outlined"
-              onClick={() => setShowRemoveFileModal({ open: false, index: null })}
-            />
-          </div>
-        </Modal>
-      )}
-      {showRemoveEnvolvidoModal.open && (
-        <Modal
-          isOpen={showRemoveEnvolvidoModal.open}
-          onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-          title="Remover investigado?"
-        >
-          <div>
-            <p>{'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.'}</p>
-            <Button
-              label="Remover"
-              variant="contained"
-              onClick={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
-            />
-            <Button
-              label="Cancelar"
-              variant="outlined"
-              onClick={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-            />
-          </div>
-        </Modal>
-      )}
-      {showUploadModal && (
-        <Modal
-          isOpen={showUploadModal}
-          onClose={() => setShowUploadModal(false)}
-          title="Adicionar arquivo"
-          children={undefined}
-        >
-          {/* Conteúdo do modal de upload */}
-        </Modal>
-      )}
-    </div>
+    </CaseContainer>
   );
 }
