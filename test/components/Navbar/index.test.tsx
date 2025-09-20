@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import Navbar from "@/components/Navbar";
 import React from "react";
+import { beforeEach,describe, expect, it, vi } from "vitest";
+
+import Navbar from "@/components/Navbar";
 
 describe("NavbarComponent", () => {
   const user = { name: "Cicrano", role: "Promotor" };
@@ -31,12 +32,12 @@ describe("NavbarComponent", () => {
     expect(onLogout).toHaveBeenCalled();
   });
 
-  it("navigates to /home when logo is clicked", () => {
+  it("navigates to /casos when logo is clicked", () => {
     const onNavigate = vi.fn();
     render(<Navbar onNavigate={onNavigate} onLogout={() => {}} user={user} />);
 
     const logo = screen.getByRole("img", { name: /vincula logo/i });
     fireEvent.click(logo);
-    expect(onNavigate).toHaveBeenCalledWith("/home");
+    expect(onNavigate).toHaveBeenCalledWith("/casos");
   });
 });
