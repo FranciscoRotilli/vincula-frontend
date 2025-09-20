@@ -10,7 +10,7 @@ import Input from '@/components/Input';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
-import GeneralTab from './casos/viewCase/index';
+import GeneralTab from './casos/viewCase';
 import styles from './page.module.css';
 
 type Errors = { usuario?: string; senha?: string };

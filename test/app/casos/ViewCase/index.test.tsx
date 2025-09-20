@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import GeneralTab from '@/app/casos/viewCase';
 
+
 const queryClient = new QueryClient();
 
 function renderWithQueryClient(ui: React.ReactElement) {
