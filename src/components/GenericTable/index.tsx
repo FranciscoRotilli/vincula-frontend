@@ -198,7 +198,11 @@ export default function GenericTable<T extends { id: number | string }>({
                     >
                       {selectable && (
                         <TableCell padding="checkbox">
-                          <Checkbox className={styles.tableCheckbox} color="primary" checked={isItemSelected} />
+                          <Checkbox
+                            className={styles.tableCheckbox}
+                            color="primary"
+                            checked={isItemSelected}
+                          />
                         </TableCell>
                       )}
                       {columns.map((column) => {
@@ -272,6 +276,7 @@ export default function GenericTable<T extends { id: number | string }>({
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          data-testid="table-pagination"
         />
       )}
     </Paper>
