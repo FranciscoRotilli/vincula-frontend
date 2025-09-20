@@ -29,8 +29,9 @@ export interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
+  variant: 'outlined' | 'ghost';
   pagination?: Pagination;
-  sorting?: Sorting<T>
+  sorting?: Sorting<T>;
   selectable?: boolean;
   rowActions?: RowAction<T>[];
   onRowClick?: (row: T) => void;

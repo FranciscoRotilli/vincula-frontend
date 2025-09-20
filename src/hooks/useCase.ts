@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { addCase, CaseResponse, deleteCase, getCaseById, getCases, updateCaseCanView, updateCaseName, updateCaseSituation } from '@/services/caseService';
-import { ApiResponse, ApiSortingParams, CaseItem,FilterParams, PaginationParams } from '@/types/Cases';
+import { ApiSortingParams, CaseItem, CasesResponse, CompleteCaseResponse, FilterParams, PaginationParams } from '@/types/Cases';
 
 type AddCaseInput = {
   name: string;
@@ -46,16 +46,16 @@ export function useCases(
   filters: FilterParams,
   sorting: ApiSortingParams
 ) {
-  return useQuery<ApiResponse, Error>({
+  return useQuery<CasesResponse, Error>({
     queryKey: ['cases', pagination, filters, sorting],
     queryFn: () => getCases(pagination, filters, sorting),
   });
 }
 
 export function useCaseById(caseId: string) {
-  return useQuery({
+  return useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
     queryFn: () => getCaseById(caseId),
-    enabled: !!caseId,
+    refetchOnWindowFocus: false,
   });
 }
