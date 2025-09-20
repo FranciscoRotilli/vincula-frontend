@@ -4,8 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { vi } from 'vitest';
 
-import GeneralTab from '@/app/casos/viewCase/index';
-
+import GeneralTab from '@/app/casos/ViewCase';
 
 const queryClient = new QueryClient();
 
