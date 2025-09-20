@@ -38,7 +38,7 @@ const rowActions = [
     {
       label: "Ver detalhes",
       onClick: () => {
-        router.push("/temp");
+        router.push("/casos/viewcase");
       },
     },
   ];

@@ -8,13 +8,13 @@ describe("CasosPage", () => {
     mockRouter.push.mockReset();
   });
 
-  it('navega para "/temp" ao clicar em "Ver detalhes"', () => {
+//não vai funcionar até a página de informações gerais do caso estar na develop
+  it('should navigate to /casos/viewcase when clicking "Ver detalhes" button', () => {
   render(<CasosPage />);
 
   const buttons = screen.getAllByText("Ver detalhes");
   fireEvent.click(buttons[0]);
 
-  expect(mockRouter.push).toHaveBeenCalledWith("/temp");
+  expect(mockRouter.push).toHaveBeenCalledWith("/casos/viewcase");
 });
 });
-
