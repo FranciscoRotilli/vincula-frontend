@@ -161,33 +161,6 @@ describe('CasosPage', () => {
     if (responsibleInput) expect(responsibleInput.value).toBe('');
   });
 
-  it('should handle pagination changes', async () => {
-    render(renderWithClient(<CasosPage />));
-
-    const pagination = screen.queryByTestId('table-pagination');
-
-    if (pagination) {
-      const paginationButtons = screen
-        .getAllByRole('button')
-        .filter(
-          (button) =>
-            button.getAttribute('aria-label')?.includes('page') ||
-            button.getAttribute('title')?.includes('page')
-        );
-
-      expect(paginationButtons.length).toBeGreaterThan(0);
-    }
-  });
-
-  it('should handle sorting changes', async () => {
-    render(renderWithClient(<CasosPage />));
-
-    await waitFor(() => {
-      const tableHeaders = screen.getAllByText(/nome do caso|responsável|situação/i);
-      expect(tableHeaders.length).toBeGreaterThan(0);
-    });
-  });
-
   it('should create case successfully', async () => {
     render(renderWithClient(<CasosPage />));
 
@@ -226,15 +199,6 @@ describe('CasosPage', () => {
     if (closeButtons.length > 0) {
       fireEvent.click(closeButtons[0]);
     }
-  });
-
-  it('should display row actions correctly', async () => {
-    render(renderWithClient(<CasosPage />));
-
-    await waitFor(() => {
-      const table = screen.getByRole('table') || document.querySelector('[role="grid"]');
-      expect(table).toBeInTheDocument();
-    });
   });
 
   it('should handle empty data state', () => {

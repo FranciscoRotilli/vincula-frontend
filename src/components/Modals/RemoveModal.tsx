@@ -1,8 +1,8 @@
 'use client';
 
-import { MdClose } from 'react-icons/md';
 import Modal from '@mui/material/Modal';
 import Image from 'next/image';
+import { MdClose } from 'react-icons/md';
 
 import Button from '../Button';
 import styles from './RemoveModal.module.css';
