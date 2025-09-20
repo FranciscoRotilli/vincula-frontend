@@ -12,9 +12,10 @@ interface RemoveModalProps {
   description: string;
   isOpen: boolean;
   onClose: () => void;
+  onRemove: () => void;
 }
 
-export default function RemoveModal({ title, description, isOpen, onClose }: RemoveModalProps) {
+export default function RemoveModal({ title, description, isOpen, onClose, onRemove }: RemoveModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <div className={styles.modalContainer}>
@@ -25,7 +26,7 @@ export default function RemoveModal({ title, description, isOpen, onClose }: Rem
         <p className={styles.description}>{description}</p>
 
         <div className={styles.buttons}>
-          <Button label="Remover" variant="contained" className={styles.removeButton} onClick={() => {}} />
+          <Button label="Remover" variant="contained" className={styles.removeButton} onClick={onRemove} />
           <Button label="Cancelar" variant="error" onClick={onClose} />
         </div>
       </div>

@@ -24,5 +24,6 @@ export function useCaseById(caseId: string) {
   return useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
     queryFn: () => getCaseById(caseId),
+    refetchOnWindowFocus: false,
   });
 }

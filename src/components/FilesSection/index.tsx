@@ -12,6 +12,7 @@ import { t } from '@/texts';
 import RemoveModal from '../Modals/RemoveModal';
 import CreateCaseModal from '../Modals/CreateCaseModal';
 import { useCaseById } from '@/hooks/useCase';
+import { useRemoveFile } from '@/hooks/useFile';
 
 const dataMock: any = [
   { id: 1, name: 'ExtratoDetalhado.csv', createdDate: '10 Ago 2025 10:00:00', size: '4.2 MB' },
@@ -30,15 +31,31 @@ type FilesSectionProps = {
 
 export default function FilesSection({ caseId }: FilesSectionProps) {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [fileToRemove, setFileToRemove] = useState<File | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // usar quando o modal de upload estiver pronto
 
   const { data: caseData, isLoading } = useCaseById(caseId);
+  const removeFileMutation = useRemoveFile(caseId);
+
+  const handleRemove = () => {
+    if (fileToRemove) {
+      removeFileMutation.mutate(fileToRemove.id, {
+        onSuccess: () => {
+          setIsRemoveModalOpen(false);
+          setFileToRemove(null);
+        },
+      });
+    }
+  };
 
   const rowActions = [
     {
       label: 'Delete',
       icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
-      onClick: () => setIsRemoveModalOpen(true),
+      onClick: (row: File) => {
+        setFileToRemove(row);
+        setIsRemoveModalOpen(true);
+      },
     },
   ];
 
@@ -70,6 +87,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
       <RemoveModal
         isOpen={isRemoveModalOpen}
         onClose={() => setIsRemoveModalOpen(false)}
+        onRemove={handleRemove}
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
       />
