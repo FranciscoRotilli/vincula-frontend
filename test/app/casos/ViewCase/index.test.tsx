@@ -16,7 +16,6 @@ function renderWithQueryClient(ui: React.ReactElement) {
   );
 }
 
-
 vi.mock('@/components/Button', () => ({
   __esModule: true,
   default: ({ label, onClick, ...props }: any) => (
@@ -67,8 +66,7 @@ vi.mock('@/components/Modals', () => ({
   default: ({ isOpen, title, children, onClose }: any) =>
     isOpen ? (
       <div>
-        <div>{title}</div>
-        {children}
+        <div>{title || children}</div>
         <button onClick={onClose}>{"Fechar"}</button>
       </div>
     ) : null,
@@ -78,7 +76,7 @@ vi.mock('@/components/Modals/CreateCaseModal', () => ({
   default: ({ isOpen, onClose }: any) =>
     isOpen ? (
       <div>
-        <div>{"Alterar nome do caso"}</div>
+        <div>{"Alterar nome"}</div>
         <button onClick={onClose}>{"Fechar"}</button>
       </div>
     ) : null,
@@ -116,7 +114,7 @@ describe('GeneralTab', () => {
     renderWithQueryClient(<GeneralTab caseId="1" />);
     fireEvent.change(screen.getByPlaceholderText('Insira o nome'), { target: { value: 'Novo Nome' } });
     fireEvent.change(screen.getByPlaceholderText('Insira o CPF / CNPJ'), { target: { value: '12345678901' } });
-    fireEvent.click(screen.getByRole('button', { name: '' })); // Botão de adicionar
+    fireEvent.click(screen.getByRole('button', { name: '' }));
     await waitFor(() => {
       expect(screen.getByText('Novo Nome')).toBeInTheDocument();
     });
@@ -126,7 +124,7 @@ describe('GeneralTab', () => {
     renderWithQueryClient(<GeneralTab caseId="1" />);
     fireEvent.change(screen.getByPlaceholderText('Insira o nome'), { target: { value: 'Nome Inválido' } });
     fireEvent.change(screen.getByPlaceholderText('Insira o CPF / CNPJ'), { target: { value: '123' } });
-    fireEvent.click(screen.getByRole('button', { name: '' })); // Botão de adicionar
+    fireEvent.click(screen.getByRole('button', { name: '' }));
     await waitFor(() => {
       expect(screen.queryByText('Nome Inválido')).not.toBeInTheDocument();
     });
@@ -146,9 +144,9 @@ describe('GeneralTab', () => {
     renderWithQueryClient(<GeneralTab caseId="1" />);
 
 		fireEvent.click(screen.getByText('Alterar nome'));
-    expect(screen.getByText('Alterar nome do caso')).toBeInTheDocument();
+    expect(screen.getByText('Alterar nome')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Fechar'));
-    expect(screen.queryByText('Alterar nome do caso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Alterar nome')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Alterar situação'));
     const alterarSituacaoDivs = screen.getAllByText('Alterar situação');

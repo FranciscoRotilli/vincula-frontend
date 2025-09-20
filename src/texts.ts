@@ -52,6 +52,9 @@ export const texts = {
   'container.vinculo': 'Página de Vínculos do Caso:',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
+  'cases.title.changeNameDesc': 'Altere o nome do caso abaixo.',
+  'cases.title.changeSituationDesc': 'Selecione a nova situação do caso.',
+  'cases.title.addFileDesc': 'Selecione um arquivo para anexar ao caso.',
 } as const;
 
 export type TextKey = keyof typeof texts;

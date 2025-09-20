@@ -1,13 +1,12 @@
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import { FiUpload } from 'react-icons/fi';
+import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
+import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import GenericTable from '@/components/GenericTable';
-import Modal from '@/components/Modals';
-import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import {
   useCaseById,
   useDeleteCase,
@@ -328,107 +327,109 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
         </div>
 
         {showNameModal && (
-          <CreateCaseModal
+          <ConfirmationModal
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
-            onSubmit={async ({ caseName }) => {
-              setNovoNomeCaso(caseName);
-              handleUpdateName();
-            }}
-          />
+            icon={<FiEdit2 size={36} color="#ff3636" />}
+            title={t('cases.title.changeName', { defaultValue: 'Alterar nome do caso' })}
+            description={t('cases.title.changeNameDesc', { defaultValue: 'Altere o nome do caso abaixo.' })}
+            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            onPrimary={handleUpdateName}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowNameModal(false)}
+          >
+            <input
+              type="text"
+              value={novoNomeCaso}
+              onChange={e => setNovoNomeCaso(e.target.value)}
+              className={styles.input}
+              style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
+              placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
+            />
+          </ConfirmationModal>
         )}
+
         {showSituationModal && (
-          <Modal
+          <ConfirmationModal
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
+            icon={<FiEdit2 size={36} color="#ff3636" />}
             title={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
+            description={t('cases.title.changeSituationDesc', { defaultValue: 'Selecione a nova situação do caso.' })}
+            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            onPrimary={handleUpdateSituation}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowSituationModal(false)}
           >
             <select
               value={novaSituacao}
               onChange={(e) => setNovaSituacao(e.target.value as CaseItem['status'])}
               className={styles.input}
+              style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
             >
               <option value="">{t('cases.title.selectSituation', { defaultValue: 'Selecione a situação' })}</option>
               <option value="Em andamento">{t('cases.title.situationOngoing', { defaultValue: 'Em andamento' })}</option>
               <option value="Suspenso">{t('cases.title.situationSuspended', { defaultValue: 'Suspenso' })}</option>
               <option value="Encerrado">{t('cases.title.situationClosed', { defaultValue: 'Encerrado' })}</option>
             </select>
-            <Button
-              label={t('cases.title.save', { defaultValue: 'Salvar' })}
-              variant="contained"
-              onClick={handleUpdateSituation}
-              disabled={!novaSituacao}
-            />
-            <Button
-              label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-              variant="outlined"
-              onClick={() => setShowSituationModal(false)}
-            />
-          </Modal>
+          </ConfirmationModal>
         )}
+
         {showDeleteCaseModal && (
-          <Modal isOpen={showDeleteCaseModal} onClose={() => setShowDeleteCaseModal(false)} title={t('cases.title.delete', { defaultValue: 'Excluir caso' })}>
-            <div>
-              <p>{t('cases.title.deleteWarning', { defaultValue: 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.' })}</p>
-              <Button
-                label={t('cases.title.delete', { defaultValue: 'Excluir' })}
-                variant="contained"
-                onClick={handleDeleteCase}
-              />
-              <Button label={t('cases.title.cancel', { defaultValue: 'Cancelar' })} variant="outlined" onClick={() => setShowDeleteCaseModal(false)} />
-            </div>
-          </Modal>
+          <ConfirmationModal
+            isOpen={showDeleteCaseModal}
+            onClose={() => setShowDeleteCaseModal(false)}
+            icon={<TbTrash size={36} color="#ff3636" />}
+            title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
+            description={t('cases.title.deleteWarning', { defaultValue: 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.' })}
+            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
+            onPrimary={handleDeleteCase}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowDeleteCaseModal(false)}
+          />
         )}
+
         {showRemoveFileModal.open && (
-          <Modal
+          <ConfirmationModal
             isOpen={showRemoveFileModal.open}
             onClose={() => setShowRemoveFileModal({ open: false, index: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeFile', { defaultValue: 'Remover arquivo?' })}
-          >
-            <div>
-              <p>{t('cases.title.removeFileWarning', { defaultValue: 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.' })}</p>
-              <Button
-                label={t('cases.title.remove', { defaultValue: 'Remover' })}
-                variant="contained"
-                onClick={() => handleRemoveArquivo(showRemoveFileModal.index!)}
-              />
-              <Button
-                label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-                variant="outlined"
-                onClick={() => setShowRemoveFileModal({ open: false, index: null })}
-              />
-            </div>
-          </Modal>
+            description={t('cases.title.removeFileWarning', { defaultValue: 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.' })}
+            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
+            onPrimary={() => handleRemoveArquivo(showRemoveFileModal.index!)}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
+          />
         )}
+
         {showRemoveEnvolvidoModal.open && (
-          <Modal
+          <ConfirmationModal
             isOpen={showRemoveEnvolvidoModal.open}
             onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
-          >
-            <div>
-              <p>{t('cases.title.removeInvestigatedWarning', { defaultValue: 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.' })}</p>
-              <Button
-                label={t('cases.title.remove', { defaultValue: 'Remover' })}
-                variant="contained"
-                onClick={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
-              />
-              <Button
-                label={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-                variant="outlined"
-                onClick={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-              />
-            </div>
-          </Modal>
+            description={t('cases.title.removeInvestigatedWarning', { defaultValue: 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.' })}
+            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
+            onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+          />
         )}
+
         {showUploadModal && (
-          <Modal
+          <ConfirmationModal
             isOpen={showUploadModal}
             onClose={() => setShowUploadModal(false)}
+            icon={<FiUpload size={36} color="#ff3636" />}
             title={t('cases.title.addFile', { defaultValue: 'Adicionar arquivo' })}
-            children={undefined}
+            description={t('cases.title.addFileDesc', { defaultValue: 'Selecione um arquivo para anexar ao caso.' })}
+            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            onPrimary={() => setShowUploadModal(false)}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowUploadModal(false)}
           >
-          </Modal>
+          </ConfirmationModal>
         )}
       </div>
   );
