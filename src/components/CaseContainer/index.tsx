@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import GeneralTab from '@/app/casos/ViewCase';
 import Footer from '@/components/Footer';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 
@@ -18,7 +19,8 @@ export function CaseContainer({ children, caseId }: CaseContainerProps) {
     <div data-testid="case-container">
       <NavbarContainer />
       <div className={styles.caseContainer}>
-        <CaseTabs caseId={caseId} />
+				<CaseTabs caseId={caseId} />
+				<GeneralTab caseId={caseId} />
         <main className={styles.content}>{children}</main>
       </div>
       <Footer />

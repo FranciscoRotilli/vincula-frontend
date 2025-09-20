@@ -195,7 +195,7 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
   }
 
   return (
-    <CaseContainer caseId={caseId}>
+
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails}>
@@ -432,6 +432,5 @@ export default function GeneralTab({ caseId }: Readonly<{ caseId: string }>) {
           </Modal>
         )}
       </div>
-    </CaseContainer>
   );
 }
