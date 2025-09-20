@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 
 import { ApiResponse, ApiSortingParams, FilterParams, PaginationParams } from '@/types/Cases';
