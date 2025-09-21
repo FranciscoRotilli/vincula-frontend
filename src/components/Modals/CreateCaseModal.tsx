@@ -1,17 +1,16 @@
 'use client';
 import React, { useMemo, useState } from 'react';
 
+import Input from '@/components/Input';
 import Modal from '@/components/Modals';
 import modalStyles from '@/components/Modals/Modal.module.css';
-import Input from '@/components/Input';
+import { t } from '@/texts';
 
 type CreateCaseModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: {
     caseName: string;
-    caseResponsable: string;
-    creationDate: string; //formato dd/mm/aaaa
   }) => Promise<void> | void;
 };
 
@@ -36,9 +35,12 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
     if (!canSave) return;
     await onSubmit({
       caseName: caseName,
-      caseResponsable: CASE_RESPONSABLE,
-      creationDate: creationDateFormated,
     });
+    setCaseName('');
+    onClose();
+  };
+
+  const handleClose = () => {
     setCaseName('');
     onClose();
   };
@@ -48,20 +50,19 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       isOpen={isOpen}
       title="Adicionar caso"
       size="medium"
-      onClose={function (): void {
-        setCaseName('');
-        onClose();
-      }}
+      onClose={handleClose}
       onAction={handleSubmit}
       actionButton="Adicionar"
       cancelButton="Cancelar"
     >
       <div className={modalStyles.formStack}>
-        <label>Nome do caso:</label>
-        <Input placeholder={''} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
-        <label>Nome do responsável:</label>
+        <label>{t("modal.caseName")}</label>
+        <Input placeholder={'Digite o nome do caso'} onChange={(e) => setCaseName(e.target.value)} value={caseName} />
+        
+        <label>{t("modal.responsibleName")}</label>
         <Input placeholder={''} disabled value={CASE_RESPONSABLE} />
-        <label>Data de criação:</label>
+        
+        <label>{t("modal.creationDate")}</label>
         <Input placeholder={''} disabled value={creationDateFormated} />
       </div>
     </Modal>

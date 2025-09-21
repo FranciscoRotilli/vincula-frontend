@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { ReactNode, useEffect } from 'react';
 
 import styles from './Modal.module.css';
@@ -66,7 +67,7 @@ const Modal = ({
       >
         {title && (
           <header className={styles.header}>
-            <h2 className={styles.title} id="modal-title">
+            <h2 className={styles.title} data-testid="modal-title">
               {title}
             </h2>
             <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
@@ -74,9 +75,11 @@ const Modal = ({
             </button>
           </header>
         )}
+        <div className={styles.body}>
+          {isError && <Image src="/error.svg" alt="Error" width={50} height={50} className={styles.errorIcon} />}
 
-        <main className={styles.content}>{children}</main>
-
+          <main className={styles.content}>{children}</main>
+        </div>
         {(cancelButton || actionButton) && (
           <footer className={styles.footer}>
             {cancelButton && (

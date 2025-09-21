@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import Footer from "../../../src/components/footer/Footer";
+
+import Footer from "../../../src/components/Footer";
 
 
 describe('Footer Component', () => {
@@ -10,9 +11,9 @@ describe('Footer Component', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders footer images', () => {
+  it('renders footer logo', () => {
     render(<Footer />);
     const image = screen.getAllByAltText(/vincula/i);
-    expect(image).toHaveLength(2);
+    expect(image).toHaveLength(1);
   });
 });

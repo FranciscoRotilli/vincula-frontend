@@ -1,20 +1,21 @@
 'use client'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
-    FormControl,
-    FormHelperText,
-    IconButton,
-    InputAdornment,
-    SvgIconProps,
-    TextField,
-    TextFieldProps,
+FormControl,
+FormHelperText,
+IconButton,
+InputAdornment,
+SvgIconProps,
+TextField,
+TextFieldProps,
 } from '@mui/material'
 import { 
-    ChangeEvent, 
-    forwardRef, 
-    ReactElement, 
-    useEffect, 
-    useState} from 'react'
+ChangeEvent, 
+forwardRef, 
+ReactElement, 
+useEffect, 
+useState
+} from 'react'
 
 import styles from './Input.module.css'
 
@@ -83,6 +84,17 @@ const Input = forwardRef<HTMLDivElement, InputProps>(({
                 type={isPassword ? (showPassword ? 'text' : 'password') : type}
                 required={required}
                 error={hasError}
+                sx={{
+                    '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: 'var(--input-disabled-background)',
+                        '& fieldset': {
+                            borderColor: 'var(--input-disabled-border)',
+                        }
+                    },
+                    '& .MuiInputBase-root.Mui-disabled .MuiInputBase-input': {
+                        WebkitTextFillColor: 'var(--input-disabled-textfill)',
+                    }
+                }}
                 slotProps={{
                     input: {
                         sx: { height: height },
