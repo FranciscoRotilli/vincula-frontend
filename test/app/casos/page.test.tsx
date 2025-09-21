@@ -1,11 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect,it } from "vitest";
 
-import CasosPage from '@/app/casos/page';
 import { t } from '@/texts';
 
 import { renderWithClient } from '../../renderWithClient';
+import CasosPage from "./../../../src/app/casos/page";
 
 describe('CasosPage', () => {
   it('should render page title', () => {
