@@ -2,6 +2,7 @@
 
 import AddIcon from '@mui/icons-material/Add';
 import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
 
 import Button from '@/components/Button';
 import Filter, { FilterValues } from '@/components/Filter';
@@ -15,9 +16,6 @@ import { ApiSortingParams, CaseItem, FilterParams } from '@/types/Cases';
 import { Column, Sorting } from '@/types/Table';
 
 import styles from './page.module.css';
-import AddIcon from '@mui/icons-material/Add';
-import Footer from '@/components/Footer';
-import { useRouter } from "next/navigation";
 
 const columns: Column<CaseItem>[] = [
   { key: 'name', label: 'Caso', align: 'left' },
@@ -26,48 +24,6 @@ const columns: Column<CaseItem>[] = [
   { key: 'creation_date', label: 'Data de Abertura', align: 'left' },
 ];
 
-export default function Casos() {
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cases, setCases] = useState(data);
-  const [filteredData, setFilteredData] = useState(data);
-
-  const rowActions = [
-    {
-      label: "Ver detalhes",
-      onClick: () => {
-        router.push("/casos/viewcase");
-      },
-    },
-  ];
-
-  const situations = [
-    { value: 'Aberto', label: 'Aberto' },
-    { value: 'Em andamento', label: 'Em andamento' },
-    { value: 'Concluído', label: 'Concluído' },
-  ];
-
-  const handleFilter = (filters: FilterValues) => {
-    const filtered = cases.filter((item) => {
-      const matchesSearch =
-        !filters.search ||
-        item.case.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.responsible.toLowerCase().includes(filters.search.toLowerCase());
-
-      const matchesCaseNumber =
-        !filters.caseNumber || item.case.toLowerCase().includes(filters.caseNumber.toLowerCase());
-
-      const matchesCaseName = !filters.caseName || item.case.toLowerCase().includes(filters.caseName.toLowerCase());
-
-      const matchesResponsible =
-        !filters.responsible || item.responsible.toLowerCase().includes(filters.responsible.toLowerCase());
-
-      const matchesSituation = !filters.situation || item.status.toLowerCase() === filters.situation.toLowerCase();
-
-      return matchesSearch && matchesCaseNumber && matchesCaseName && matchesResponsible && matchesSituation;
-    });
-
-    setFilteredData(filtered);
 const situations = [
   { value: 'Aberto', label: 'Aberto' },
   { value: 'Em andamento', label: 'Em andamento' },
@@ -92,6 +48,7 @@ function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams
 }
 
 export default function Casos() {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [pagination, setPagination] = useState({ page: 1, limit: 10 });
@@ -112,6 +69,15 @@ export default function Casos() {
   const cases = apiResponse?.items || [];
 
   const caseMutation = useCase();
+
+  const rowActions = [
+    {
+      label: "Ver detalhes",
+      onClick: () => {
+        router.push("/casos/viewcase");
+      },
+    },
+  ];
 
   const handleFilter = (newFilters: FilterValues) => {
     setFilters(newFilters);
