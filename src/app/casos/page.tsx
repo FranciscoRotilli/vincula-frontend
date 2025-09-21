@@ -32,9 +32,13 @@ const data = [
   { id: 10, case: 'Caso 010', responsible: 'Patrícia Martins', status: 'Aberto', openedAt: '2025-08-29' },
 ];
 
-const router = useRouter();
+export default function Casos() {
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cases, setCases] = useState(data);
+  const [filteredData, setFilteredData] = useState(data);
 
-const rowActions = [
+  const rowActions = [
     {
       label: "Ver detalhes",
       onClick: () => {
@@ -43,16 +47,11 @@ const rowActions = [
     },
   ];
 
-const situations = [
-  { value: 'Aberto', label: 'Aberto' },
-  { value: 'Em andamento', label: 'Em andamento' },
-  { value: 'Concluído', label: 'Concluído' },
-];
-
-export default function Casos() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cases, setCases] = useState(data);
-  const [filteredData, setFilteredData] = useState(data);
+  const situations = [
+    { value: 'Aberto', label: 'Aberto' },
+    { value: 'Em andamento', label: 'Em andamento' },
+    { value: 'Concluído', label: 'Concluído' },
+  ];
 
   const handleFilter = (filters: FilterValues) => {
     const filtered = cases.filter((item) => {
