@@ -11,6 +11,7 @@ export type ButtonProps = {
   onClick: () => void;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
+  'data-testid'?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -22,6 +23,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   className = '',
   type = 'button',
+  'data-testid': testId,
 }) => {
   const hasLabel = !!label;
   return (
@@ -37,7 +39,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       aria-disabled={disabled}
-      data-testid="button"
+      data-testid={testId ?? 'button'}
     >
       {/* {icon && (
         <span className={hasLabel ? styles.icon : styles.iconOnly}>{icon}</span>

@@ -1,0 +1,81 @@
+image: node:20-alpine
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+    - .npm
+  policy: pull-push
+
+install:
+  stage: setup
+  tags:
+    - docker-linux
+  interruptible: true
+  script:
+    - npm ci --prefer-offline
+  artifacts:
+    paths:
+      - package-lock.json
+    expire_in: 1 day
+
+lint:
+  stage: lint
+  needs:
+    - install
+  tags:
+    - docker-linux
+  interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
+  script:
+    - npm ci --prefer-offline
+    - npm run lint
+
+test:
+  stage: test
+  needs:
+    - install
+  tags:
+    - docker-linux
+  interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
+  script:
+    - npm ci --prefer-offline
+    - npm run test
+
+build:
+  stage: build
+  needs:
+    - install
+    - lint
+    - test
+  tags:
+    - docker-linux
+  interruptible: true
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+      - .npm
+    policy: pull
+  script:
+    - npm ci --prefer-offline
+    - npm run build

@@ -14,6 +14,11 @@ export interface Pagination {
   onPageChange: (page: number, pageSize: number) => void;
 }
 
+export interface Sorting<T> {
+  sortBy: keyof T;
+  sortDir: Order;
+}
+
 export interface RowAction<T> {
   label: string;
   icon?: React.ReactNode;
@@ -24,8 +29,11 @@ export interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
+  variant: 'outlined' | 'ghost';
   pagination?: Pagination;
+  sorting?: Sorting<T>;
   selectable?: boolean;
   rowActions?: RowAction<T>[];
   onRowClick?: (row: T) => void;
+  onSort?: (sorting: Sorting<T>) => void;
 }

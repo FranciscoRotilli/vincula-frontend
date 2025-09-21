@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Box,
@@ -13,12 +13,14 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
-} from "@mui/material";
-import { visuallyHidden } from "@mui/utils";
-import React, { useMemo, useState } from "react";
+} from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
+import React, { useMemo, useState } from 'react';
 
-import { GenericTableProps, Order } from "../../types/Table";
-import styles from "./GenericTable.module.css"
+import { t } from '@/texts';
+
+import { GenericTableProps, Order } from '../../types/Table';
+import styles from './GenericTable.module.css';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   const valueA = a[orderBy];
@@ -29,11 +31,8 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   return 0;
 }
 
-function getComparator<T>(
-  order: Order,
-  orderBy: keyof T
-): (a: T, b: T) => number {
-  return order === "desc"
+function getComparator<T>(order: Order, orderBy: keyof T): (a: T, b: T) => number {
+  return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
@@ -42,31 +41,44 @@ export default function GenericTable<T extends { id: number | string }>({
   columns,
   data,
   loading,
+  variant,
   pagination,
+  sorting,
   selectable = false,
   rowActions,
   onRowClick,
+  onSort,
 }: GenericTableProps<T>) {
-  const [order, setOrder] = useState<Order>("asc");
+  const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof T>(columns[0].key);
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const isPaginationServerSide = !!pagination;
+  const isSortingServerSide = !!sorting;
+  const shouldHavePagination = (pagination?.totalItems ?? 0) > 5 || data.length > 5;
+
+  const currentOrderBy = isSortingServerSide ? sorting.sortBy : orderBy;
+  const currentOrder = isSortingServerSide ? sorting.sortDir : order;
 
   const clientSideRows = useMemo(() => {
     return [...data]
-      .sort(getComparator(order, orderBy))
+      .sort(getComparator(currentOrder, currentOrderBy))
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  }, [data, order, orderBy, page, rowsPerPage]);
+  }, [data, currentOrder, currentOrderBy, page, rowsPerPage]);
 
   const rows = isPaginationServerSide ? data : clientSideRows;
 
   const handleSort = (property: keyof T) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+    const isAsc = currentOrderBy === property && currentOrder === 'asc';
+    const newDirection = isAsc ? 'desc' : 'asc';
+    if (isSortingServerSide) {
+      onSort?.({ sortBy: property, sortDir: newDirection });
+    } else {
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(property);
+    }
   };
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,11 +90,7 @@ export default function GenericTable<T extends { id: number | string }>({
     setSelected([]);
   };
 
-  const handleRowClick = (
-    event: React.MouseEvent<unknown>,
-    id: string | number,
-    row: T
-  ) => {
+  const handleRowClick = (event: React.MouseEvent<unknown>, id: string | number, row: T) => {
     if (selectable) {
       const selectedIndex = selected.indexOf(id);
       let newSelected: (string | number)[] = [];
@@ -107,9 +115,7 @@ export default function GenericTable<T extends { id: number | string }>({
     }
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSize = parseInt(event.target.value, 10);
     if (isPaginationServerSide) {
       pagination!.onPageChange(0, newSize);
@@ -132,48 +138,45 @@ export default function GenericTable<T extends { id: number | string }>({
               <TableRow>
                 {selectable && (
                   <TableCell
-                    className={styles.headTableCell}
+                    className={`${styles.headTableCell} ${variant === 'outlined' ? styles.outlined : ''}`}
                     padding="checkbox"
                   >
                     <Checkbox
                       color="primary"
-                      indeterminate={
-                        selected.length > 0 && selected.length < data.length
-                      }
-                      checked={
-                        data.length > 0 && selected.length === data.length
-                      }
+                      indeterminate={selected.length > 0 && selected.length < data.length}
+                      checked={data.length > 0 && selected.length === data.length}
                       onChange={handleSelectAll}
                     />
                   </TableCell>
                 )}
                 {columns.map((column) => (
                   <TableCell
-                    className={styles.headTableCell}
+                    className={`${styles.headTableCell} ${variant === 'outlined' ? styles.outlined : ''}`}
                     key={String(column.key)}
-                    align={column.align || "left"}
-                    sortDirection={orderBy === column.key ? order : false}
+                    align={column.align || 'left'}
+                    sortDirection={currentOrderBy === column.key ? currentOrder : false}
                   >
                     <TableSortLabel
                       className={styles.tableCellLabel}
-                      active={orderBy === column.key}
-                      direction={orderBy === column.key ? order : "asc"}
+                      active={currentOrderBy === column.key}
+                      direction={currentOrderBy === column.key ? currentOrder : 'asc'}
                       onClick={() => handleSort(column.key)}
                     >
                       {column.label}
-                      {orderBy === column.key && (
+                      {currentOrderBy === column.key && (
                         <Box component="span" sx={visuallyHidden}>
-                          {order === "desc"
-                            ? "ordenado decrescente"
-                            : "ordenado crescente"}
+                          {currentOrder === 'desc' ? 'ordenado decrescente' : 'ordenado crescente'}
                         </Box>
                       )}
                     </TableSortLabel>
                   </TableCell>
                 ))}
                 {rowActions && (
-                  <TableCell className={styles.headTableCell} align="center">
-                    Ação
+                  <TableCell
+                    className={`${styles.headTableCell} ${variant === 'outlined' ? styles.outlined : ''}`}
+                    align="center"
+                  >
+                    {t('genericTable.action')}
                   </TableCell>
                 )}
               </TableRow>
@@ -205,13 +208,8 @@ export default function GenericTable<T extends { id: number | string }>({
                       {columns.map((column) => {
                         const value = row[column.key];
                         return (
-                          <TableCell
-                            key={String(column.key)}
-                            align={column.align || "left"}
-                          >
-                            {column.render
-                              ? column.render(value, row)
-                              : (value as React.ReactNode)}
+                          <TableCell key={String(column.key)} align={column.align || 'left'}>
+                            {column.render ? column.render(value, row) : (value as React.ReactNode)}
                           </TableCell>
                         );
                       })}
@@ -256,8 +254,9 @@ export default function GenericTable<T extends { id: number | string }>({
                   <TableCell
                     colSpan={columns.length + (selectable ? 1 : 0) + (rowActions ? 1 : 0)}
                     align="center"
+                    data-testid="generic-table-no-data"
                   >
-                    Nenhum registro encontrado
+                    {t('genericTable.noData')}
                   </TableCell>
                 </TableRow>
               )}
@@ -266,19 +265,20 @@ export default function GenericTable<T extends { id: number | string }>({
         )}
       </TableContainer>
 
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={isPaginationServerSide ? pagination!.totalItems : data.length}
-        rowsPerPage={isPaginationServerSide ? pagination!.pageSize : rowsPerPage}
-        page={isPaginationServerSide ? pagination!.currentPage : page}
-        labelRowsPerPage="Linhas por página"
-        labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} de ${count}`
-        }
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {shouldHavePagination && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={isPaginationServerSide ? pagination!.totalItems : data.length}
+          rowsPerPage={isPaginationServerSide ? pagination!.pageSize : rowsPerPage}
+          page={isPaginationServerSide ? pagination!.currentPage : page}
+          labelRowsPerPage="Linhas por página"
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          data-testid="table-pagination"
+        />
+      )}
     </Paper>
   );
 }

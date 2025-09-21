@@ -9,7 +9,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-testid="footer-component">
       <div className={styles.left}>
         <p className={styles.text}>
           {currentYear} {t('footer.copy')}
