@@ -16,11 +16,13 @@ export const texts = {
   'cases.title.allowView': 'Permitir visualização',
   'cases.title.delete': 'Excluir caso',
   'cases.title.investigated': 'Investigados',
-  'cases.title.investigatedDesc': 'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
+  'cases.title.investigatedDesc':
+    'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
   'cases.title.inputName': 'Insira o nome',
   'cases.title.inputCpfCnpj': 'Insira o CPF / CNPJ',
   'cases.title.files': 'Arquivos',
-  'cases.title.filesDesc': 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
+  'cases.title.filesDesc':
+    'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
   'cases.title.upload': 'Upload',
   'cases.title.selectSituation': 'Selecione a situação',
   'cases.title.situationOngoing': 'Em andamento',
@@ -28,11 +30,14 @@ export const texts = {
   'cases.title.situationClosed': 'Encerrado',
   'cases.title.save': 'Salvar',
   'cases.title.cancel': 'Cancelar',
-  'cases.title.deleteWarning': 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
+  'cases.title.deleteWarning':
+    'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.removeFile': 'Remover arquivo?',
-  'cases.title.removeFileWarning': 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
+  'cases.title.removeFileWarning':
+    'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.removeInvestigated': 'Remover investigado?',
-  'cases.title.removeInvestigatedWarning': 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
+  'cases.title.removeInvestigatedWarning':
+    'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.remove': 'Remover',
   'cases.title.addFile': 'Adicionar arquivo',
 
@@ -48,15 +53,23 @@ export const texts = {
   'modal.owner': 'Responsável',
   'modal.status': 'Número do caso',
 
+  'addFile.origin': 'Origem',
+  'addFile.required': '*',
+  'addFile.select': 'Selecionar',
+  'addFile.type': 'Tipo',
+  'addFile.file': 'Arquivo',
+  'addFile.add': 'Adicionar',
 
   'removeFileModal.title': 'Remover arquivo?',
-  'removeFileModal.description': 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
+  'removeFileModal.description':
+    'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
 
   'container.vis': 'Página de Visualização dos dados:',
   'container.vinculo': 'Página de Vínculos do Caso:',
 
   'files.title': 'Arquivos ({count})',
-  'files.description': 'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
+  'files.description':
+    'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
   'cases.title.changeNameDesc': 'Altere o nome do caso abaixo.',

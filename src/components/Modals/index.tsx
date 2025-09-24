@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import React, { ReactNode, useEffect } from 'react';
 
 import styles from './Modal.module.css';
@@ -7,7 +6,7 @@ type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-	description?: string;
+  description?: string;
   icon?: ReactNode;
   children?: ReactNode;
   size?: 'small' | 'medium' | 'large' | 'fullscreen';
@@ -33,7 +32,7 @@ const Modal = ({
   onAction,
   actionButton,
   cancelButton,
-  isError = false,
+  isError: _isError = false,
   actionButtonColor = 'primary',
 }: ModalProps) => {
   useEffect(() => {
@@ -75,12 +74,18 @@ const Modal = ({
           <div style={{ flex: 1, textAlign: 'center' }}>
             {icon && <div style={{ margin: '0 auto 12px auto' }}>{icon}</div>}
             {title && (
-              <h2 className={styles.title} data-testid="modal-title" style={{ textAlign: 'center' }}>
+              <h2
+                className={styles.title}
+                data-testid="modal-title"
+                style={{ textAlign: 'center' }}
+              >
                 {title}
               </h2>
             )}
             {description && (
-              <div style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginBottom: 8 }}>
+              <div
+                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginBottom: 8 }}
+              >
                 {description}
               </div>
             )}
@@ -107,10 +112,7 @@ const Modal = ({
               </button>
             )}
             {cancelButton && (
-              <button
-                className={`${styles.button} ${styles.secondary}`}
-                onClick={onClose}
-              >
+              <button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
                 {cancelButton}
               </button>
             )}

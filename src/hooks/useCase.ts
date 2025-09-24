@@ -1,8 +1,24 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { useMockData } from '@/app/casos/teste/page';
-import { addCase, CaseResponse, deleteCase, getCaseById, getCases, updateCaseCanView, updateCaseName, updateCaseSituation } from '@/services/caseService';
-import { ApiSortingParams, CaseItem, CasesResponse, CompleteCaseResponse, FilterParams, PaginationParams } from '@/types/Cases';
+// import { useMockData } from '@/app/casos/teste/page';
+import {
+  addCase,
+  CaseResponse,
+  deleteCase,
+  getCaseById,
+  getCases,
+  updateCaseCanView,
+  updateCaseName,
+  updateCaseSituation,
+} from '@/services/caseService';
+import {
+  ApiSortingParams,
+  CaseItem,
+  CasesResponse,
+  CompleteCaseResponse,
+  FilterParams,
+  PaginationParams,
+} from '@/types/Cases';
 
 type AddCaseInput = {
   name: string;
@@ -16,9 +32,8 @@ export function useCase() {
 
 export function useUpdateCaseName() {
   return useMutation({
-    mutationFn: (
-      { caseId, name }: { caseId: string; name: string }
-    ) => updateCaseName(caseId, name),
+    mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
+      updateCaseName(caseId, name),
   });
 }
 
@@ -54,18 +69,11 @@ export function useCases(
 }
 
 export function useCaseById(caseId: string) {
-  const mock = useMockData?.();
-
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
     queryFn: () => getCaseById(caseId),
     refetchOnWindowFocus: false,
-    enabled: !mock?.caseDetails,
   });
-
-  if (mock?.caseDetails) {
-    return { data: mock.caseDetails, isLoading: false, isError: false };
-  }
 
   return queryResult;
 }
