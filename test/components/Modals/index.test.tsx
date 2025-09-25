@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { fireEvent,render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, vi } from 'vitest';
 
@@ -72,8 +72,10 @@ describe('Componente Modal', () => {
     );
 
     const title = screen.queryByRole('heading');
-
     expect(title).not.toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0]).toHaveAttribute('aria-label', 'Fechar');
   });
 });

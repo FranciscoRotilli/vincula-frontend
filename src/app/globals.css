@@ -28,6 +28,7 @@
   --input-disabled-textfill: #9e9e9e;
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -36,6 +37,7 @@
     --text-color-secundary: #b0b0b0cc;
   }
 }
+*/
 
 html,
 body {
@@ -63,8 +65,10 @@ a {
   text-decoration: none;
 }
 
+/*
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
 }
+*/
