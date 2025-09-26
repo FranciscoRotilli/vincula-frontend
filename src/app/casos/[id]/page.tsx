@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
@@ -17,30 +17,12 @@ import {
 } from '@/hooks/useCase';
 import { t } from '@/texts';
 import { CaseItem } from '@/types/Cases';
+import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
 
 import styles from './page.module.css';
 
-type EnvolvidoRow = { id: number; nome: string; cpf: string };
-type ArquivoRow = { id: number; nome: string; tipo: string; data: string; tamanho: string };
-
-const envolvidosMock = [
-  { id: 1, nome: 'BETO BARBOSA', cpf: '494.392.650-94' },
-  { id: 2, nome: 'ZITA AMELI', cpf: '933.250.630-20' },
-  { id: 3, nome: 'TESTE', cpf: '494.392.650-94' },
-  { id: 4, nome: 'TESTE 2', cpf: '933.250.630-20' },
-];
-
-const arquivosMock: (EnvolvidoRow | ArquivoRow)[] = [
-  {
-    id: 1,
-    nome: 'ExtratoDetalhado.csv',
-    tipo: 'SIMBA',
-    data: '10 Ago 2025 10:00:00',
-    tamanho: '4.2 MB',
-  },
-  { id: 2, nome: 'Extrato_2.xlsx', tipo: 'SIMBA', data: '10 Ago 2025 10:00:00', tamanho: '21 KB' },
-];
+type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
 export default function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -66,9 +48,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
   const [novoNome, setNovoNome] = useState('');
+  const [novoTelefone, setNovoTelefone] = useState('');
   const [novoCpf, setNovoCpf] = useState('');
-  const [envolvidos, setEnvolvidos] = useState(envolvidosMock);
-  const [arquivos, setArquivos] = useState(arquivosMock);
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
@@ -77,6 +58,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const { data: caseDetails, isLoading, isError } = useCaseById(caseId);
 
+  const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
+  const [arquivos, setArquivos] = useState<File[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
 
@@ -127,7 +110,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         envolvidos.length > 0
           ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
           : 1;
-      setEnvolvidos([...envolvidos, { id: nextId, nome: novoNome, cpf: maskCpfCnpj(novoCpf) }]);
+      setEnvolvidos([...envolvidos, { id: nextId, 
+        name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone }]);
       setNovoNome('');
       setNovoCpf('');
     }
@@ -144,8 +128,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const envolvidosColumns: Column<EnvolvidoRow>[] = [
-    { key: 'nome', label: 'NOME' },
-    { key: 'cpf', label: 'CPF / CNPJ' },
+    { key: 'name', label: 'NOME' },
+    { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
+    { key: 'phone_number', label: 'Telefone' },
   ];
 
   const envolvidosRowActions = [
@@ -179,6 +164,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  useEffect(() => {
+    if (caseDetails) {
+      setEnvolvidos(caseDetails.suspects || []);
+      setArquivos(caseDetails.archives || []);
+    }
+  }, [caseDetails])
+
   if (isLoading) {
     return <div>{'Carregando...'}</div>;
   }
@@ -204,7 +196,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
             <div className={styles.detailsRow}>
               <div>
-                <strong>{t('modal.caseNumber')}</strong> {caseDetails.id}
+                <strong>{t('modal.caseNumber')}</strong> #{caseDetails.case_number}
               </div>
             </div>
           </div>
@@ -271,6 +263,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
                 className={styles.input}
                 maxLength={18}
+              />
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
+                value={novoTelefone}
+                onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
+                className={styles.input}
+                maxLength={15}
               />
               <Button
                 icon={<span style={{ fontWeight: 'bold', fontSize: '1.5em' }}>+</span>}

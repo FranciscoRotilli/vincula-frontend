@@ -20,6 +20,7 @@ export const texts = {
     'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
   'cases.title.inputName': 'Insira o nome',
   'cases.title.inputCpfCnpj': 'Insira o CPF / CNPJ',
+  'cases.title.inputPhone': 'Insira o telefone',
   'cases.title.files': 'Arquivos',
   'cases.title.filesDesc':
     'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',

@@ -47,17 +47,23 @@ describe('AddFileModal (basic)', () => {
     const onClose = vi.fn();
     openModal({ onSubmit, onClose });
 
-    fireEvent.change(screen.getByLabelText(/Origem/i), { target: { value: 'local' } });
-    fireEvent.change(screen.getByLabelText(/Tipo/i), { target: { value: 'csv' } });
+    fireEvent.change(screen.getByLabelText(/Origem/i), { target: { value: 'SIMBA' } });
+    fireEvent.change(screen.getByLabelText(/Tipo/i), {
+      target: { value: 'Cadastros dos Assinantes' },
+    });
 
     const input = screen.getByLabelText(/Arquivo/i, { selector: 'input[type="file"]' }) as HTMLInputElement;
-    const file = makeFile('dados.csv', 'text/csv');
+    const file = makeFile('Cadastros dos Assinantes.csv', 'text/csv');
     fireEvent.change(input, { target: { files: [file] } });
 
     fireEvent.click(screen.getByRole('button', { name: /Adicionar/i }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
-    expect(onSubmit).toHaveBeenCalledWith({ origin: 'local', type: 'csv', file });
+    expect(onSubmit).toHaveBeenCalledWith({
+      origin: 'SIMBA',
+      type: 'Cadastros dos Assinantes',
+      file,
+    });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

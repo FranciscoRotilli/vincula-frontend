@@ -31,7 +31,7 @@ export type CompleteCaseResponse = {
 };
 
 export type Suspects = {
-  id: string;
+  id: string | number;
   name: string;
   cpf_cnpj: string;
   phone_number: string;

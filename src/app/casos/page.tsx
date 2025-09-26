@@ -72,8 +72,8 @@ export default function Casos() {
   const rowActions = [
     {
       label: "Ver detalhes",
-      onClick: () => {
-        router.push("/casos/viewcase");
+      onClick: (obj: CaseItem) => {
+        router.push("/casos/" + obj.id);
       },
     },
   ];

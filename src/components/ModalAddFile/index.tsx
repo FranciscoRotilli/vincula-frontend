@@ -15,23 +15,21 @@ type AddFileModalProps = {
 };
 
 const ORIGIN_OPTIONS = [
-  { value: 'local', label: 'Local' },
-  { value: 's3', label: 'S3' },
-  { value: 'gdrive', label: 'Google Drive' },
+  { value: 'SIMBA', label: 'SIMBA' },
+  { value: 'SITTEL', label: 'SITTEL' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'csv', label: 'CSV' },
-  { value: 'pdf', label: 'PDF' },
-  { value: 'xlsx', label: 'Planilha Excel' },
+  { value: 'Cadastros dos Assinantes', label: 'Cadastros dos Assinantes' },
+  { value: 'ExtratoDetalhado', label: 'ExtratoDetalhado' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
 const MAX_SIZE_MB = 50;
 
 const ACCEPT_BY_TYPE: Record<string, string> = {
   csv: '.csv,text/csv',
-  pdf: 'application/pdf,.pdf',
-  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx',
 };
 
 export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModalProps) {
@@ -70,8 +68,6 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     if (isTooBig(f)) return `Arquivo acima de ${MAX_SIZE_MB} MB.`;
     if (!matchesSelectedType(f, selectedType)) {
       if (selectedType === 'csv') return 'Tipo inválido. Envie um arquivo CSV (.csv).';
-      if (selectedType === 'pdf') return 'Tipo inválido. Envie um arquivo PDF (.pdf).';
-      if (selectedType === 'xlsx') return 'Tipo inválido. Envie um arquivo Excel (.xlsx).';
       return 'Arquivo inválido para o tipo selecionado.';
     }
     return undefined;
