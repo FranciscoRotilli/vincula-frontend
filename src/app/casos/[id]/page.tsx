@@ -110,8 +110,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         envolvidos.length > 0
           ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
           : 1;
-      setEnvolvidos([...envolvidos, { id: nextId, 
-        name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone }]);
+      setEnvolvidos([
+        ...envolvidos,
+        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
+      ]);
       setNovoNome('');
       setNovoCpf('');
     }
@@ -169,7 +171,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       setEnvolvidos(caseDetails.suspects || []);
       setArquivos(caseDetails.archives || []);
     }
-  }, [caseDetails])
+  }, [caseDetails]);
 
   if (isLoading) {
     return <div>{'Carregando...'}</div>;
@@ -207,25 +209,25 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
