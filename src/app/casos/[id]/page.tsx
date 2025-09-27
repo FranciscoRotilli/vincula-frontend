@@ -20,6 +20,7 @@ import { CaseItem } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
 
+import { maskCpfCnpj } from '../../../../utils/functions';
 import styles from './page.module.css';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
@@ -144,25 +145,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     },
   ];
 
-  function maskCpfCnpj(value: string) {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 11) {
-      // CPF: xxx.xxx.xxx-xx
-      let cpf = digits.slice(0, 11);
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-      return cpf;
-    } else {
-      // CNPJ: xx.xxx.xxx/xxxx-xx
-      let cnpj = digits.slice(0, 14);
-      cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
-      cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      cnpj = cnpj.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-      return cnpj;
-    }
-  }
+
 
   useEffect(() => {
     if (caseDetails) {
