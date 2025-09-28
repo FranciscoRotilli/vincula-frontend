@@ -17,6 +17,8 @@
   --button-error: #ff3333;
   --button-error-hover: #ffebee;
   --button-error-active: #ffcdd2;
+  --button-error-contained-hover: #e42f2f;
+  --button-error-contained-active: #b62525;
   --table-icon: #1a2128;
   --action-link: #337ab7;
   --action-link-hover: #0050ac;

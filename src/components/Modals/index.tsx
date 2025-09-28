@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import React, { ReactNode, useEffect } from 'react';
 
 import styles from './Modal.module.css';
@@ -7,7 +6,9 @@ type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  children: ReactNode;
+  description?: string;
+  icon?: ReactNode;
+  children?: ReactNode;
   size?: 'small' | 'medium' | 'large' | 'fullscreen';
   closeOnOverlayClick?: boolean;
   actionButton?: string;
@@ -15,6 +16,7 @@ type ModalProps = {
   disableEscapeKeyDown?: boolean;
   onAction?: () => void;
   isError?: boolean;
+  actionButtonColor?: 'primary' | 'error';
 };
 
 const Modal = ({
@@ -22,13 +24,16 @@ const Modal = ({
   onClose,
   children,
   title,
+  description,
+  icon,
   size = 'medium',
   closeOnOverlayClick = true,
   disableEscapeKeyDown = false,
   onAction,
   actionButton,
   cancelButton,
-  isError = false,
+  isError: _isError = false,
+  actionButtonColor = 'primary',
 }: ModalProps) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -65,37 +70,50 @@ const Modal = ({
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
       >
-        {title && (
-          <header className={styles.header}>
-            <h2 className={styles.title} data-testid="modal-title">
-              {title}
-            </h2>
-            <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
-              &times;
-            </button>
-          </header>
-        )}
+        <header className={styles.header}>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            {icon && <div style={{ margin: '0 auto 12px auto' }}>{icon}</div>}
+            {title && (
+              <h2
+                className={styles.title}
+                data-testid="modal-title"
+                style={{ textAlign: 'center' }}
+              >
+                {title}
+              </h2>
+            )}
+            {description && (
+              <div
+                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginBottom: 8 }}
+              >
+                {description}
+              </div>
+            )}
+          </div>
+          <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
+            &times;
+          </button>
+        </header>
         <div className={styles.body}>
-          {isError && <Image src="/error.svg" alt="Error" width={50} height={50} className={styles.errorIcon} />}
-
           <main className={styles.content}>{children}</main>
         </div>
         {(cancelButton || actionButton) && (
           <footer className={styles.footer}>
-            {cancelButton && (
-              <button
-                className={isError ? `${styles.button}` : `${styles.button}  ${styles.secondary}`}
-                onClick={onClose}
-              >
-                {cancelButton}
-              </button>
-            )}
             {actionButton && (
               <button
-                className={isError ? `${styles.button} ${styles.error}` : `${styles.button} ${styles.primary}`}
+                className={
+                  actionButtonColor === 'error'
+                    ? `${styles.button} ${styles.error}`
+                    : `${styles.button} ${styles.primary}`
+                }
                 onClick={onAction}
               >
                 {actionButton}
+              </button>
+            )}
+            {cancelButton && (
+              <button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
+                {cancelButton}
               </button>
             )}
           </footer>

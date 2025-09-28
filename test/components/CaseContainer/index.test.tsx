@@ -1,10 +1,22 @@
 import '@testing-library/jest-dom';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { CaseContainer } from '../../../src/components/CaseContainer';
+
+const queryClient = new QueryClient();
+
+
+function renderWithQueryClient(ui: React.ReactElement) {
+	return render(
+		<QueryClientProvider client={queryClient}>
+			{ui}
+		</QueryClientProvider>
+	);
+}
 
 vi.mock('@/services/userService', () => ({
   getCurrentUser: vi.fn().mockResolvedValue({ name: 'Test User' }),
@@ -24,7 +36,7 @@ describe('CaseContainer Component', () => {
   });
 
   test('should render the main container element', () => {
-    render(
+    renderWithQueryClient(
       <CaseContainer caseId="test-id">
         <p>Test content</p>
       </CaseContainer>
@@ -33,7 +45,7 @@ describe('CaseContainer Component', () => {
   });
 
   test('should render the Navbar, Footer, Tabs, and child content', () => {
-    render(
+    renderWithQueryClient(
       <CaseContainer caseId="test-id">
         <p>Test content</p>
       </CaseContainer>

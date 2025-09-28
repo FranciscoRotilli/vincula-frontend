@@ -81,7 +81,6 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--modal-title-color, var(--foreground));
 }
 
 .closeButton {
@@ -89,7 +88,7 @@
   border: none;
   font-size: 1.8rem;
   cursor: pointer;
-  color: var(--modal-close-color, var(--foreground));
+  color: var(--foreground);
   line-height: 1;
   padding: 0;
   transition: opacity 0.2s;

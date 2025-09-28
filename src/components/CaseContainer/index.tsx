@@ -25,4 +25,3 @@ export function CaseContainer({ children, caseId }: CaseContainerProps) {
     </div>
   );
 }
-

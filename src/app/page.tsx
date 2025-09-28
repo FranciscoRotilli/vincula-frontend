@@ -1,9 +1,9 @@
 'use client';
 
-import { Lock,Person } from '@mui/icons-material';
+import { Lock, Person } from '@mui/icons-material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { type ChangeEvent, type FormEvent,useState } from 'react';
+import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -38,7 +38,8 @@ export default function LoginPage() {
     loginMutation.mutate(
       { username: usuario, password: senha },
       {
-        onSuccess: (data) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSuccess: (data : any) => {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
           router.push('/casos');
@@ -55,8 +56,7 @@ export default function LoginPage() {
     <main className={styles.page}>
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
-      </div>
-
+			</div>
       <section className={styles.center}>
         <div className={styles.card}>
           <div className={styles.logoGroup}>
@@ -83,7 +83,7 @@ export default function LoginPage() {
               label="Usuário"
               required
               error={errors.usuario}
-              startIcon={<Person data-testid="icon-person"/>}
+              startIcon={<Person data-testid="icon-person" />}
               data-testid="username-input"
             />
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
               label={loginMutation.isPending ? 'Entrando...' : 'Login'}
               disabled={loginMutation.isPending}
               onClick={() => {}}
-              data-testid='login-button'
+              data-testid="login-button"
             />
           </form>
         </div>

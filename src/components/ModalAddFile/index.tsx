@@ -4,6 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React, { useId, useRef, useState } from 'react';
 
 import Modal from '@/components/Modals';
+import { t } from '@/texts';
 
 import styles from './AddFileModal.module.css';
 
@@ -14,23 +15,21 @@ type AddFileModalProps = {
 };
 
 const ORIGIN_OPTIONS = [
-  { value: 'local', label: 'Local' },
-  { value: 's3', label: 'S3' },
-  { value: 'gdrive', label: 'Google Drive' },
+  { value: 'SIMBA', label: 'SIMBA' },
+  { value: 'SITTEL', label: 'SITTEL' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'csv', label: 'CSV' },
-  { value: 'pdf', label: 'PDF' },
-  { value: 'xlsx', label: 'Planilha Excel' },
+  { value: 'Cadastros dos Assinantes', label: 'Cadastros dos Assinantes' },
+  { value: 'ExtratoDetalhado', label: 'ExtratoDetalhado' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
 const MAX_SIZE_MB = 50;
 
 const ACCEPT_BY_TYPE: Record<string, string> = {
   csv: '.csv,text/csv',
-  pdf: 'application/pdf,.pdf',
-  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx',
 };
 
 export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModalProps) {
@@ -69,8 +68,6 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     if (isTooBig(f)) return `Arquivo acima de ${MAX_SIZE_MB} MB.`;
     if (!matchesSelectedType(f, selectedType)) {
       if (selectedType === 'csv') return 'Tipo inválido. Envie um arquivo CSV (.csv).';
-      if (selectedType === 'pdf') return 'Tipo inválido. Envie um arquivo PDF (.pdf).';
-      if (selectedType === 'xlsx') return 'Tipo inválido. Envie um arquivo Excel (.xlsx).';
       return 'Arquivo inválido para o tipo selecionado.';
     }
     return undefined;
@@ -173,12 +170,19 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
   return (
     <div className={styles.addfileTheme}>
-      <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar arquivo" size="medium" data-testid="modal-add-file">
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        title="Adicionar arquivo"
+        size="medium"
+        data-testid="modal-add-file"
+      >
         <div className={`${styles.form} addfileScope`}>
           <div className={styles.row}>
             <div className={styles.field}>
               <label htmlFor={`${titleId}-origin`} className={styles.label}>
-                Origem <span className={styles.required}>*</span>
+                {t('addFile.origin')}{' '}
+                <span className={styles.required}>{t('addFile.required')}</span>
               </label>
               <div className={styles.selectWrapper}>
                 <select
@@ -191,7 +195,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                   aria-invalid={showOriginError}
                   aria-describedby={showOriginError ? `${titleId}-origin-error` : undefined}
                 >
-                  <option value="">Selecionar</option>
+                  <option value="">{t('addFile.select')}</option>
                   {ORIGIN_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}
@@ -201,7 +205,12 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                 <KeyboardArrowDownIcon className={styles.selectIcon} />
               </div>
               {showOriginError && (
-                <p id={`${titleId}-origin-error`} className={styles.error} role="alert" aria-live="polite">
+                <p
+                  id={`${titleId}-origin-error`}
+                  className={styles.error}
+                  role="alert"
+                  aria-live="polite"
+                >
                   {errors.origin}
                 </p>
               )}
@@ -209,7 +218,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
             <div className={styles.field}>
               <label htmlFor={`${titleId}-type`} className={styles.label}>
-                Tipo <span className={styles.required}>*</span>
+                {t('addFile.type')} <span className={styles.required}>{t('addFile.required')}</span>
               </label>
               <div className={styles.selectWrapper}>
                 <select
@@ -222,7 +231,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                   aria-invalid={showTypeError}
                   aria-describedby={showTypeError ? `${titleId}-type-error` : undefined}
                 >
-                  <option value="">Selecionar</option>
+                  <option value="">{t('addFile.select')}</option>
                   {TYPE_OPTIONS.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
@@ -232,7 +241,12 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
                 <KeyboardArrowDownIcon className={styles.selectIcon} />
               </div>
               {showTypeError && (
-                <p id={`${titleId}-type-error`} className={styles.error} role="alert" aria-live="polite">
+                <p
+                  id={`${titleId}-type-error`}
+                  className={styles.error}
+                  role="alert"
+                  aria-live="polite"
+                >
                   {errors.type}
                 </p>
               )}
@@ -241,7 +255,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
           <div className={`${styles.fieldFull} ${styles.fileBlock}`}>
             <label htmlFor={`${titleId}-file`} className={styles.label}>
-              Arquivo <span className={styles.required}>*</span>
+              {t('addFile.file')} <span className={styles.required}>{t('addFile.required')}</span>
             </label>
 
             <div
@@ -264,9 +278,10 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
               role="button"
               tabIndex={0}
               onClick={() => fileInputRef.current?.click()}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
+              onKeyDown={(e) =>
+                (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()
+              }
               aria-label="Selecione ou arraste o arquivo"
-              aria-invalid={showFileError}
               aria-describedby={showFileError ? `${titleId}-file-error` : undefined}
             >
               <input
@@ -286,7 +301,12 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
             </div>
 
             {showFileError && (
-              <p id={`${titleId}-file-error`} className={styles.error} role="alert" aria-live="polite">
+              <p
+                id={`${titleId}-file-error`}
+                className={styles.error}
+                role="alert"
+                aria-live="polite"
+              >
                 {errors.file}
               </p>
             )}
@@ -295,7 +315,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
         <div className={styles.actions}>
           <button type="button" className={styles.primaryButton} onClick={handleSubmit}>
-            Adicionar
+            {t('addFile.add')}
           </button>
         </div>
       </Modal>

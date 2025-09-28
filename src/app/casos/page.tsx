@@ -1,6 +1,7 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
 
 import Button from '@/components/Button';
@@ -21,13 +22,6 @@ const columns: Column<CaseItem>[] = [
   { key: 'owner', label: 'Responsável', align: 'left' },
   { key: 'status', label: 'Situação', align: 'left' },
   { key: 'creation_date', label: 'Data de Abertura', align: 'left' },
-];
-
-const rowActions = [
-  {
-    label: 'Ver detalhes',
-    onClick: (row: unknown) => console.log('Ver detalhes', row),
-  },
 ];
 
 const situations = [
@@ -54,8 +48,8 @@ function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams
 }
 
 export default function Casos() {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [pagination, setPagination] = useState({ page: 1, limit: 10 });
   const [filters, setFilters] = useState<FilterValues>({});
   const apiFilterParams = mapUiFiltersToApiParams(filters);
@@ -65,15 +59,24 @@ export default function Casos() {
   });
   const apiSortingParams = mapUiSortingToApiParams(sorting);
 
-  const { data: apiResponse, isLoading, refetch } = useCases(
-    pagination,
-    apiFilterParams,
-    apiSortingParams
-  );
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useCases(pagination, apiFilterParams, apiSortingParams);
 
   const cases = apiResponse?.items || [];
 
   const caseMutation = useCase();
+
+  const rowActions = [
+    {
+      label: "Ver detalhes",
+      onClick: (obj: CaseItem) => {
+        router.push("/casos/" + obj.id);
+      },
+    },
+  ];
 
   const handleFilter = (newFilters: FilterValues) => {
     setFilters(newFilters);
@@ -135,6 +138,7 @@ export default function Casos() {
             columns={columns}
             data={cases}
             loading={isLoading}
+            variant="ghost"
             selectable={false}
             rowActions={rowActions}
             pagination={{
