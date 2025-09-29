@@ -7,6 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function GET() {
   const { access } = await getTokensFromCookies();
+  console.log(access);
   if (!access) return NextResponse.json({ error: 'Not logged in' }, { status: 401 });
 
   try {
