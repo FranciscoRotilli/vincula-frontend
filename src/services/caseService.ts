@@ -1,23 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from 'axios';
 import {
-  ApiResponse,
+  ApiSortingParams,
   CasesResponse,
   CompleteCaseResponse,
-  ApiSortingParams,
   FilterParams,
   PaginationParams,
 } from '@/types/Cases';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export type CaseResponse = { caseName: string };
 
-export type CaseResponse = {
-  caseName: string;
-};
-
-type ErrorWithMessage = {
-  message: string;
-};
+type ErrorWithMessage = { message: string };
 
 function toQueryString(params: Record<string, unknown>) {
   const search = new URLSearchParams();
@@ -30,27 +22,27 @@ function toQueryString(params: Record<string, unknown>) {
   return qs ? `?${qs}` : '';
 }
 
+async function throwIfError(resp: Response, fallback: string) {
+  let err: unknown;
+  try {
+    err = await resp.json();
+  } catch {
+    /* noop */
+  }
+  throw new Error(
+    typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
+      ? (err as ErrorWithMessage).message
+      : `${fallback} (status ${resp.status})`
+  );
+}
+
 export async function addCase(name: string): Promise<CaseResponse> {
   const resp = await fetch('/api/cases', {
     method: 'POST',
     body: JSON.stringify({ name }),
     headers: { 'Content-Type': 'application/json' },
   });
-
-  if (!resp.ok) {
-    let err: unknown;
-    try {
-      err = await resp.json();
-    } catch {
-      /* noop */
-    }
-    throw new Error(
-      typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
-        ? (err as ErrorWithMessage).message
-        : `Falha ao criar caso (status ${resp.status})`
-    );
-  }
-
+  if (!resp.ok) await throwIfError(resp, 'Falha ao criar caso');
   return resp.json();
 }
 
@@ -58,90 +50,64 @@ export async function getCases(
   paginationParams: PaginationParams,
   filterParams: FilterParams,
   sortingParams: ApiSortingParams
-): Promise<ApiResponse> {
+): Promise<CasesResponse> {
   const qs = toQueryString({ ...paginationParams, ...filterParams, ...sortingParams });
-
   const resp = await fetch(`/api/cases${qs}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
   });
-
-  if (!resp.ok) {
-    let err: unknown;
-    try {
-      err = await resp.json();
-    } catch {
-      /* noop */
-    }
-    throw new Error(
-      typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
-        ? (err as ErrorWithMessage).message
-        : `Falha ao listar casos (status ${resp.status})`
-    );
-  }
-
+  if (!resp.ok) await throwIfError(resp, 'Falha ao listar casos');
   return resp.json();
 }
-export async function getCaseById(caseId: string): Promise<CompleteCaseResponse> {
-  const response = await axios.get(`${API_URL}/case/${caseId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-  });
 
-  return response.data;
+export async function getCaseById(caseId: string): Promise<CompleteCaseResponse> {
+  const resp = await fetch(`/api/cases/${caseId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao buscar caso');
+  return resp.json();
 }
 
 export async function updateCaseName(caseId: string, name: string) {
-  const response = await axios.patch(
-    `${API_URL}/case/${caseId}/`,
-    { name },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    }
-  );
-  return response.data;
+  const resp = await fetch(`/api/cases/${caseId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar nome do caso');
+  return resp.json();
 }
 
 export async function updateCaseSituation(caseId: string, situation: string) {
-  const response = await axios.patch(
-    `${API_URL}/case/${caseId}/`,
-    { situation },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    }
-  );
-  return response.data;
+  const resp = await fetch(`/api/cases/${caseId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ situation }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar situação do caso');
+  return resp.json();
 }
 
 export async function updateCaseCanView(caseId: string, canView: boolean) {
-  const response = await axios.patch(
-    `${API_URL}/case/${caseId}/`,
-    { canView },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    }
-  );
-  return response.data;
+  const resp = await fetch(`/api/cases/${caseId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ canView }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar visibilidade do caso');
+  return resp.json();
 }
 
 export async function deleteCase(caseId: string) {
-  const response = await axios.delete(`${API_URL}/case/${caseId}/`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-  });
-  return response.data;
+  const resp = await fetch(`/api/cases/${caseId}`, { method: 'DELETE' });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao excluir caso');
+
+  try {
+    return await resp.json();
+  } catch {
+    return { ok: true };
+  }
 }

@@ -58,8 +58,8 @@ export function useDeleteCase() {
 }
 
 export function useCases(
-  pagination: PaginationParams, 
-  filters: FilterParams, 
+  pagination: PaginationParams,
+  filters: FilterParams,
   sorting: ApiSortingParams
 ) {
   return useQuery<CasesResponse, Error>({
