@@ -1,7 +1,10 @@
 'use client';
 import React, { use, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
+import { CircularProgress } from '@mui/material';
+import { BiSolidError } from 'react-icons/bi';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
@@ -26,6 +29,7 @@ type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone
 
 export default function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const caseId = id;
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
@@ -56,7 +60,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
 
-  const { data: caseDetails, isLoading, isError } = useCaseById(caseId);
+  const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -110,8 +114,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         envolvidos.length > 0
           ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
           : 1;
-      setEnvolvidos([...envolvidos, { id: nextId, 
-        name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone }]);
+      setEnvolvidos([
+        ...envolvidos,
+        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
+      ]);
       setNovoNome('');
       setNovoCpf('');
     }
@@ -169,13 +175,39 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       setEnvolvidos(caseDetails.suspects || []);
       setArquivos(caseDetails.archives || []);
     }
-  }, [caseDetails])
+  }, [caseDetails]);
 
   if (isLoading) {
-    return <div>{'Carregando...'}</div>;
+    return (
+      <div className={styles.loadingOrErrorContainer}>
+        <CircularProgress size={40} />
+      </div>
+    );
   }
   if (isError || !caseDetails) {
-    return <div>{'Erro ao carregar detalhes do caso.'}</div>;
+    return (
+      <div className={styles.loadingOrErrorContainer}>
+        <div className={styles.errorContent}>
+          <BiSolidError size={60} className={styles.errorIcon} />
+          <span>Algo deu errado ao carregar os detalhes do caso.</span>
+          <div className={styles.errorButtons}>
+            <Button
+              size="medium"
+              label="Voltar para casos"
+              variant="error"
+              className={styles.returnButton}
+              onClick={() => router.push('/casos')}
+            />
+            <Button
+              size="medium"
+              label="Recarregar"
+              className={styles.reloadButton}
+              onClick={() => refetch()}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
   return (
     <CaseContainer caseId={id}>
