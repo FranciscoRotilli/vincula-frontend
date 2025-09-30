@@ -189,18 +189,18 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
-          <span>Algo deu errado ao carregar os detalhes do caso.</span>
+          <span>{t('cases.errorMessage')}</span>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
-              label="Voltar para casos"
+              label={t('cases.returnToCases')}
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
             />
             <Button
               size="medium"
-              label="Recarregar"
+              label={t('cases.reload')}
               className={styles.reloadButton}
               onClick={() => refetch()}
             />
