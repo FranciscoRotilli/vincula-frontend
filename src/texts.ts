@@ -47,6 +47,14 @@ export const texts = {
 
   'filter.situation': 'Situação',
 
+  'graph.filter.investigated': 'Investigado',
+  'graph.filter.cpfCnpj': 'CPF / CNPJ',
+  'graph.filter.cpfCnpjDescription': 'Insira o nome do cpf / cnpj',
+  'graph.filter.destination': 'Destino',
+  'graph.filter.destinationDescription': 'Insira o nome ou cpf / cnpj destino',
+	'graph.filter.database': 'Base de dados',
+	'graph.filter.databaseDescription': 'Selecione',
+
   'modal.caseName': 'Nome do caso:',
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
