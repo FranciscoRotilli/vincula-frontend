@@ -13,11 +13,23 @@ export default function NavbarContainer() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   useEffect(() => {
     async function fetchUser() {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (err) {
+        if (
+          typeof err === 'object' &&
+          err !== null &&
+          'message' in err &&
+          typeof (err as { message?: unknown }).message === 'string' &&
+          (err as { message: string }).message === 'UNAUTHORIZED'
+        ) {
+          router.push('/login');
+        }
+      }
     }
     fetchUser();
-  }, []);
+  }, [router]);
 
   return (
     <Navbar
