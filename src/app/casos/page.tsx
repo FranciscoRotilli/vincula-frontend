@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
 
 import Button from '@/components/Button';
-import Filter, { FilterValues } from '@/components/Filter';
+import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Footer from '@/components/Footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
@@ -30,10 +30,17 @@ const situations = [
   { value: 'Concluído', label: 'Concluído' },
 ];
 
+const filterFields: FieldConfig[] = [
+  { key: 'caseNumber', label: t('modal.caseNumber'), placeholder: 'Insira o número do caso', type: 'input' },
+  { key: 'caseName', label: t('modal.caseName'), placeholder: 'Insira o nome do caso', type: 'input' },
+  { key: 'responsible', label: t('modal.owner'), placeholder: 'Insira o responsável', type: 'input' },
+  { key: 'situation', label: t('filter.situation'), placeholder: 'Situação', type: 'select', options: situations },
+];
+
 function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
   const apiParams: FilterParams = {
-    status: uiFilters.situation,
-    owner: uiFilters.responsible,
+    status: uiFilters.situation as string | undefined,
+    owner: uiFilters.responsible as string | undefined,
     name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber,
   };
 
@@ -133,7 +140,11 @@ export default function Casos() {
           onSubmit={handleCreateCase}
         />
         <div className={styles.tableContainer}>
-          <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
+          <Filter
+            fields={filterFields}
+            onFilter={handleFilter}
+            onClear={handleClear}
+          />
           <Table
             columns={columns}
             data={cases}
