@@ -17,7 +17,7 @@ export async function getCurrentUser() {
   const resp = await fetch('/api/me');
   if (!resp.ok) {
     if (resp.status === 401) {
-      throw new Error('UNAUTHORIZED');
+      throw new Error('Failed to get user');
     }
     return null;
   }

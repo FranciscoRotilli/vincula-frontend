@@ -16,16 +16,8 @@ export default function NavbarContainer() {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-      } catch (err) {
-        if (
-          typeof err === 'object' &&
-          err !== null &&
-          'message' in err &&
-          typeof (err as { message?: unknown }).message === 'string' &&
-          (err as { message: string }).message === 'UNAUTHORIZED'
-        ) {
-          router.push('/login');
-        }
+      } catch {
+          router.push('/');
       }
     }
     fetchUser();
