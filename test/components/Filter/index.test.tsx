@@ -49,13 +49,13 @@ describe('Filter', () => {
       caseNumber: '1',
       caseName: 'bar',
       responsible: 'baz',
-      situation: 'closed',
+      situation: 'Em andamento',
     };
     render(<Filter onFilter={() => {}} situations={situations} defaultValues={defaultValues} />);
 
     expect(screen.getByDisplayValue('1')).toBeInTheDocument();
     expect(screen.getByDisplayValue('bar')).toBeInTheDocument();
     expect(screen.getByDisplayValue('baz')).toBeInTheDocument();
-    expect(screen.getByText(/closed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Em andamento/i)).toBeInTheDocument();
   });
 });
