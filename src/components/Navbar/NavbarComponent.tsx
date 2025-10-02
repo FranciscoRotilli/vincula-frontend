@@ -1,18 +1,22 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getCurrentUser, logout } from '@/services/userService';
+import { getCurrentUser, logout } from '@/services/auth';
+import { CurrentUser } from '@/types/User';
 
 import Navbar from './index';
 
 export default function NavbarContainer() {
   const router = useRouter();
-  const [user, setUser] = React.useState<Awaited<ReturnType<typeof getCurrentUser>>>(null);
-
-  React.useEffect(() => {
-    getCurrentUser().then(setUser);
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  useEffect(() => {
+    async function fetchUser() {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    }
+    fetchUser();
   }, []);
 
   return (
@@ -22,7 +26,7 @@ export default function NavbarContainer() {
         await logout();
         router.push('/');
       }}
-      user={user}
+      user={user ? { name: user.username, role: user.role } : null}
     />
   );
 }
