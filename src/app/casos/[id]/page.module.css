@@ -58,14 +58,13 @@
 .actionsBox {
   max-height: 12.375rem; /* 198px */
   position: relative;
-  overflow: scroll;
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem var(--button-primary-shadow); /* 0 2px 8px */
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: flex-start;
   justify-content: flex-start;
 }
