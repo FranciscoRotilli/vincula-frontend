@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { apiFetch } from '@/lib/backend';
 
-export async function GET(_req: NextRequest, { params }: { params: { caseId: string } }) {
-  const resp = await apiFetch(`/case/${params.caseId}`, { method: 'GET' });
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
+  const { caseId } = await params;
+  const resp = await apiFetch(`/case/${caseId}`, { method: 'GET' });
 
   const text = await resp.text();
   try {
@@ -19,10 +20,11 @@ export async function GET(_req: NextRequest, { params }: { params: { caseId: str
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { caseId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
+  const { caseId } = await params;
   const body = await req.json();
 
-  const resp = await apiFetch(`/case/${params.caseId}/`, {
+  const resp = await apiFetch(`/case/${caseId}/`, {
     method: 'PATCH',
     body: JSON.stringify(body),
   });
