@@ -25,6 +25,9 @@ export type FilterProps = {
   onClear?: () => void;
   defaultValues?: FilterValues;
   disabled?: boolean;
+  customStyles?: {
+    container?: string;
+  };
 };
 
 const Filter: React.FC<FilterProps> = ({
@@ -33,6 +36,7 @@ const Filter: React.FC<FilterProps> = ({
   onClear,
   defaultValues = {},
   disabled = false,
+  customStyles = {},
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
@@ -54,7 +58,7 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   return (
-    <div className={styles.filterContainer}>
+    <div className={`${styles.filterContainer} ${customStyles?.container || ''}`}>
       <div className={styles.fieldsRow}>
         {fields.map((field) =>
           field.type === 'input' ? (
@@ -68,8 +72,12 @@ const Filter: React.FC<FilterProps> = ({
               data-testid={field.testId || `${field.key}-input`}
             />
           ) : (
-            <div key={field.key} className={styles.inputWrapper}>
-              <label htmlFor={`${field.key}-select`} className={styles.label}>
+            <div 
+              key={field.key} 
+              className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
+              data-testid={field.testId || `${field.key}-select`} 
+            >
+              <label className={styles.label}>
                 {field.label}
               </label>
               <CustomSelect
@@ -79,14 +87,13 @@ const Filter: React.FC<FilterProps> = ({
                 placeholder={field.placeholder}
                 style={{ height: '2.5rem', width: '11.25rem' }}
                 isControlled
-                data-testid={field.testId || `${field.key}-select`}
               />
             </div>
           )
         )}
       </div>
 
-      <div className={styles.actions}>
+      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
         {onClear && (
           <Button
             data-testid="clear-button"
@@ -95,7 +102,7 @@ const Filter: React.FC<FilterProps> = ({
             size="icon"
             label=""
             onClick={handleClear}
-            className={styles.filterButton}
+            className={`${styles.filterButton} ${customStyles?.clearButton || ''}`}
             disabled={disabled}
           />
         )}
@@ -107,7 +114,7 @@ const Filter: React.FC<FilterProps> = ({
             size="icon"
             label=""
             onClick={handleFilter}
-            className={styles.filterButton}
+            className={`${styles.filterButton} ${customStyles?.filterButton || ''}`}
             disabled={disabled}
           />
         </div>

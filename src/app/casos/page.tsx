@@ -31,10 +31,10 @@ const situations = [
 ];
 
 const filterFields: FieldConfig[] = [
-  { key: 'caseNumber', label: t('modal.caseNumber'), placeholder: 'Insira o número do caso', type: 'input' },
-  { key: 'caseName', label: t('modal.caseName'), placeholder: 'Insira o nome do caso', type: 'input' },
-  { key: 'responsible', label: t('modal.owner'), placeholder: 'Insira o responsável', type: 'input' },
-  { key: 'situation', label: t('filter.situation'), placeholder: 'Situação', type: 'select', options: situations },
+  { key: 'caseNumber', label: t('modal.caseNumber'), placeholder: 'Insira o número do caso', type: 'input', testId: 'case-number-input' },
+  { key: 'caseName', label: t('modal.caseName'), placeholder: 'Insira o nome do caso', type: 'input', testId: 'case-name-input' },
+  { key: 'responsible', label: t('modal.owner'), placeholder: 'Insira o responsável', type: 'input', testId: 'case-responsible-input' },
+  { key: 'situation', label: t('filter.situation'), placeholder: 'Situação', type: 'select', testId: 'situation-input' , options: situations },
 ];
 
 function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {

@@ -20,6 +20,7 @@ interface SelectProps {
   required?: boolean;
   isControlled?: boolean;
   style?: React.CSSProperties;
+  testId?: string;
 }
 
 export const CustomSelect: React.FC<SelectProps> = ({
@@ -32,6 +33,7 @@ export const CustomSelect: React.FC<SelectProps> = ({
   required,
   isControlled = false,
   style,
+  testId,
 }) => {
   const [internalValue, setInternalValue] = useState<string>('');
 
@@ -55,6 +57,7 @@ export const CustomSelect: React.FC<SelectProps> = ({
         required={required}
         sx={style}
         displayEmpty
+        data-testid={testId}
         renderValue={(selected) => {
           if (selected === '') {
             return <span className={styles.placeholder}>{placeholder}</span>;
