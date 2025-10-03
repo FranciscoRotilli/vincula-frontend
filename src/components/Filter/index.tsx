@@ -58,7 +58,7 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   return (
-    <div className={`${styles.filterContainer} ${customStyles?.container || ''}`}>
+    <div className={`${styles.filterContainer} ${customStyles?.container || ''}`} data-testid="filter-component">
       <div className={styles.fieldsRow}>
         {fields.map((field) =>
           field.type === 'input' ? (

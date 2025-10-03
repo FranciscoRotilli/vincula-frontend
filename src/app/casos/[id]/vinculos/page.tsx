@@ -4,14 +4,13 @@ import React, { use, useEffect,useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
-import { t } from '@/texts';
 
 import styles from './page.module.css';
 
 
 const baseOptions = [
-  { value: 'simba', label: 'SIMBA' },
-  { value: 'sintel', label: 'SINTEL' },
+  { value: 'SIMBA', label: 'SIMBA' },
+  { value: 'SINTEL', label: 'SINTEL' },
 ];
 
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
@@ -59,11 +58,14 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   };
 
   return (
-    <CaseContainer caseId={id}>
-      <Filter classname={styles.filter}
+    <CaseContainer caseId={id} data-testid="aba-vinculos">
+      <Filter
         fields={filterFields}
         onFilter={handleFilter}
         onClear={handleClear}
+        customStyles={{
+          container: styles.containerOverride,
+        }}
       />
       <div data-testid="graph-container">
 
