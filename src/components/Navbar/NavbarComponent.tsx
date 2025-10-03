@@ -13,11 +13,15 @@ export default function NavbarContainer() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   useEffect(() => {
     async function fetchUser() {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch {
+          router.push('/');
+      }
     }
     fetchUser();
-  }, []);
+  }, [router]);
 
   return (
     <Navbar
