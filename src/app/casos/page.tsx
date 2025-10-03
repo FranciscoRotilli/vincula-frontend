@@ -12,7 +12,7 @@ import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import { useCase, useCases } from '@/hooks/useCase';
 import { t } from '@/texts';
-import { ApiSortingParams, CaseItem, FilterParams } from '@/types/Cases';
+import { ApiSortingParams, CaseItem, CaseStatus, FilterParams } from '@/types/Cases';
 import { Column, Sorting } from '@/types/Table';
 
 import styles from './page.module.css';
@@ -24,10 +24,10 @@ const columns: Column<CaseItem>[] = [
   { key: 'creation_date', label: 'Data de Abertura', align: 'left' },
 ];
 
-const situations = [
-  { value: 'Aberto', label: 'Aberto' },
+const situations: { value: CaseStatus; label: string }[] = [
   { value: 'Em andamento', label: 'Em andamento' },
-  { value: 'Concluído', label: 'Concluído' },
+  { value: 'Encerrado', label: 'Encerrado' },
+  { value: 'Suspenso', label: 'Suspenso' },
 ];
 
 const filterFields: FieldConfig[] = [
@@ -38,13 +38,11 @@ const filterFields: FieldConfig[] = [
 ];
 
 function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
-  const apiParams: FilterParams = {
-    status: uiFilters.situation as string | undefined,
-    owner: uiFilters.responsible as string | undefined,
+  return {
+    status: uiFilters.situation,
+    owner: uiFilters.responsible,
     name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber,
   };
-
-  return apiParams;
 }
 
 function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams {

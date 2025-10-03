@@ -3,12 +3,20 @@ import React, { useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
+import { CaseStatus } from '@/types/Cases';
+
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
 
-export type FilterValues = Record<string, string | number | undefined | null>;
+export type FilterValues = {
+  caseNumber?: string;
+  caseName?: string;
+  responsible?: string;
+  situation?: CaseStatus;
+  search?: string;
+};
 
 export type FieldConfig = {
   key: string;

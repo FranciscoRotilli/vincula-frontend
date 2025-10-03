@@ -27,7 +27,7 @@ describe('VinculosPage', () => {
     vi.resetAllMocks();
   });
 
-  it('renderiza CaseContainer e Filter corretamente', async () => {
+  it('render page components correctly', async () => {
     const params = Promise.resolve({ id: '123' });
     render(<VinculosPage params={params} />);
 
