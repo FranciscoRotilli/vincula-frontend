@@ -27,11 +27,17 @@ export type CompleteCaseResponse = {
   owner: string;
   update_date: string;
   archives: File[];
-  suspects: Suspects[];
+  suspects: Suspect[];
 };
 
-export type Suspects = {
+export type Suspect = {
   id: string | number;
+  name: string;
+  cpf_cnpj: string;
+  phone_number: string;
+};
+
+export type SuspectInput = {
   name: string;
   cpf_cnpj: string;
   phone_number: string;
