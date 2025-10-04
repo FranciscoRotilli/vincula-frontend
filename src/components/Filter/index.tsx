@@ -16,6 +16,7 @@ export type FilterValues = {
   responsible?: string;
   situation?: CaseStatus;
   search?: string;
+  [key: string]: string | CaseStatus | undefined;
 };
 
 export type FieldConfig = {
@@ -35,7 +36,15 @@ export type FilterProps = {
   disabled?: boolean;
   customStyles?: {
     container?: string;
+    inputWrapper?: string;
+    actions?: string;
+    filterButton?: string;
+    clearButton?: string;
   };
+};
+
+const isCaseStatus = (value: string): value is CaseStatus => {
+  return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
 
 const Filter: React.FC<FilterProps> = ({
@@ -53,7 +62,15 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   const handleSelectChange = (key: string) => (value: string | null) => {
-    setFilters((prev) => ({ ...prev, [key]: value ?? undefined }));
+    setFilters((prev) => {
+      if (key === 'situation') {
+        return {
+          ...prev,
+          situation: value && isCaseStatus(value) ? value : undefined,
+        };
+      }
+      return { ...prev, [key]: value ?? undefined };
+    });
   };
 
   const handleFilter = () => {
@@ -66,33 +83,34 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   return (
-    <div className={`${styles.filterContainer} ${customStyles?.container || ''}`} data-testid="filter-component">
+    <div
+      className={`${styles.filterContainer} ${customStyles?.container || ''}`}
+      data-testid="filter-component"
+    >
       <div className={styles.fieldsRow}>
         {fields.map((field) =>
           field.type === 'input' ? (
             <Input
               key={field.key}
-              placeholder={field.placeholder}
+              placeholder={field.placeholder ?? ''}
               label={field.label}
-              value={filters[field.key] || ''}
+              value={(filters[field.key] as string | undefined) ?? ''}
               onChange={handleInputChange(field.key)}
               disabled={disabled}
               data-testid={field.testId || `${field.key}-input`}
             />
           ) : (
-            <div 
-              key={field.key} 
+            <div
+              key={field.key}
               className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
-              data-testid={field.testId || `${field.key}-select`} 
+              data-testid={field.testId || `${field.key}-select`}
             >
-              <label className={styles.label}>
-                {field.label}
-              </label>
+              <label className={styles.label}>{field.label}</label>
               <CustomSelect
                 options={field.options || []}
-                value={(filters[field.key] as string) || null}
+                value={(filters[field.key] as string | null) ?? null}
                 onChange={handleSelectChange(field.key)}
-                placeholder={field.placeholder}
+                placeholder={field.placeholder ?? ''}
                 style={{ height: '2.5rem', width: '11.25rem' }}
                 isControlled
               />
