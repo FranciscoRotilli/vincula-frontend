@@ -45,6 +45,10 @@ export const texts = {
   'cases.createError': 'Erro ao criar caso. Tente novamente.',
   'cases.createSuccess': 'Caso criado com sucesso!',
 
+  'cases.errorMessage': 'Algo deu errado ao carregar os detalhes do caso.',
+  'cases.returnToCases': 'Voltar para casos',
+  'cases.reload': 'Recarregar',
+
   'filter.situation': 'Situação',
 
   'modal.caseName': 'Nome do caso:',

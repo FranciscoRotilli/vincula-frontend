@@ -48,13 +48,13 @@
 }
 
 .removeButton {
-  background-color: var(--button-error);
+  background-color: var(--button-error) !important;
 }
 
 .removeButton:hover:not(.disabled) {
-  background-color: var(--button-error-contained-hover);
+  background-color: var(--button-error-contained-hover) !important;
 }
 
 .removeButton:active:not(.disabled) {
-  background-color: var(--button-error-contained-active);
+  background-color: var(--button-error-contained-active) !important;
 }

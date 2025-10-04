@@ -5,6 +5,43 @@
   padding: 2rem;
 }
 
+.loadingOrErrorContainer {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.errorIcon {
+  color: var(--button-error);
+}
+
+.errorButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.reloadButton {
+  background-color: var(--button-error) !important;
+}
+
+.reloadButton:hover:not(.disabled) {
+  background-color: var(--button-error-contained-hover) !important;
+}
+
+.reloadButton:active:not(.disabled) {
+  background-color: var(--button-error-contained-active) !important;
+}
+
 .navbar {
   display: flex;
   gap: 2rem;
