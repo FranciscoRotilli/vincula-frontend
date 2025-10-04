@@ -3,10 +3,45 @@
 import React, { use, useEffect, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
-import GraphFilter from '@/components/GraphFilter';
+import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
+import Graph from '@/components/Graph'; 
+import { t } from '@/texts';
+
+import styles from './page.module.css';
+
+const baseOptions = [
+  { value: 'SIMBA', label: 'SIMBA' },
+  { value: 'SINTEL', label: 'SINTEL' },
+];
+
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
-  const [investigated, setInvestigated] = useState<string[]>([]);
-  const [archives, setArchives] = useState<string[]>([]);
+  const nodes = [
+    { id: 'alvo-principal', size: 50, caption: 'vincula', labels: ['Investigado'], properties: { nome: 'Investigado Principal' } },
+  ];
+
+  const rels = [];
+
+  for (let i = 1; i <= 50; i++) {
+    const nodeId = `entidade-${i}`;
+    nodes.push({
+      id: nodeId,
+      size: 30,
+      caption: `${i}`,
+      labels: ['Entidade'],
+      properties: { nome: `Entidade ${i}` }
+    });
+    rels.push({
+      id: `rel-${i}`,
+      from: 'alvo-principal',
+      to: nodeId,
+      type: 'VINCULADO_A'
+    });
+  }
+  const graphData = { nodes, rels };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [filters, setFilters] = useState<FilterValues>({});
+  const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
 
   const { id } = use(params);
 
@@ -34,12 +69,21 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   }, [id]);
 
   return (
-    <CaseContainer caseId={id} data-testid="aba-vinculos">
-      <GraphFilter
-        archives={archives}
-        investigated={investigated}
+    <CaseContainer caseId={id}>
+      <Filter
+        fields={filterFields}
+        onFilter={handleFilter}
+        onClear={handleClear}
+        customStyles={{
+          container: styles.containerOverride,
+        }}
       />
-      <div data-testid="graph-container">
+      <div>
+        <h1>{t('container.vinculo')}{id}</h1>
+        
+        <div style={{ marginTop: '20px' }}>
+          <Graph nodes={graphData.nodes} rels={graphData.rels} />
+        </div>
 
       </div>
     </CaseContainer>
