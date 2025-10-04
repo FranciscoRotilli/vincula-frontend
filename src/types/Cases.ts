@@ -37,6 +37,12 @@ export type Suspect = {
   phone_number: string;
 };
 
+export type SuspectInput = {
+  name: string;
+  cpf_cnpj: string;
+  phone_number: string;
+};
+
 export type PaginationParams = {
   page: number;
   limit: number;

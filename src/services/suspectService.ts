@@ -1,8 +1,8 @@
-import { Suspect } from '@/types/Cases';
+import { SuspectInput } from '@/types/Cases';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function addSuspect(caseId: string, suspect: Suspect) {
+export async function addSuspect(caseId: string, suspect: SuspectInput) {
   const response = await fetch(`${API_URL}/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {
@@ -15,6 +15,4 @@ export async function addSuspect(caseId: string, suspect: Suspect) {
   if (!response.ok) {
     throw new Error(`Falha ao adicionar suspeito: ${response.statusText}`);
   }
-
-  return response.json();
 }

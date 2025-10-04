@@ -18,8 +18,9 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
+import { useAddSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem } from '@/types/Cases';
+import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
 
@@ -61,6 +62,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const deleteCaseMutation = useDeleteCase();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+
+  const addSuspectMutation = useAddSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -109,18 +112,24 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    if (novoNome && novoCpf && (novoCpf.length === 11 || novoCpf.length === 14)) {
-      const nextId =
-        envolvidos.length > 0
-          ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
-          : 1;
-      setEnvolvidos([
-        ...envolvidos,
-        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
-      ]);
-      setNovoNome('');
-      setNovoCpf('');
-    }
+    const newSuspect: SuspectInput = {
+      name: novoNome,
+      cpf_cnpj: novoCpf,
+      phone_number: novoTelefone,
+    };
+
+    addSuspectMutation.mutate(
+      { caseId, newSuspect },
+      {
+        onSuccess: () => {
+          setNovoNome('');
+          setNovoCpf('');
+          setNovoTelefone('');
+
+          refetch();
+        },
+      }
+    );
   };
 
   const handleRemoveEnvolvido = (index: number) => {
@@ -321,7 +330,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               <GenericTable<EnvolvidoRow>
                 columns={envolvidosColumns}
                 data={envolvidos}
-                loading={false}
+                loading={isLoading}
                 rowActions={envolvidosRowActions}
                 variant={'outlined'}
               />
