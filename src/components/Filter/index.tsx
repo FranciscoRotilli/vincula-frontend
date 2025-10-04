@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
-import { t } from '@/texts';
 import { CaseStatus } from '@/types/Cases';
 
 import Button from '../Button';
@@ -12,47 +11,66 @@ import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
 
 export type FilterValues = {
-  search?: string;
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
   situation?: CaseStatus;
+  search?: string;
+  [key: string]: string | CaseStatus | undefined;
 };
 
-export type SituationOption = { value: string; label: string };
+export type FieldConfig = {
+  key: string;
+  label: string;
+  placeholder?: string;
+  type: 'input' | 'select';
+  options?: { value: string; label: string }[];
+  testId?: string;
+};
 
 export type FilterProps = {
+  fields: FieldConfig[];
   onFilter: (filters: FilterValues) => void;
   onClear?: () => void;
   defaultValues?: FilterValues;
-  situations: SituationOption[];
   disabled?: boolean;
-  loading?: boolean;
+  customStyles?: {
+    container?: string;
+    inputWrapper?: string;
+    actions?: string;
+    filterButton?: string;
+    clearButton?: string;
+  };
+};
+
+const isCaseStatus = (value: string): value is CaseStatus => {
+  return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
 
 const Filter: React.FC<FilterProps> = ({
+  fields,
   onFilter,
   onClear,
   defaultValues = {},
-  situations,
   disabled = false,
-  // loading = false, // Commented out - not being used
+  customStyles = {},
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
-  const handleInputChange =
-    (field: keyof FilterValues) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
+  const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters((prev) => ({ ...prev, [key]: e.target.value }));
+  };
 
-  const handleSelectChange = (field: keyof FilterValues) => (value: string | null) => {
-    setFilters((prev) => ({
-      ...prev,
-      [field]: value ?? undefined,
-    }));
+  const handleSelectChange = (key: string) => (value: string | null) => {
+    setFilters((prev) => {
+      if (key === 'situation') {
+        return {
+          ...prev,
+          situation: value && isCaseStatus(value) ? value : undefined,
+        };
+      }
+      return { ...prev, [key]: value ?? undefined };
+    });
   };
 
   const handleFilter = () => {
@@ -61,82 +79,56 @@ const Filter: React.FC<FilterProps> = ({
 
   const handleClear = () => {
     setFilters({ ...defaultValues });
-    onClear && onClear();
+    onClear?.();
   };
 
-  // Commented out - not being used currently
-  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key === 'Enter') handleFilter();
-  // };
-
-  // Commented out - not being used currently
-  // function handleChange(
-  //   _arg0: string
-  // ):
-  //   | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
-  //       ((event: React.ChangeEvent<HTMLInputElement>) => void))
-  //   | undefined {
-  //   return _arg0
-  //     ? (event) =>
-  //         setFilters((prev) => ({
-  //           ...prev,
-  //           [_arg0]: event.target.value,
-  //         }))
-  //     : undefined;
-  // }
-
   return (
-    <div className={styles.filterContainer}>
+    <div
+      className={`${styles.filterContainer} ${customStyles?.container || ''}`}
+      data-testid="filter-component"
+    >
       <div className={styles.fieldsRow}>
-        <Input
-          placeholder="Insira o número do caso"
-          label={t('modal.caseNumber')}
-          value={filters.caseNumber || ''}
-          onChange={handleInputChange('caseNumber')}
-          disabled={disabled}
-          data-testid="case-number-input"
-        />
-        <Input
-          placeholder="Insira o nome do caso"
-          label={t('modal.caseName')}
-          value={filters.caseName || ''}
-          onChange={handleInputChange('caseName')}
-          disabled={disabled}
-          data-testid="case-name-input"
-        />
-        <Input
-          placeholder="Insira o responsável"
-          label={t('modal.owner')}
-          value={filters.responsible || ''}
-          onChange={handleInputChange('responsible')}
-          disabled={disabled}
-          data-testid="case-responsible-input"
-        />
-        <div className={styles.inputWrapper}>
-          <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            {t('filter.situation')}
-          </label>
-          <CustomSelect
-            options={situations}
-            value={filters.situation || null}
-            onChange={handleSelectChange('situation')}
-            placeholder="Situação"
-            style={{ height: '2.5rem', width: '11.25rem' }}
-            isControlled
-            data-testid="situation-select"
-          />
-        </div>
+        {fields.map((field) =>
+          field.type === 'input' ? (
+            <Input
+              key={field.key}
+              placeholder={field.placeholder ?? ''}
+              label={field.label}
+              value={(filters[field.key] as string | undefined) ?? ''}
+              onChange={handleInputChange(field.key)}
+              disabled={disabled}
+              data-testid={field.testId || `${field.key}-input`}
+            />
+          ) : (
+            <div
+              key={field.key}
+              className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
+              data-testid={field.testId || `${field.key}-select`}
+            >
+              <label className={styles.label}>{field.label}</label>
+              <CustomSelect
+                options={field.options || []}
+                value={(filters[field.key] as string | null) ?? null}
+                onChange={handleSelectChange(field.key)}
+                placeholder={field.placeholder ?? ''}
+                style={{ height: '2.5rem', width: '11.25rem' }}
+                isControlled
+              />
+            </div>
+          )
+        )}
       </div>
-      <div className={styles.actions}>
+
+      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
         {onClear && (
           <Button
             data-testid="clear-button"
             icon={<MdOutlineClear />}
             variant="outlined"
             size="icon"
-            label={''}
+            label=""
             onClick={handleClear}
-            className={styles.filterButton}
+            className={`${styles.filterButton} ${customStyles?.clearButton || ''}`}
             disabled={disabled}
           />
         )}
@@ -146,9 +138,9 @@ const Filter: React.FC<FilterProps> = ({
             icon={<FiFilter />}
             variant="contained"
             size="icon"
-            label={''}
+            label=""
             onClick={handleFilter}
-            className={styles.filterButton}
+            className={`${styles.filterButton} ${customStyles?.filterButton || ''}`}
             disabled={disabled}
           />
         </div>
