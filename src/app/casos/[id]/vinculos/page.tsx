@@ -4,8 +4,7 @@ import React, { use, useEffect, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
-import Graph from '@/components/Graph'; 
-import { t } from '@/texts';
+import Graph from '@/components/Graph';
 
 import styles from './page.module.css';
 
@@ -79,8 +78,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         }}
       />
       <div>
-        <h1>{t('container.vinculo')}{id}</h1>
-        
         <div style={{ marginTop: '20px' }}>
           <Graph nodes={graphData.nodes} rels={graphData.rels} />
         </div>
