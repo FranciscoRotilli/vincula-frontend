@@ -1,7 +1,7 @@
-import { SuspectInput } from '@/types/Cases';
+import { SuspectRequest } from '@/types/Cases';
 
 
-export async function addSuspect(caseId: string, suspect: SuspectInput) {
+export async function addSuspect(caseId: string, suspect: SuspectRequest) {
   const resp = await fetch(`/api/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {

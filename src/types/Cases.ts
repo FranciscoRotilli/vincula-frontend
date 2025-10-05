@@ -1,4 +1,4 @@
-import { File } from './Files';
+import { FileResponse } from './Files';
 
 export type CaseStatus = 'Em andamento' | 'Suspenso' | 'Encerrado';
 
@@ -26,7 +26,7 @@ export type CompleteCaseResponse = {
   case_number: number;
   owner: string;
   update_date: string;
-  archives: File[];
+  archives: FileResponse[];
   suspects: Suspect[];
 };
 
@@ -37,7 +37,7 @@ export type Suspect = {
   phone_number: string;
 };
 
-export type SuspectInput = {
+export type SuspectRequest = {
   name: string;
   cpf_cnpj: string;
   phone_number: string;
