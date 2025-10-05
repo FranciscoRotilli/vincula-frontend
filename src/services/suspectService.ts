@@ -3,7 +3,7 @@ import { SuspectInput } from '@/types/Cases';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function addSuspect(caseId: string, suspect: SuspectInput) {
-  const response = await fetch(`${API_URL}/case/${caseId}/suspect`, {
+  const resp = await fetch(`${API_URL}/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -12,7 +12,13 @@ export async function addSuspect(caseId: string, suspect: SuspectInput) {
     body: JSON.stringify(suspect),
   });
 
-  if (!response.ok) {
-    throw new Error(`Falha ao adicionar suspeito: ${response.statusText}`);
+  if (!resp.ok) {
+    throw new Error(`Falha ao adicionar suspeito: ${resp.statusText}`);
+  }
+
+  try {
+    return await resp.json();
+  } catch {
+    return { ok: true };
   }
 }
