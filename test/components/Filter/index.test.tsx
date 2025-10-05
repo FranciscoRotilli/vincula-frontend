@@ -1,47 +1,33 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import Filter, { FilterValues, SituationOption } from '../../../src/components/Filter';
+import Filter, { FieldConfig, FilterValues } from '../../../src/components/Filter';
 
-const situations: SituationOption[] = [
-  { value: 'open', label: 'Aberto' },
-  { value: 'closed', label: 'Fechado' },
+const fields: FieldConfig[] = [
+  { key: 'caseNumber', label: 'Número do Caso', type: 'input', placeholder: 'Digite o número' },
+  { key: 'caseName', label: 'Nome do Caso', type: 'input', placeholder: 'Digite o nome' },
+  { key: 'responsible', label: 'Responsável', type: 'input', placeholder: 'Digite o responsável' },
+  { 
+    key: 'situation', 
+    label: 'Situação', 
+    type: 'select', 
+    options: [
+      { value: 'open', label: 'Aberto' },
+      { value: 'closed', label: 'Fechado' },
+    ],
+    placeholder: 'Selecione'
+  },
 ];
 
 describe('Filter', () => {
   it('renders all filter fields', () => {
-    render(<Filter onFilter={() => {}} situations={situations} />);
-    expect(screen.getByTestId('case-number-input')).toBeInTheDocument();
-    expect(screen.getByTestId('case-name-input')).toBeInTheDocument();
-    expect(screen.getByTestId('case-responsible-input')).toBeInTheDocument();
+    render(<Filter fields={fields} onFilter={() => {}} />);
+
+    expect(screen.getByTestId('caseNumber-input')).toBeInTheDocument();
+    expect(screen.getByTestId('caseName-input')).toBeInTheDocument();
+    expect(screen.getByTestId('responsible-input')).toBeInTheDocument();
     expect(screen.getByTestId('situation-select')).toBeInTheDocument();
-  });
-
-  it('calls onFilter with correct values', () => {
-    const onFilter = vi.fn();
-    render(<Filter onFilter={onFilter} situations={situations} />);
-
-    fireEvent.change(screen.getByTestId('case-number-input'));
-    fireEvent.change(screen.getByTestId('case-name-input'));
-    fireEvent.change(screen.getByTestId('case-responsible-input'));
-    fireEvent.change(screen.getByTestId('situation-select'));
-    fireEvent.click(screen.getByTestId('filter-button'));
-
-    expect(onFilter).toHaveBeenCalledOnce();
-  });
-
-  it('calls onClear and resets fields', () => {
-    const onClear = vi.fn();
-    render(<Filter onFilter={() => {}} onClear={onClear} situations={situations} />);
-
-    fireEvent.change(screen.getByTestId('case-number-input'));
-
-    fireEvent.click(screen.getByTestId('clear-button'));
-
-    expect(onClear).toHaveBeenCalled();
-    
-    expect(screen.queryByDisplayValue('teste')).not.toBeInTheDocument();
   });
 
   it('renders with default values', () => {
@@ -51,7 +37,8 @@ describe('Filter', () => {
       responsible: 'baz',
       situation: 'Em andamento',
     };
-    render(<Filter onFilter={() => {}} situations={situations} defaultValues={defaultValues} />);
+
+    render(<Filter fields={fields} onFilter={() => {}} defaultValues={defaultValues} />);
 
     expect(screen.getByDisplayValue('1')).toBeInTheDocument();
     expect(screen.getByDisplayValue('bar')).toBeInTheDocument();

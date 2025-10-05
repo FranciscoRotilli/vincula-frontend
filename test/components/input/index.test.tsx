@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 
-import { CalendarMonth, Email, Lock } from '@mui/icons-material'
+import { Lock } from '@mui/icons-material'
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'

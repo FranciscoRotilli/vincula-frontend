@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
 
 import Button from '@/components/Button';
-import Filter, { FilterValues } from '@/components/Filter';
+import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Footer from '@/components/Footer';
 import Table from '@/components/GenericTable';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
 import NavbarContainer from '@/components/Navbar/NavbarComponent';
 import { useCase, useCases } from '@/hooks/useCase';
 import { t } from '@/texts';
-import { ApiSortingParams, CaseItem, FilterParams } from '@/types/Cases';
+import { ApiSortingParams, CaseItem, CaseStatus, FilterParams } from '@/types/Cases';
 import { Column, Sorting } from '@/types/Table';
 
 import styles from './page.module.css';
@@ -24,20 +24,25 @@ const columns: Column<CaseItem>[] = [
   { key: 'creation_date', label: 'Data de Abertura', align: 'left' },
 ];
 
-const situations = [
-  { value: 'Aberto', label: 'Aberto' },
+const situations: { value: CaseStatus; label: string }[] = [
   { value: 'Em andamento', label: 'Em andamento' },
-  { value: 'Concluído', label: 'Concluído' },
+  { value: 'Encerrado', label: 'Encerrado' },
+  { value: 'Suspenso', label: 'Suspenso' },
+];
+
+const filterFields: FieldConfig[] = [
+  { key: 'caseNumber', label: t('modal.caseNumber'), placeholder: 'Insira o número do caso', type: 'input', testId: 'case-number-input' },
+  { key: 'caseName', label: t('modal.caseName'), placeholder: 'Insira o nome do caso', type: 'input', testId: 'case-name-input' },
+  { key: 'responsible', label: t('modal.owner'), placeholder: 'Insira o responsável', type: 'input', testId: 'case-responsible-input' },
+  { key: 'situation', label: t('filter.situation'), placeholder: 'Situação', type: 'select', testId: 'situation-input' , options: situations },
 ];
 
 function mapUiFiltersToApiParams(uiFilters: FilterValues): FilterParams {
-  const apiParams: FilterParams = {
+  return {
     status: uiFilters.situation,
     owner: uiFilters.responsible,
     name: uiFilters.search || uiFilters.caseName || uiFilters.caseNumber,
   };
-
-  return apiParams;
 }
 
 function mapUiSortingToApiParams(uiSorting: Sorting<CaseItem>): ApiSortingParams {
@@ -133,7 +138,11 @@ export default function Casos() {
           onSubmit={handleCreateCase}
         />
         <div className={styles.tableContainer}>
-          <Filter onFilter={handleFilter} onClear={handleClear} situations={situations} />
+          <Filter
+            fields={filterFields}
+            onFilter={handleFilter}
+            onClear={handleClear}
+          />
           <Table
             columns={columns}
             data={cases}
