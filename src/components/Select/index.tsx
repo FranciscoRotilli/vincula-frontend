@@ -37,15 +37,17 @@ export const CustomSelect: React.FC<SelectProps> = ({
 }) => {
   const [internalValue, setInternalValue] = useState<string>('');
 
-  const handleValueChange = (event: SelectChangeEvent<string | null>) => {
+  const handleValueChange = (event: SelectChangeEvent<string>) => {
     const newValue = event.target.value === '' ? null : event.target.value;
     if (!isControlled) {
-      setInternalValue(event.target.value!);
+      setInternalValue(event.target.value);
     }
     onChange(newValue);
   };
 
-  const selectValue = isControlled ? (value ?? '') : internalValue;
+  const selectValue = isControlled
+  ? value ?? ''
+  : internalValue ?? '';
 
   return (
     <FormControl fullWidth>
