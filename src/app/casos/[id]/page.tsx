@@ -20,8 +20,8 @@ import {
 } from '@/hooks/useCase';
 import { useAddSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem, SuspectInput } from '@/types/Cases';
-import { File } from '@/types/Files';
+import { CaseItem, SuspectRequest } from '@/types/Cases';
+import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
 
 import styles from './page.module.css';
@@ -66,7 +66,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const addSuspectMutation = useAddSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
 
@@ -112,7 +112,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    const newSuspect: SuspectInput = {
+    const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
       phone_number: novoTelefone,

@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { addSuspect } from '@/services/suspectService';
-import { SuspectInput } from '@/types/Cases';
+import { SuspectRequest } from '@/types/Cases';
 
 export function useAddSuspect() {
   return useMutation({
-    mutationFn: ({ caseId, newSuspect }: { caseId: string; newSuspect: SuspectInput }) =>
+    mutationFn: ({ caseId, newSuspect }: { caseId: string; newSuspect: SuspectRequest }) =>
       addSuspect(caseId, newSuspect),
   });
 }

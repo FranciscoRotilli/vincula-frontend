@@ -1,8 +1,8 @@
-import { SuspectInput } from '@/types/Cases';
+import { SuspectRequest } from '@/types/Cases';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function addSuspect(caseId: string, suspect: SuspectInput) {
+export async function addSuspect(caseId: string, suspect: SuspectRequest) {
   const resp = await fetch(`${API_URL}/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {

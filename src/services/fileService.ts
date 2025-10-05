@@ -1,4 +1,4 @@
-import { File } from '@/types/Files';
+import { FileRequest } from '@/types/Files';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,14 +22,14 @@ export async function removeFile(caseId: string, fileId: string) {
   }
 }
 
-export async function addFile(fileId: string, file: File) {
+export async function addFile(fileId: string, newFile: FileRequest) {
   const resp = await fetch(`${API_URL}/case/${fileId}/files`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
-    body: JSON.stringify(file),
+    body: JSON.stringify(newFile),
   });
 
   if (!resp.ok) {
