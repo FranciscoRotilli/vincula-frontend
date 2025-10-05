@@ -22,18 +22,14 @@ export async function removeFile(caseId: string, fileId: string) {
   }
 }
 
-export async function addFile(caseId: string, newFile: FileRequest) {
-  const formData = new FormData();
-  formData.append('origin', newFile.origin);
-  formData.append('file_type', newFile.file_type);
-  formData.append('file', newFile.file);
-
-  const resp = await fetch(`${API_URL}/case/${caseId}/files`, {
+export async function addFile(fileId: string, file: FileRequest) {
+  const resp = await fetch(`${API_URL}/case/${fileId}/files`, {
     method: 'POST',
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
-    body: formData,
+    body: JSON.stringify(file),
   });
 
   if (!resp.ok) {
