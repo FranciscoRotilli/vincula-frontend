@@ -15,6 +15,11 @@ export async function logout() {
 
 export async function getCurrentUser() {
   const resp = await fetch('/api/me');
-  if (!resp.ok) return null;
+  if (!resp.ok) {
+    if (resp.status === 401) {
+      throw new Error('Failed to get user');
+    }
+    return null;
+  }
   return resp.json();
 }

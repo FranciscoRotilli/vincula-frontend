@@ -40,6 +40,16 @@
 
 .tableContainer {
   padding: 1rem;
+  background-color: var(--white);
+  border-radius: 6px;
+}
+
+.filterContainer {
+  margin: 0 1rem;
+}
+
+.tableContainer {
+  padding: 1rem;
   border: 1px solid #ccc;
   background-color: var(--white);
   border-radius: 6px;
