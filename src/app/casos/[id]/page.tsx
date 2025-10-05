@@ -23,8 +23,8 @@ import { t } from '@/texts';
 import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { maskCpfCnpj } from '@/utils/functions';
 
-import { maskCpfCnpj } from '../../../../utils/functions';
 import styles from './page.module.css';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
