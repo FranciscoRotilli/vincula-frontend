@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { FiX } from 'react-icons/fi';
 
 import { t } from '@/texts';
+import { maskCpfCnpj, maskPhone } from '@/utils/functions';
 
-import { maskCpfCnpj, maskPhone } from '../../../utils/functions';
 import styles from './NodeModal.module.css';
 
 type NodeModalProps = {
