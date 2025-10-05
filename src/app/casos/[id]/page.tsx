@@ -81,6 +81,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onSuccess: () => {
           setShowSituationModal(false);
         },
+        onError: (error) => {
+          console.error('Failed to update case situation:', error);
+        },
       }
     );
   };
@@ -110,8 +113,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         envolvidos.length > 0
           ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
           : 1;
-      setEnvolvidos([...envolvidos, { id: nextId, 
-        name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone }]);
+      setEnvolvidos([
+        ...envolvidos,
+        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
+      ]);
       setNovoNome('');
       setNovoCpf('');
     }
@@ -169,7 +174,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       setEnvolvidos(caseDetails.suspects || []);
       setArquivos(caseDetails.archives || []);
     }
-  }, [caseDetails])
+  }, [caseDetails]);
 
   if (isLoading) {
     return <div>{'Carregando...'}</div>;
