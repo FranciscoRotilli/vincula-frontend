@@ -55,7 +55,7 @@
   outline: none;
 }
 
-.filterButton {
+.iconButton {
   min-width: 40px;
   min-height: 40px;
   padding: 0;
@@ -115,4 +115,8 @@
   margin-left: 0.25em;
   margin-bottom: 0.35em;
   font-size: 0.875em;
+}
+
+.saveFilter {
+  display: flex;
 }
