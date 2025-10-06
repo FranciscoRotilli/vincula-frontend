@@ -1,8 +1,9 @@
 "use client";
-import type { HitTargets, Node, Relationship } from '@neo4j-nvl/base'
+import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import React from 'react'
+import React, { useState } from 'react'
+
 interface InteractiveGraphProps {
   nodes: Node[];
   rels: Relationship[];
@@ -15,8 +16,6 @@ interface InteractiveGraphProps {
 export default function Graph({
   nodes,
   rels,
-  height,
-  zoom,
   onNodeClick,
   onRelationshipClick,
   onCanvasClick,
@@ -29,15 +28,23 @@ export default function Graph({
     onRelationshipClick: onRelationshipClick,
     onCanvasClick: onCanvasClick,
   }
+
+  const [renderer, setRenderer] = useState<Renderer>("webgl")
+
   return (
     <>
-      <div style={{ height, border: '1px solid black', position: 'relative' }}>
+      <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         <InteractiveNvlWrapper
           nodes={nodes}
           rels={rels}
           zoom={zoom}
           mouseEventCallbacks={mouseEventCallbacks}
-          layout='d3Force'
+          nvlOptions={{renderer}}
+          nvlCallbacks={{
+            onLayoutDone: () => {
+              setRenderer('canvas')
+            }
+          }}
         />
       </div>
     </>

@@ -40,7 +40,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
     { id: 'rel-principal-secundario', from: 'alvo-principal', to: 'alvo-secundario', properties: { type: 'associado a' } }
   ];
 
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 200; i++) {
     const nodeId = `entidade-${i}`;
     nodes.push({
       id: nodeId,
@@ -59,7 +59,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   }
   const [graphNodes, setGraphNodes] = useState<AppNode[]>(nodes);
   const [graphRels, setGraphRels] = useState<AppRelationship[]>(rels);
-  const zoom = calculateInitialZoom(graphNodes.length);
+  
+
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
 
@@ -132,7 +133,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             <div>
               <p><strong>ID:</strong> {selectedElement.id}</p>
               <p><strong>Tipo:</strong> {'from' in selectedElement ? 'Relação' : 'Nó'}</p>
-              {/* Mostra as propriedades do elemento */}
               <pre>{JSON.stringify(selectedElement.properties, null, 2)}</pre>
             </div>
           ) : (
