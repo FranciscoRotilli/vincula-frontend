@@ -232,25 +232,25 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
