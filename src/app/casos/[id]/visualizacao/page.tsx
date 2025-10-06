@@ -6,9 +6,11 @@ export default async function VinculosDadosPage({
 }: {
   params: { id: string };
 }) {
+  const { id } = params;
+
   return (
-    <CaseContainer caseId={params.id}>
-      <VisualizationTab caseId={params.id} />
+    <CaseContainer caseId={id}>
+      <VisualizationTab caseId={id} />
     </CaseContainer>
   );
 }

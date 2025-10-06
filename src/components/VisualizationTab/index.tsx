@@ -1,6 +1,5 @@
 'use client';
 
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
   Alert,
   Button,
