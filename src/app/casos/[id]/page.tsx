@@ -18,10 +18,12 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
+import { useAddSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem } from '@/types/Cases';
+import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
 
@@ -62,6 +64,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
+  const addSuspectMutation = useAddSuspect();
+
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
@@ -84,6 +88,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowSituationModal(false);
+        },
+        onError: (error) => {
+          console.error('Failed to update case situation:', error);
         },
       }
     );
@@ -109,18 +116,24 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    if (novoNome && novoCpf && (novoCpf.length === 11 || novoCpf.length === 14)) {
-      const nextId =
-        envolvidos.length > 0
-          ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
-          : 1;
-      setEnvolvidos([
-        ...envolvidos,
-        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
-      ]);
-      setNovoNome('');
-      setNovoCpf('');
-    }
+    const newSuspect: SuspectInput = {
+      name: novoNome,
+      cpf_cnpj: novoCpf,
+      phone_number: novoTelefone,
+    };
+
+    addSuspectMutation.mutate(
+      { caseId, newSuspect },
+      {
+        onSuccess: () => {
+          setNovoNome('');
+          setNovoCpf('');
+          setNovoTelefone('');
+
+          refetch();
+        },
+      }
+    );
   };
 
   const handleRemoveEnvolvido = (index: number) => {
@@ -149,26 +162,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       },
     },
   ];
-
-  function maskCpfCnpj(value: string) {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 11) {
-      // CPF: xxx.xxx.xxx-xx
-      let cpf = digits.slice(0, 11);
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-      return cpf;
-    } else {
-      // CNPJ: xx.xxx.xxx/xxxx-xx
-      let cnpj = digits.slice(0, 14);
-      cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
-      cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      cnpj = cnpj.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-      return cnpj;
-    }
-  }
 
   useEffect(() => {
     if (caseDetails) {
@@ -239,25 +232,25 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
@@ -321,7 +314,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               <GenericTable<EnvolvidoRow>
                 columns={envolvidosColumns}
                 data={envolvidos}
-                loading={false}
+                loading={isLoading}
                 rowActions={envolvidosRowActions}
                 variant={'outlined'}
               />

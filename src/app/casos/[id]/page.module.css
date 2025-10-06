@@ -67,8 +67,8 @@
 
 .gridContainer {
   display: grid;
-  grid-template-columns: 2fr 2fr;
-  gap: 2rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-gap: 1rem;
 }
 
 .caseDetails {
@@ -77,8 +77,6 @@
   overflow: auto;
   stroke: var(--gray);
   stroke-width: 0.0625rem; /* 1px */
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem var(--button-primary-shadow); /* 0 2px 8px */
@@ -97,16 +95,13 @@
 .actionsBox {
   max-height: 12.375rem; /* 198px */
   position: relative;
-  overflow: scroll;
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem var(--button-primary-shadow); /* 0 2px 8px */
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: flex-start;
   justify-content: flex-start;
 }
@@ -114,8 +109,7 @@
 .actionsRow {
   display: flex;
   flex-direction: row;
-  gap: 1.6875rem; /* 27px */
-  margin-top: 1rem;
+  gap: 1rem; /* 27px */
 }
 
 .envolvidosBox,

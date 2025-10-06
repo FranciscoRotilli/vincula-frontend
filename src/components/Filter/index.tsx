@@ -72,16 +72,11 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   const handleSelectChange = (key: string) => (value: string | null) => {
-    setFilters((prev) => {
-      if (key === 'situation') {
-        return {
-          ...prev,
-          situation: value && isCaseStatus(value) ? value : undefined,
-        };
-      }
-      return { ...prev, [key]: value ?? undefined };
-    });
-  };
+  setFilters((prev) => ({
+    ...prev,
+    [key]: value && value !== '' ? value : undefined,
+  }));
+};
 
   const handleFilter = () => {
     onFilter(filters);
@@ -123,7 +118,7 @@ const Filter: React.FC<FilterProps> = ({
               <label className={styles.label}>{field.label}</label>
               <CustomSelect
                 options={field.options || []}
-                value={(filters[field.key] as string | null) ?? null}
+                value={(filters[field.key] as string | undefined) ?? ''}
                 onChange={handleSelectChange(field.key)}
                 placeholder={field.placeholder ?? ''}
                 style={{ height: '2.5rem', width: '11.25rem' }}
