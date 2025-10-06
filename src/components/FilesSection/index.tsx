@@ -31,7 +31,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   const [fileToRemove, setFileToRemove] = useState<FileResponse | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-  const { data: caseData, isLoading } = useCaseById(caseId);
+  const { data: caseData, isLoading, refetch } = useCaseById(caseId);
   const removeFileMutation = useRemoveFile(caseId);
 
   const handleRemove = () => {
@@ -84,7 +84,8 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
       <AddFileModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        onSubmit={() => console.log('Add file')}
+        onSubmit={() => refetch()}
+        caseId={caseId}
       />
       <RemoveModal
         isOpen={isRemoveModalOpen}
