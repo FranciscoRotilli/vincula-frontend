@@ -16,7 +16,7 @@ export function useRemoveFile(caseId: string) {
 
 export function useAddFile() {
   return useMutation({
-    mutationFn: ({ fileId, newFile }: { fileId: string; newFile: FileRequest }) =>
-      addFile(fileId, newFile),
+    mutationFn: ({ caseId, newFile }: { caseId: string; newFile: FileRequest }) =>
+      addFile(caseId, newFile),
   });
 }
