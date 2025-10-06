@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable i18next/no-literal-string */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import type { Node, Relationship } from '@neo4j-nvl/base';
@@ -10,6 +7,7 @@ import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
 
+import mockData from './MOCK_GRAFO.json';
 import styles from './page.module.css';
 
 const calculateInitialZoom = (nodeCount: number) => {
@@ -19,48 +17,74 @@ const calculateInitialZoom = (nodeCount: number) => {
 };
 
 interface AppNode extends Node {
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
 interface AppRelationship extends Relationship {
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
+interface RawNode {
+  id: string;
+  name: string;
+  identity?: string;
+  case_number?: string;
+  file_name?: string | string[];
+  phone_number?: string | string[];
+  type?: string;
+}
+
+interface RawEdge {
+  id: string;
+  source: string;
+  target: string;
+  quantity?: number;
+  file_name?: string | string[];
+  rif_involvment?: string;
+}
+
+const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }) => {
+  const nodes: AppNode[] = apiData.nodes.map(rawNode => {
+    return {
+      id: rawNode.id,
+      caption: rawNode.name,
+      size: 30,
+      color: rawNode.type === 'Person' ? '#f0ad4e' : '#e04141',
+      properties: {
+        identity: rawNode.identity,
+        case_number: rawNode.case_number,
+        file_name: Array.isArray(rawNode.file_name) ? rawNode.file_name.join(', ') : rawNode.file_name,
+        phone_number: Array.isArray(rawNode.phone_number) ? rawNode.phone_number.join(', ') : rawNode.phone_number,
+        type: rawNode.type,
+      },
+    };
+  });
+  const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
+    return {
+      id: rawEdge.id,
+      from: rawEdge.source,
+      to: rawEdge.target,
+      caption: String(rawEdge.quantity || ''),
+      properties: {
+        file_name: Array.isArray(rawEdge.file_name) ? rawEdge.file_name.join(', ') : rawEdge.file_name,
+        quantity: rawEdge.quantity,
+        rif_involvment: rawEdge.rif_involvment,
+      },
+    };
+  });
+  return { nodes, rels };
+}
 const baseOptions = [
   { value: 'SIMBA', label: 'SIMBA' },
   { value: 'SINTEL', label: 'SINTEL' },
 ];
 
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
-  const nodes: AppNode[] = [
-    { id: 'alvo-principal', size: 50, caption: 'vincula', color: '#e04141', properties: { nome: 'Investigado Principal' } },
-    { id: 'alvo-secundario', size: 50, caption: 'secundario', color: '#f0ad4e', properties: { nome: 'Investigado Secundario' } },
-  ];
-  const rels: AppRelationship[] = [
-    { id: 'rel-principal-secundario', from: 'alvo-principal', to: 'alvo-secundario', properties: { type: 'associado a' } }
-  ];
 
-  for (let i = 1; i <= 200; i++) {
-    const nodeId = `entidade-${i}`;
-    nodes.push({
-      id: nodeId,
-      size: 30,
-      caption: `${i}`,
-      properties: { nome: `Entidade ${i}` }
-    });
-    const sourceNode = i <= 1 ? 'alvo-secundario' : 'alvo-principal';
-
-    rels.push({
-      id: `rel-${i}`,
-      from: sourceNode,
-      to: nodeId,
-      properties: { type: 'envolido-em' }
-    });
-  }
-  const [graphNodes, setGraphNodes] = useState<AppNode[]>(nodes);
-  const [graphRels, setGraphRels] = useState<AppRelationship[]>(rels);
-  
-
+  const { nodes: initialNodes, rels: initialRels } = transformApiData(mockData);
+  const [graphNodes, setGraphNodes] = useState<AppNode[]>(initialNodes);
+  const [graphRels, setGraphRels] = useState<AppRelationship[]>(initialRels);
+  const zoom = calculateInitialZoom(graphNodes.length);
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
 
@@ -142,4 +166,5 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       </div>
     </CaseContainer>
   );
+}
 }

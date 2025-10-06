@@ -2,8 +2,7 @@
 import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import React, { useState } from 'react'
-
+import { useState } from 'react'
 interface InteractiveGraphProps {
   nodes: Node[];
   rels: Relationship[];
@@ -16,6 +15,8 @@ interface InteractiveGraphProps {
 export default function Graph({
   nodes,
   rels,
+  height,
+  zoom,
   onNodeClick,
   onRelationshipClick,
   onCanvasClick,
