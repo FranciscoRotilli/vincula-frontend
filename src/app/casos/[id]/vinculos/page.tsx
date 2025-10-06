@@ -3,14 +3,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import type { Node, Relationship } from '@neo4j-nvl/base'; 
-import React, { use, useEffect,useState } from 'react';
+import type { Node, Relationship } from '@neo4j-nvl/base';
+import React, { use, useEffect, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
 
 import styles from './page.module.css';
+
+const calculateInitialZoom = (nodeCount: number) => {
+  if (nodeCount < 50) return 1.0;
+  if (nodeCount < 100) return 0.7;
+  return 0.4;
+};
 
 interface AppNode extends Node {
   properties: Record<string, any>;
@@ -27,12 +33,14 @@ const baseOptions = [
 
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nodes: AppNode[] = [
-    { id: 'alvo-principal', size: 50, caption: 'vincula', color: '#e04141',  properties: { nome: 'Investigado Principal' } },
+    { id: 'alvo-principal', size: 50, caption: 'vincula', color: '#e04141', properties: { nome: 'Investigado Principal' } },
+    { id: 'alvo-secundario', size: 50, caption: 'secundario', color: '#f0ad4e', properties: { nome: 'Investigado Secundario' } },
+  ];
+  const rels: AppRelationship[] = [
+    { id: 'rel-principal-secundario', from: 'alvo-principal', to: 'alvo-secundario', properties: { type: 'associado a' } }
   ];
 
-  const rels: AppRelationship[] = [];
-
-  for (let i = 1; i <= 50; i++) {
+  for (let i = 1; i <= 3; i++) {
     const nodeId = `entidade-${i}`;
     nodes.push({
       id: nodeId,
@@ -40,16 +48,18 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       caption: `${i}`,
       properties: { nome: `Entidade ${i}` }
     });
+    const sourceNode = i <= 1 ? 'alvo-secundario' : 'alvo-principal';
+
     rels.push({
       id: `rel-${i}`,
-      from: 'alvo-principal',
+      from: sourceNode,
       to: nodeId,
-      properties: { type: 'envolvido em'}
+      properties: { type: 'envolido-em' }
     });
   }
   const [graphNodes, setGraphNodes] = useState<AppNode[]>(nodes);
   const [graphRels, setGraphRels] = useState<AppRelationship[]>(rels);
-
+  const zoom = calculateInitialZoom(graphNodes.length);
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
 
@@ -109,13 +119,14 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             nodes={graphNodes}
             rels={graphRels}
             height={900}
+            zoom={zoom}
             onNodeClick={handleNodeClick}
             onRelationshipClick={handleRelationshipClick}
             onCanvasClick={handleCanvasClick}
           />
         </div>
 
-        <div className={styles.detailsPanel}> 
+        <div className={styles.detailsPanel}>
           <h3>Detalhes</h3>
           {selectedElement ? (
             <div>
@@ -128,7 +139,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             <p>Clique em um nó para ver os detalhes.</p>
           )}
         </div>
-
       </div>
     </CaseContainer>
   );
