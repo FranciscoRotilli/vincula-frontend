@@ -27,7 +27,7 @@ const baseOptions = [
 
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nodes: AppNode[] = [
-    { id: 'alvo-principal', size: 50, caption: 'vincula', properties: { nome: 'Investigado Principal' } },
+    { id: 'alvo-principal', size: 50, caption: 'vincula', color: '#e04141',  properties: { nome: 'Investigado Principal' } },
   ];
 
   const rels: AppRelationship[] = [];
@@ -108,7 +108,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           <Graph
             nodes={graphNodes}
             rels={graphRels}
-            height={600}
+            height={900}
             onNodeClick={handleNodeClick}
             onRelationshipClick={handleRelationshipClick}
             onCanvasClick={handleCanvasClick}
