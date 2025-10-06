@@ -89,6 +89,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onSuccess: () => {
           setShowSituationModal(false);
         },
+        onError: (error) => {
+          console.error('Failed to update case situation:', error);
+        },
       }
     );
   };
@@ -159,8 +162,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       },
     },
   ];
-
-
 
   useEffect(() => {
     if (caseDetails) {
