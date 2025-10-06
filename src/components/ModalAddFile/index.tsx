@@ -4,14 +4,17 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import React, { useId, useRef, useState } from 'react';
 
 import Modal from '@/components/Modals';
+import { useAddFile } from '@/hooks/useFile';
 import { t } from '@/texts';
+import { FileRequest } from '@/types/Files';
 
 import styles from './AddFileModal.module.css';
 
 type AddFileModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: { origin: string; type: string; file: File }) => Promise<void> | void;
+  onSubmit: () => void;
+  caseId: string;
 };
 
 const ORIGIN_OPTIONS = [
@@ -21,8 +24,8 @@ const ORIGIN_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'Cadastros dos Assinantes', label: 'Cadastros dos Assinantes' },
-  { value: 'ExtratoDetalhado', label: 'ExtratoDetalhado' },
+  { value: 'CADASTRO_ASSINANTES', label: 'Cadastros dos Assinantes' },
+  { value: 'EXTRATO_DETALHADO', label: 'Extrato Detalhado' },
   { value: 'RIF', label: 'RIF' },
 ];
 
@@ -32,9 +35,11 @@ const ACCEPT_BY_TYPE: Record<string, string> = {
   csv: '.csv,text/csv',
 };
 
-export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModalProps) {
+export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddFileModalProps) {
   const titleId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addFileMutation = useAddFile();
 
   const [origin, setOrigin] = useState('');
   const [type, setType] = useState('');
@@ -137,15 +142,6 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     pickFile(f);
   };
 
-  const reset = () => {
-    setOrigin('');
-    setType('');
-    setFile(null);
-    setDragActive(false);
-    setErrors({});
-    setSubmitAttempted(false);
-  };
-
   const handleSubmit = async () => {
     if (!submitAttempted) setSubmitAttempted(true);
     const errs = validateAll();
@@ -154,14 +150,22 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
       focusFirstInvalid(errs);
       return;
     }
-    await onSubmit({ origin, type, file });
-    reset();
-    onClose();
-  };
 
-  const handleClose = () => {
-    reset();
-    onClose();
+    const newFile: FileRequest = {
+      origin,
+      file_type: type,
+      file,
+    };
+
+    addFileMutation.mutate(
+      { caseId, newFile },
+      {
+        onSuccess: () => {
+          onSubmit();
+          onClose();
+        },
+      }
+    );
   };
 
   const showOriginError = submitAttempted && !!errors.origin;
@@ -172,7 +176,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     <div className={styles.addfileTheme}>
       <Modal
         isOpen={isOpen}
-        onClose={handleClose}
+        onClose={onClose}
         title="Adicionar arquivo"
         size="medium"
         data-testid="modal-add-file"
