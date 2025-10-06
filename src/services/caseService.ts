@@ -81,14 +81,20 @@ export async function updateCaseName(caseId: string, name: string) {
   return resp.json();
 }
 
-export async function updateCaseSituation(caseId: string, situation: string) {
+export async function updateCaseSituation(caseId: string, status: string) {
   const resp = await fetch(`/api/cases/${caseId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ situation }),
+    body: JSON.stringify({ status }),
     headers: { 'Content-Type': 'application/json' },
   });
   if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar situação do caso');
-  return resp.json();
+
+  try {
+    const data = await resp.json();
+    return { data, status: resp.status };
+  } catch {
+    return { data: null, status: resp.status };
+  }
 }
 
 export async function updateCaseCanView(caseId: string, canView: boolean) {

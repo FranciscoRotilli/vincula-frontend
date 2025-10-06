@@ -45,6 +45,10 @@ export const texts = {
   'cases.createError': 'Erro ao criar caso. Tente novamente.',
   'cases.createSuccess': 'Caso criado com sucesso!',
 
+  'cases.errorMessage': 'Algo deu errado ao carregar os detalhes do caso.',
+  'cases.returnToCases': 'Voltar para casos',
+  'cases.reload': 'Recarregar',
+
   'filter.situation': 'Situação',
 
   'modal.caseName': 'Nome do caso:',
@@ -76,6 +80,11 @@ export const texts = {
   'cases.title.changeNameDesc': 'Altere o nome do caso abaixo.',
   'cases.title.changeSituationDesc': 'Selecione a nova situação do caso.',
   'cases.title.addFileDesc': 'Selecione um arquivo para anexar ao caso.',
+
+  'nodeModal.quantity': 'Quantidade:',
+  'nodeModal.cpfCnpj': 'CPF / CNPJ:',
+  'nodeModal.phone': 'Telefone:',
+  'nodeModal.close': 'Fechar',
 } as const;
 
 export type TextKey = keyof typeof texts;

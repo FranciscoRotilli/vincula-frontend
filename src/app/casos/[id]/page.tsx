@@ -1,5 +1,8 @@
 'use client';
+import { CircularProgress } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
+import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
@@ -15,10 +18,12 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
+import { useAddSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem } from '@/types/Cases';
+import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
 
@@ -26,6 +31,7 @@ type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone
 
 export default function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const caseId = id;
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
@@ -56,7 +62,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
 
-  const { data: caseDetails, isLoading, isError } = useCaseById(caseId);
+  const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+
+  const addSuspectMutation = useAddSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -80,6 +88,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowSituationModal(false);
+        },
+        onError: (error) => {
+          console.error('Failed to update case situation:', error);
         },
       }
     );
@@ -105,18 +116,24 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    if (novoNome && novoCpf && (novoCpf.length === 11 || novoCpf.length === 14)) {
-      const nextId =
-        envolvidos.length > 0
-          ? Math.max(...envolvidos.map((e) => (typeof e.id === 'number' ? e.id : 0))) + 1
-          : 1;
-      setEnvolvidos([
-        ...envolvidos,
-        { id: nextId, name: novoNome, cpf_cnpj: maskCpfCnpj(novoCpf), phone_number: novoTelefone },
-      ]);
-      setNovoNome('');
-      setNovoCpf('');
-    }
+    const newSuspect: SuspectInput = {
+      name: novoNome,
+      cpf_cnpj: novoCpf,
+      phone_number: novoTelefone,
+    };
+
+    addSuspectMutation.mutate(
+      { caseId, newSuspect },
+      {
+        onSuccess: () => {
+          setNovoNome('');
+          setNovoCpf('');
+          setNovoTelefone('');
+
+          refetch();
+        },
+      }
+    );
   };
 
   const handleRemoveEnvolvido = (index: number) => {
@@ -146,26 +163,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     },
   ];
 
-  function maskCpfCnpj(value: string) {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 11) {
-      // CPF: xxx.xxx.xxx-xx
-      let cpf = digits.slice(0, 11);
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-      return cpf;
-    } else {
-      // CNPJ: xx.xxx.xxx/xxxx-xx
-      let cnpj = digits.slice(0, 14);
-      cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
-      cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      cnpj = cnpj.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-      return cnpj;
-    }
-  }
-
   useEffect(() => {
     if (caseDetails) {
       setEnvolvidos(caseDetails.suspects || []);
@@ -174,10 +171,36 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   }, [caseDetails]);
 
   if (isLoading) {
-    return <div>{'Carregando...'}</div>;
+    return (
+      <div className={styles.loadingOrErrorContainer}>
+        <CircularProgress size={40} />
+      </div>
+    );
   }
   if (isError || !caseDetails) {
-    return <div>{'Erro ao carregar detalhes do caso.'}</div>;
+    return (
+      <div className={styles.loadingOrErrorContainer}>
+        <div className={styles.errorContent}>
+          <BiSolidError size={60} className={styles.errorIcon} />
+          <span>{t('cases.errorMessage')}</span>
+          <div className={styles.errorButtons}>
+            <Button
+              size="medium"
+              label={t('cases.returnToCases')}
+              variant="error"
+              className={styles.returnButton}
+              onClick={() => router.push('/casos')}
+            />
+            <Button
+              size="medium"
+              label={t('cases.reload')}
+              className={styles.reloadButton}
+              onClick={() => refetch()}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
   return (
     <CaseContainer caseId={id}>
@@ -291,7 +314,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               <GenericTable<EnvolvidoRow>
                 columns={envolvidosColumns}
                 data={envolvidos}
-                loading={false}
+                loading={isLoading}
                 rowActions={envolvidosRowActions}
                 variant={'outlined'}
               />
