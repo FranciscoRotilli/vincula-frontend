@@ -18,7 +18,7 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
 import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
@@ -65,6 +65,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
   const addSuspectMutation = useAddSuspect();
+  const deleteSuspectMutation = useDeleteSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -137,8 +138,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleRemoveEnvolvido = (index: number) => {
-    setEnvolvidos(envolvidos.filter((_, i) => i !== index));
-    setShowRemoveEnvolvidoModal({ open: false, index: null });
+    if (index === null || index === undefined) return;
+    const suspect = envolvidos[index];
+
+    deleteSuspectMutation.mutate(
+      { caseId, suspectId: suspect.id.toString() },
+      {
+        onSuccess: () => {
+          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Erro ao remover investigado:', error);
+        },
+      }
+    );
   };
 
   const handleRemoveArquivo = (index: number) => {
