@@ -5,64 +5,68 @@ import React, { useState } from 'react';
 import Filter, { FieldConfig, FilterValues } from '../Filter';
 import filterStyles from '../Filter/Filter.module.css';
 
+type GraphFilterProps = {
+  archives: string[];
+  investigated: string[];
+};
+
 const baseOptions = [
   { value: 'SIMBA', label: 'SIMBA' },
   { value: 'SINTEL', label: 'SINTEL' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
-export default function GraphFilter(
-  ) {
+export default function GraphFilter({ archives, investigated }: Readonly<GraphFilterProps>) {
   const [filters, setFilters] = useState<FilterValues>({});
-  const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
-
-
+  const [archivesOptions, setArchivesOptions] = useState<{ value: string; label: string }[]>([]);
+  const [investigatedOptions, setInvestigatedOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   const filterFields: FieldConfig[] = [
     {
-      key: 'investigado',
+      key: 'investigated',
       label: 'Investigado',
       type: 'select',
-      options: investigado,
+      options: investigatedOptions,
       placeholder: 'Selecione',
     },
     {
-      key: 'cpfCnpj',
+      key: 'cpf_cnpj',
       label: 'CPF/CNPJ',
       type: 'input',
       placeholder: 'Digite o CPF/CNPJ',
       isCpfCnpjField: true,
     },
     {
-      key: 'destino',
-      label: 'Destino',
-      type: 'input',
-      placeholder: 'Digite o CPF/CNPJ de destino',
-      isCpfCnpjField: true,
-    },
-    {
-      key: 'baseDados',
-      label: 'Base de dados',
+      key: 'origin',
+      label: 'Origem',
       type: 'select',
       options: baseOptions,
+      placeholder: 'Selecione',
+    },
+    {
+      key: 'archive',
+      label: 'Arquivo',
+      options: archivesOptions,
+      type: 'select',
       placeholder: 'Selecione',
     },
   ];
 
   const handleFilter = (newFilters: FilterValues) => {
+    console.log('Filtros aplicados:', newFilters);
     setFilters(newFilters);
   };
 
   const handleClear = () => {
+    console.log('Filtros limpados');
     setFilters({});
   };
 
   return (
     <div className={filterStyles.containerOverride}>
-      <Filter
-        fields={filterFields}
-        onFilter={handleFilter}
-        onClear={handleClear}
-      />
+      <Filter fields={filterFields} onFilter={handleFilter} onClear={handleClear} />
     </div>
   );
 }
