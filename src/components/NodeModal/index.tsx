@@ -15,7 +15,8 @@ type NodeModalProps = {
   phone?: string;
   isRelationship?: boolean;
   sourceDatabase?: string;
-  fileName?: string;
+  caseNumber?: string;
+  files?: string[];
 };
 
 export default function NodeModal({
@@ -27,7 +28,8 @@ export default function NodeModal({
   phone,
   isRelationship = false,
   sourceDatabase,
-  fileName,
+  caseNumber,
+  files,
 }: Readonly<NodeModalProps>) {
   if (!isOpen) return null;
 
@@ -50,9 +52,29 @@ export default function NodeModal({
               <div style={{ marginBottom: '12px' }}>
                 <strong>{t('nodeModal.sourceDatabase')}</strong> {sourceDatabase || 'N/A'}
               </div>
-              <div style={{ marginBottom: '12px' }}>
-                <strong>{t('nodeModal.source')}</strong> {fileName || 'N/A'}
-              </div>
+              {caseNumber && (
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>{t('nodeModal.caseNumber')}</strong> {caseNumber}
+                </div>
+              )}
+              {files && files.length > 0 && (
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>{t('nodeModal.files')}</strong>
+                  <div style={{ marginTop: '8px', maxHeight: '100px', overflowY: 'auto' }}>
+                    {files.map((file, index) => (
+                      <div key={index} style={{ 
+                        padding: '4px 8px', 
+                        backgroundColor: '#f5f5f5', 
+                        borderRadius: '4px', 
+                        marginBottom: '4px',
+                        fontSize: '0.9em'
+                      }}>
+                        {file}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {quantity !== undefined && (
                 <div>
                   <strong>{t('nodeModal.quantity')}</strong> {quantity}
@@ -62,18 +84,41 @@ export default function NodeModal({
           ) : (
             <div>
               {quantity !== undefined && (
-                <div>
+                <div style={{ marginBottom: '12px' }}>
                   <strong>{t('nodeModal.quantity')}</strong> {quantity}
                 </div>
               )}
               {cpfCnpj && (
-                <div>
+                <div style={{ marginBottom: '12px' }}>
                   <strong>{t('nodeModal.cpfCnpj')}</strong> {maskCpfCnpj(cpfCnpj)}
                 </div>
               )}
               {phone && (
-                <div>
+                <div style={{ marginBottom: '12px' }}>
                   <strong>{t('nodeModal.phone')}</strong> {maskPhone(phone)}
+                </div>
+              )}
+              {caseNumber && (
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>{t('nodeModal.caseNumber')}</strong> {caseNumber}
+                </div>
+              )}
+              {files && files.length > 0 && (
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>{t('nodeModal.files')}</strong>
+                  <div style={{ marginTop: '8px', maxHeight: '100px', overflowY: 'auto' }}>
+                    {files.map((file, index) => (
+                      <div key={index} style={{ 
+                        padding: '4px 8px', 
+                        backgroundColor: '#f5f5f5', 
+                        borderRadius: '4px', 
+                        marginBottom: '4px',
+                        fontSize: '0.9em'
+                      }}>
+                        {file}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
