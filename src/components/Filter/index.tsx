@@ -4,6 +4,7 @@ import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { CaseStatus } from '@/types/Cases';
+import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 
 import Button from '../Button';
 import Input from '../Input';
@@ -15,17 +16,18 @@ export type FilterValues = {
   caseName?: string;
   responsible?: string;
   situation?: CaseStatus;
-  search?: string;
+	search?: string;
   [key: string]: string | CaseStatus | undefined;
 };
 
 export type FieldConfig = {
-  key: string;
-  label: string;
-  placeholder?: string;
-  type: 'input' | 'select';
-  options?: { value: string; label: string }[];
-  testId?: string;
+	key: string;
+	label: string;
+	placeholder?: string;
+	type: 'input' | 'select';
+	options?: { value: string; label: string }[];
+	testId?: string;
+	isCpfCnpjField?: boolean;
 };
 
 export type FilterProps = {
@@ -58,7 +60,20 @@ const Filter: React.FC<FilterProps> = ({
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
 
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters((prev) => ({ ...prev, [key]: e.target.value }));
+    const value = e.target.value;
+    const field = fields.find(f => f.key === key);
+    
+    let processedValue = value;
+    if (field?.isCpfCnpjField) {
+      const digits = onlyNumbers(value);
+      if (digits.length <= 14) {
+        processedValue = maskCpfCnpj(digits);
+      } else {
+        return;
+      }
+    }
+    
+    setFilters((prev) => ({ ...prev, [key]: processedValue }));
   };
 
   const handleSelectChange = (key: string) => (value: string | null) => {
@@ -69,7 +84,21 @@ const Filter: React.FC<FilterProps> = ({
 };
 
   const handleFilter = () => {
-    onFilter(filters);
+    let isValid = true;
+    
+    for (const field of fields) {
+      if (field.isCpfCnpjField && filters[field.key]) {
+        const digits = onlyNumbers(filters[field.key] as string);
+        if (digits.length !== 11 && digits.length !== 14) {
+          isValid = false;
+          break;
+        }
+      }
+    }
+    
+    if (isValid) {
+      onFilter(filters);
+    }
   };
 
   const handleClear = () => {
