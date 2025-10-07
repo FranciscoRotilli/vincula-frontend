@@ -5,6 +5,7 @@ import {
   CaseResponse,
   deleteCase,
   getCaseById,
+  getCaseGraph,
   getCases,
   updateCaseCanView,
   updateCaseName,
@@ -86,4 +87,13 @@ export function useCaseById(caseId: string) {
   });
 
   return queryResult;
+}
+
+export function useCaseGraph(caseId: string, identities?: string[]) {
+  return useQuery({
+    queryKey: ['caseGraph', caseId, identities],
+    queryFn: () => getCaseGraph(caseId, identities),
+    refetchOnWindowFocus: false,
+    enabled: !!caseId,
+  });
 }

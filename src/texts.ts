@@ -120,7 +120,8 @@ export const texts = {
   'nodeModal.close': 'Fechar',
   'nodeModal.sourceDatabase': 'Base de Dados:',
   'nodeModal.targetRecipient': 'Destinatário:',
-  'nodeModal.source': 'Fonte:',
+  'nodeModal.caseNumber': 'Número do Caso:',
+  'nodeModal.files': 'Arquivos:',
 
   'graph.zoomIn': 'Aumentar Zoom',
   'graph.zoomOut': 'Diminuir Zoom',

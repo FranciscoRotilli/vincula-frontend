@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ApiSortingParams,
   CasesResponse,
@@ -124,4 +123,24 @@ export async function deleteCase(caseId: string) {
   }
 }
 
-
+export async function getCaseGraph(caseId: string, identities?: string[]) {
+  const params = new URLSearchParams();
+  
+  if (identities && identities.length > 0) {
+    identities.forEach(identity => {
+      params.append('identity', identity);
+    });
+  }
+  
+  const qs = params.toString();
+  const url = `/api/cases/${caseId}/graph${qs ? `?${qs}` : ''}`;
+  
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+  
+  if (!resp.ok) await throwIfError(resp, 'Falha ao buscar dados do grafo');
+  return resp.json();
+}

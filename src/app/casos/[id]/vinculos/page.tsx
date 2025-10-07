@@ -3,6 +3,7 @@
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
 import React, { use, useEffect, useRef, useState } from 'react';
+import { CircularProgress } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -17,7 +18,7 @@ import Graph from '@/components/Graph';
 import NodeModal from '@/components/NodeModal';
 import { t } from '@/texts';
 
-import {
+import { 
   AppNode, 
   AppRelationship, 
   baseOptions, 
@@ -25,22 +26,36 @@ import {
   generateRelationshipName,
   getRelationshipSourceDatabase
 } from './utils';
+import { useCaseGraph } from '@/hooks/useCase';
 import mockData from './MOCK_GRAFO.json';
-import styles from './page.module.css';
-
-export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
+import styles from './page.module.css';export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
+  const { id } = use(params);
 
-  const { nodes: initialNodes, rels: initialRels } = transformApiData(mockData);
-  const [graphNodes, setGraphNodes] = useState<AppNode[]>(initialNodes);
-  const [graphRels, setGraphRels] = useState<AppRelationship[]>(initialRels);
+  const [graphNodes, setGraphNodes] = useState<AppNode[]>([]);
+  const [graphRels, setGraphRels] = useState<AppRelationship[]>([]);
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const { id } = use(params);
-
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
+
+  const { data: graphData, isLoading: isLoadingGraph, error: graphError } = useCaseGraph(id);
+
+  useEffect(() => {
+    if (graphData) {
+      console.log('Dados do grafo recebidos:', graphData); // DEBUG, remover
+      const { nodes, rels } = transformApiData(graphData);
+      setGraphNodes(nodes);
+      setGraphRels(rels);
+    } else if (graphError) {
+      // MOCK, remover quando endpoint funcional
+      console.warn('Erro ao carregar grafo, usando dados mock:', graphError);
+      
+      const { nodes: mockNodes, rels: mockRels } = transformApiData(mockData);
+      setGraphNodes(mockNodes);
+      setGraphRels(mockRels);
+    }
+  }, [graphData, graphError]);
 
   const fitNodes = () => {
     if (nvlRef.current && graphNodes.length > 0) {
@@ -213,6 +228,26 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             onRelationshipClick={handleRelationshipClick}
             onCanvasClick={handleCanvasClick}
           />
+
+          {isLoadingGraph && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1001,
+              background: 'rgba(255, 255, 255, 0.9)',
+              padding: '20px',
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <CircularProgress size={40} />
+              <span>Carregando grafo...</span>
+            </div>
+          )}
         
           {selectedElement && (
             <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
@@ -235,11 +270,30 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 sourceDatabase={selectedElement && 'from' in selectedElement ? 
                   getRelationshipSourceDatabase(selectedElement, graphNodes) : undefined
                 }
-                fileName={selectedElement && 'from' in selectedElement ? 
-                  Array.isArray(selectedElement.properties?.file_name) ? 
-                    (selectedElement.properties.file_name as string[]).join(', ') :
-                    selectedElement.properties?.file_name as string :
-                  undefined
+                caseNumber={selectedElement ? 
+                  (selectedElement.properties?.case_number as string) : undefined
+                }
+                files={selectedElement && 'from' in selectedElement ? 
+                  (() => {
+                    const fileNames = selectedElement.properties?.file_name;
+                    if (Array.isArray(fileNames)) {
+                      return fileNames;
+                    } else if (typeof fileNames === 'string') {
+                      return [fileNames];
+                    }
+                    return undefined;
+                  })() : 
+                  (selectedElement && !('from' in selectedElement) && selectedElement.properties?.type !== 'Person' ?
+                    (() => {
+                      const fileNames = selectedElement.properties?.file_name;
+                      if (Array.isArray(fileNames)) {
+                        return fileNames;
+                      } else if (typeof fileNames === 'string') {
+                        return [fileNames];
+                      }
+                      return undefined;
+                    })() : undefined
+                  )
                 }
               />
             </div>
