@@ -9,7 +9,6 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Tooltip } from '@mui/material';
 
 import { CaseContainer } from '@/components/CaseContainer';
@@ -60,12 +59,6 @@ import styles from './page.module.css';export default function VinculosPage({ pa
   const fitNodes = () => {
     if (nvlRef.current && graphNodes.length > 0) {
       nvlRef.current.fit(graphNodes.map((n) => n.id));
-    }
-  };
-
-  const resetZoom = () => {
-    if (nvlRef.current) {
-      nvlRef.current.resetZoom();
     }
   };
 
@@ -200,14 +193,6 @@ import styles from './page.module.css';export default function VinculosPage({ pa
                 className={styles.controlButton}
               >
                 <FitScreenIcon />
-              </button>
-            </Tooltip>
-            <Tooltip title={t('graph.resetZoom')} placement="right">
-              <button 
-                onClick={resetZoom}
-                className={styles.controlButton}
-              >
-                <RestartAltIcon />
               </button>
             </Tooltip>
             <Tooltip title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')} placement="right">
