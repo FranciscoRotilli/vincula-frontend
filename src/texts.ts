@@ -118,6 +118,16 @@ export const texts = {
   'nodeModal.cpfCnpj': 'CPF / CNPJ:',
   'nodeModal.phone': 'Telefone:',
   'nodeModal.close': 'Fechar',
+  'nodeModal.sourceDatabase': 'Base de Dados:',
+  'nodeModal.targetRecipient': 'Destinatário:',
+  'nodeModal.source': 'Fonte:',
+
+  'graph.zoomIn': 'Aumentar Zoom',
+  'graph.zoomOut': 'Diminuir Zoom',
+  'graph.fitToScreen': 'Ajustar à Tela',
+  'graph.resetZoom': 'Resetar Zoom',
+  'graph.fullscreen': 'Tela Cheia',
+  'graph.exitFullscreen': 'Sair da Tela Cheia',
 } as const;
 
 export type TextKey = keyof typeof texts;

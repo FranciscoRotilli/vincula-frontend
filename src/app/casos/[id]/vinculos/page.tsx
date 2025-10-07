@@ -1,96 +1,117 @@
 'use client';
 
 import type { Node, Relationship } from '@neo4j-nvl/base';
-import React, { use, useEffect, useState } from 'react';
+import type NVL from '@neo4j-nvl/base';
+import React, { use, useEffect, useRef, useState } from 'react';
+import FitScreenIcon from '@mui/icons-material/FitScreen';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { Tooltip } from '@mui/material';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
+import NodeModal from '@/components/NodeModal';
+import { t } from '@/texts';
 
+import {
+  AppNode, 
+  AppRelationship, 
+  baseOptions, 
+  transformApiData,
+  generateRelationshipName,
+  getRelationshipSourceDatabase
+} from './utils';
 import mockData from './MOCK_GRAFO.json';
 import styles from './page.module.css';
 
-const calculateInitialZoom = (nodeCount: number) => {
-  if (nodeCount < 50) return 1.0;
-  if (nodeCount < 100) return 0.7;
-  return 0.4;
-};
-
-interface AppNode extends Node {
-  properties: Record<string, unknown>;
-}
-
-interface AppRelationship extends Relationship {
-  properties: Record<string, unknown>;
-}
-
-interface RawNode {
-  id: string;
-  name: string;
-  identity?: string;
-  case_number?: string;
-  file_name?: string | string[];
-  phone_number?: string | string[];
-  type?: string;
-}
-
-interface RawEdge {
-  id: string;
-  source: string;
-  target: string;
-  quantity?: number;
-  file_name?: string | string[];
-  rif_involvment?: string;
-}
-
-const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }) => {
-  const nodes: AppNode[] = apiData.nodes.map(rawNode => {
-    return {
-      id: rawNode.id,
-      caption: rawNode.name,
-      size: 30,
-      color: rawNode.type === 'Person' ? '#f0ad4e' : '#e04141',
-      properties: {
-        identity: rawNode.identity,
-        case_number: rawNode.case_number,
-        file_name: Array.isArray(rawNode.file_name) ? rawNode.file_name.join(', ') : rawNode.file_name,
-        phone_number: Array.isArray(rawNode.phone_number) ? rawNode.phone_number.join(', ') : rawNode.phone_number,
-        type: rawNode.type,
-      },
-    };
-  });
-  const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
-    return {
-      id: rawEdge.id,
-      from: rawEdge.source,
-      to: rawEdge.target,
-      caption: String(rawEdge.quantity || ''),
-      properties: {
-        file_name: Array.isArray(rawEdge.file_name) ? rawEdge.file_name.join(', ') : rawEdge.file_name,
-        quantity: rawEdge.quantity,
-        rif_involvment: rawEdge.rif_involvment,
-      },
-    };
-  });
-  return { nodes, rels };
-}
-const baseOptions = [
-  { value: 'SIMBA', label: 'SIMBA' },
-  { value: 'SINTEL', label: 'SINTEL' },
-];
-
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
+  const nvlRef = useRef<NVL | null>(null);
 
   const { nodes: initialNodes, rels: initialRels } = transformApiData(mockData);
   const [graphNodes, setGraphNodes] = useState<AppNode[]>(initialNodes);
   const [graphRels, setGraphRels] = useState<AppRelationship[]>(initialRels);
-  const zoom = calculateInitialZoom(graphNodes.length);
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const { id } = use(params);
 
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
+
+  const fitNodes = () => {
+    if (nvlRef.current && graphNodes.length > 0) {
+      nvlRef.current.fit(graphNodes.map((n) => n.id));
+    }
+  };
+
+  const resetZoom = () => {
+    if (nvlRef.current) {
+      nvlRef.current.resetZoom();
+    }
+  };
+
+  const zoomIn = () => {
+    if (nvlRef.current) {
+      const currentScale = nvlRef.current.getScale();
+      nvlRef.current.setZoom(currentScale * 1.2);
+    }
+  };
+
+  const zoomOut = () => {
+    if (nvlRef.current) {
+      const currentScale = nvlRef.current.getScale();
+      nvlRef.current.setZoom(currentScale * 0.8);
+    }
+  };
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!isFullscreen) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+        setIsFullscreen(true);
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      console.error('Erro ao alternar tela cheia:', error);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+      const wasFullscreen = isFullscreen;
+      setIsFullscreen(isCurrentlyFullscreen);
+      
+      if (isCurrentlyFullscreen !== wasFullscreen && nvlRef.current) {
+        setTimeout(() => {
+          fitNodes();
+        }, 200);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fitNodes();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [graphNodes]);
 
   const handleNodeClick = (node: Node) => {
     console.log("Node selected: ", node);
@@ -138,29 +159,90 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           container: styles.containerOverride,
         }}
       />
-      <div className={styles.graphContainer}>
-        <div style={{ flex: 3 }}>
+      
+      <div className={isFullscreen ? styles.fullscreenContainer : ''}>
+        <div className={styles.graphContainer}>
+          <div className={styles.graphControls}>
+            <Tooltip title={t('graph.zoomIn')} placement="right">
+              <button 
+                onClick={zoomIn}
+                className={styles.controlButton}
+              >
+                <ZoomInIcon />
+              </button>
+            </Tooltip>
+            <Tooltip title={t('graph.zoomOut')} placement="right">
+              <button 
+                onClick={zoomOut}
+                className={styles.controlButton}
+              >
+                <ZoomOutIcon />
+              </button>
+            </Tooltip>
+            <Tooltip title={t('graph.fitToScreen')} placement="right">
+              <button 
+                onClick={fitNodes}
+                className={styles.controlButton}
+              >
+                <FitScreenIcon />
+              </button>
+            </Tooltip>
+            <Tooltip title={t('graph.resetZoom')} placement="right">
+              <button 
+                onClick={resetZoom}
+                className={styles.controlButton}
+              >
+                <RestartAltIcon />
+              </button>
+            </Tooltip>
+            <Tooltip title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')} placement="right">
+              <button 
+                onClick={toggleFullscreen}
+                className={styles.controlButton}
+              >
+                {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              </button>
+            </Tooltip>
+          </div>
+
           <Graph
+            ref={nvlRef}
             nodes={graphNodes}
             rels={graphRels}
-            height={900}
-            zoom={zoom}
             onNodeClick={handleNodeClick}
             onRelationshipClick={handleRelationshipClick}
             onCanvasClick={handleCanvasClick}
           />
-        </div>
-
-        <div className={styles.detailsPanel}>
-          <h3>Detalhes</h3>
-          {selectedElement ? (
-            <div>
-              <p><strong>ID:</strong> {selectedElement.id}</p>
-              <p><strong>Tipo:</strong> {'from' in selectedElement ? 'Relação' : 'Nó'}</p>
-              <pre>{JSON.stringify(selectedElement.properties, null, 2)}</pre>
+        
+          {selectedElement && (
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+              <NodeModal
+                isOpen={true}
+                onClose={() => setSelectedElement(null)}
+                name={selectedElement ? 
+                  ('from' in selectedElement ? 
+                    generateRelationshipName(selectedElement, graphNodes) :
+                    (selectedElement.properties?.name as string || selectedElement.caption || 'Nó')
+                  ) : ''
+                }
+                quantity={selectedElement && 'from' in selectedElement ? 
+                  (selectedElement?.properties?.quantity as number) : 
+                  undefined
+                }
+                cpfCnpj={selectedElement?.properties?.identity as string || ''}
+                phone={selectedElement?.properties?.phone_number as string}
+                isRelationship={'from' in selectedElement}
+                sourceDatabase={selectedElement && 'from' in selectedElement ? 
+                  getRelationshipSourceDatabase(selectedElement, graphNodes) : undefined
+                }
+                fileName={selectedElement && 'from' in selectedElement ? 
+                  Array.isArray(selectedElement.properties?.file_name) ? 
+                    (selectedElement.properties.file_name as string[]).join(', ') :
+                    selectedElement.properties?.file_name as string :
+                  undefined
+                }
+              />
             </div>
-          ) : (
-            <p>Clique em um nó para ver os detalhes.</p>
           )}
         </div>
       </div>

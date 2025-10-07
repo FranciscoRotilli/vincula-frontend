@@ -1,26 +1,27 @@
 "use client";
 import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
+import type NVL from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import { useState } from 'react'
+import React, { forwardRef, useState } from 'react'
+
 interface InteractiveGraphProps {
   nodes: Node[];
   rels: Relationship[];
-  height: number;
   zoom?: number;
   onNodeClick?: (node: Node, hitTargets: HitTargets, event: MouseEvent) => void;
   onRelationshipClick?: (rel: Relationship, hitTargets: HitTargets, event: MouseEvent) => void;
   onCanvasClick?: (event: MouseEvent) => void;
 }
-export default function Graph({
+
+const Graph = forwardRef<NVL, InteractiveGraphProps>(({
   nodes,
   rels,
-  height,
   zoom,
   onNodeClick,
   onRelationshipClick,
   onCanvasClick,
-}: InteractiveGraphProps) {
+}, ref) => {
   const mouseEventCallbacks: MouseEventCallbacks = {
     onZoom: true,
     onPan: true,
@@ -36,6 +37,7 @@ export default function Graph({
     <>
       <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         <InteractiveNvlWrapper
+          ref={ref}
           nodes={nodes}
           rels={rels}
           zoom={zoom}
@@ -50,4 +52,8 @@ export default function Graph({
       </div>
     </>
   )
-}
+});
+
+Graph.displayName = 'Graph';
+
+export default Graph;
