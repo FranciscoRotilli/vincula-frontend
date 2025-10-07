@@ -17,8 +17,10 @@ import {
   useUpdateCaseCanView,
   useUpdateCaseName,
   useUpdateCaseSituation,
+  useUpdateCaseOwner,
 } from '@/hooks/useCase';
 import { useAddSuspect } from '@/hooks/useSuspect';
+import { useUsers, User } from '@/hooks/useUsers';
 import { t } from '@/texts';
 import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
@@ -37,6 +39,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -56,13 +59,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [novoNome, setNovoNome] = useState('');
   const [novoTelefone, setNovoTelefone] = useState('');
   const [novoCpf, setNovoCpf] = useState('');
+  const [novoResponsavel, setNovoResponsavel] = useState('');
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
   const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
+  const updateOwnerMutation = useUpdateCaseOwner();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+  const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const addSuspectMutation = useAddSuspect();
 
@@ -77,6 +83,26 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowNameModal(false);
+        },
+      }
+    );
+  };
+
+  const handleUpdateOwner = async () => {
+    if (!novoResponsavel) {
+      return;
+    }
+    
+    updateOwnerMutation.mutate(
+      { caseId, userId: novoResponsavel },
+      {
+        onSuccess: () => {
+          setShowChangeResponsibleModal(false);
+          setNovoResponsavel(''); 
+          refetch(); 
+        },
+        onError: (error: any) => {
+          console.error('Failed to update case owner:', error);
         },
       }
     );
@@ -182,7 +208,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
-          <span>{t('cases.errorMessage')}</span>
+          <span>
+            {isError && isError.message.includes('permissão') 
+              ? 'Você não tem mais permissão para acessar este caso. O responsável pode ter sido alterado.'
+              : t('cases.errorMessage')
+            }
+          </span>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -191,12 +222,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
             />
-            <Button
-              size="medium"
-              label={t('cases.reload')}
-              className={styles.reloadButton}
-              onClick={() => refetch()}
-            />
+            {!isError?.message.includes('permissão') && (
+              <Button
+                size="medium"
+                label={t('cases.reload')}
+                className={styles.reloadButton}
+                onClick={() => refetch()}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -248,6 +281,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
+              />
+               <Button
+                size="small"
+                label={t('cases.title.changeResponsible', { defaultValue: 'Alterar responsável' })}
+                variant="contained"
+                onClick={() => setShowChangeResponsibleModal(true)}
               />
               <Button
                 size="small"
@@ -453,6 +492,42 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           ></ConfirmationModal>
         )}
       </div>
+
+    {showChangeResponsibleModal && (
+      <ConfirmationModal
+      isOpen={showChangeResponsibleModal}
+      onClose={() => setShowChangeResponsibleModal(false)}
+      icon={<FiEdit2 size={36} color="#ff3636" />}
+      title={t('cases.title.changeResponsible', { defaultValue: 'Alterar responsável' })}
+      description={t('cases.title.changeResponsibleDesc', {
+        defaultValue: 'Digite o nome do novo responsável pelo caso.',
+      })}
+      primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+      onPrimary={handleUpdateOwner}
+      secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+      onSecondary={() => setShowChangeResponsibleModal(false)}
+      >
+            <select
+              value={novoResponsavel}
+              onChange={(e) => setNovoResponsavel(e.target.value)}
+              className={styles.input}
+              style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
+              disabled={isLoadingUsers}
+            >
+              <option value="">
+                {isLoadingUsers 
+                  ? 'Carregando usuários...' 
+                  : 'Selecione o novo responsável'
+                }
+              </option>
+              {users?.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
+          </ConfirmationModal>
+        )}
     </CaseContainer>
   );
 }

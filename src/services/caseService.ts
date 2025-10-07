@@ -29,11 +29,13 @@ async function throwIfError(resp: Response, fallback: string) {
   } catch {
     /* noop */
   }
-  throw new Error(
-    typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
-      ? (err as ErrorWithMessage).message
-      : `${fallback} (status ${resp.status})`
-  );
+  const errorMessage = typeof err === 'object' && err && 'message' in (err as ErrorWithMessage)
+    ? (err as ErrorWithMessage).message
+    : `${fallback} (status ${resp.status})`;
+  
+  const error = new Error(errorMessage);
+  (error as any).status = resp.status;
+  throw error;
 }
 
 export async function addCase(name: string): Promise<CaseResponse> {
@@ -116,4 +118,13 @@ export async function deleteCase(caseId: string) {
   } catch {
     return { ok: true };
   }
+}
+
+export async function updateCaseOwner(caseId: string, userId: string): Promise<void> {
+  const resp = await fetch(`/api/cases/${caseId}/owner`, {
+    method: 'PATCH',
+    body: JSON.stringify({ user_id: userId }),
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar responsável do caso');
 }

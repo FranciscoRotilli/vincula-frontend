@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import {
   addCase,
@@ -9,6 +10,7 @@ import {
   updateCaseCanView,
   updateCaseName,
   updateCaseSituation,
+  updateCaseOwner,
 } from '@/services/caseService';
 import {
   ApiSortingParams,
@@ -62,6 +64,19 @@ export function useDeleteCase() {
   });
 }
 
+export function useUpdateCaseOwner() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
+      updateCaseOwner(caseId, userId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
+  });
+}
+
 export function useCases(
   pagination: PaginationParams,
   filters: FilterParams,
@@ -74,10 +89,25 @@ export function useCases(
 }
 
 export function useCaseById(caseId: string) {
+  const router = useRouter();
+  
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
     queryFn: () => getCaseById(caseId),
     refetchOnWindowFocus: false,
+    retry: (failureCount, error) => {
+      const status = (error as any).status;
+      if (status === 403 || error.message.includes('permissão')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    onError: (error) => {
+      const status = (error as any).status;
+      if (status === 403 || error.message.includes('permissão')) {
+        router.push('/casos');
+      }
+    },
   });
 
   return queryResult;

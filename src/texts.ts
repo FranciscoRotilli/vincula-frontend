@@ -31,6 +31,9 @@ export const texts = {
   'cases.title.situationClosed': 'Encerrado',
   'cases.title.save': 'Salvar',
   'cases.title.cancel': 'Cancelar',
+  'cases.title.changeResponsible': 'Alterar responsável',
+  'cases.title.changeResponsibleDesc': 'Digite o nome do novo responsável pelo caso.',
+  'cases.title.inputResponsible': 'Nome do responsável',
   'cases.title.deleteWarning':
     'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.removeFile': 'Remover arquivo?',
