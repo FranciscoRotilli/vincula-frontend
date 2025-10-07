@@ -23,6 +23,7 @@ import { t } from '@/texts';
 import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
 
@@ -87,6 +88,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowSituationModal(false);
+        },
+        onError: (error) => {
+          console.error('Failed to update case situation:', error);
         },
       }
     );
@@ -159,26 +163,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     },
   ];
 
-  function maskCpfCnpj(value: string) {
-    const digits = value.replace(/\D/g, '');
-    if (digits.length <= 11) {
-      // CPF: xxx.xxx.xxx-xx
-      let cpf = digits.slice(0, 11);
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
-      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-      return cpf;
-    } else {
-      // CNPJ: xx.xxx.xxx/xxxx-xx
-      let cnpj = digits.slice(0, 14);
-      cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
-      cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-      cnpj = cnpj.replace(/\.(\d{3})(\d)/, '.$1/$2');
-      cnpj = cnpj.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-      return cnpj;
-    }
-  }
-
   useEffect(() => {
     if (caseDetails) {
       setEnvolvidos(caseDetails.suspects || []);
@@ -248,25 +232,25 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}

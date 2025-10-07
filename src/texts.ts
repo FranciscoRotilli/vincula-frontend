@@ -88,6 +88,11 @@ export const texts = {
   'cases.title.changeNameDesc': 'Altere o nome do caso abaixo.',
   'cases.title.changeSituationDesc': 'Selecione a nova situação do caso.',
   'cases.title.addFileDesc': 'Selecione um arquivo para anexar ao caso.',
+
+  'nodeModal.quantity': 'Quantidade:',
+  'nodeModal.cpfCnpj': 'CPF / CNPJ:',
+  'nodeModal.phone': 'Telefone:',
+  'nodeModal.close': 'Fechar',
 } as const;
 
 export type TextKey = keyof typeof texts;
