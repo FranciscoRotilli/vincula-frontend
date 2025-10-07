@@ -1,33 +1,35 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import type { Node, Relationship } from '@neo4j-nvl/base';
-import type NVL from '@neo4j-nvl/base';
-import React, { use, useEffect, useRef, useState } from 'react';
-import { CircularProgress } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import { CircularProgress } from '@mui/material';
 import { Tooltip } from '@mui/material';
+import type { Node, Relationship } from '@neo4j-nvl/base';
+import type NVL from '@neo4j-nvl/base';
+import React, { use, useEffect, useRef, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
 import NodeModal from '@/components/NodeModal';
+import { useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
 
+import mockData from './MOCK_GRAFO.json';
+import styles from './page.module.css';
 import { 
   AppNode, 
   AppRelationship, 
   baseOptions, 
-  transformApiData,
   generateRelationshipName,
-  getRelationshipSourceDatabase
-} from './utils';
-import { useCaseGraph } from '@/hooks/useCase';
-import mockData from './MOCK_GRAFO.json';
-import styles from './page.module.css';export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
+  getRelationshipSourceDatabase,
+  transformApiData} from './utils';
+  
+  export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
 
@@ -111,7 +113,7 @@ import styles from './page.module.css';export default function VinculosPage({ pa
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
-  }, [isFullscreen]);
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -119,7 +121,7 @@ import styles from './page.module.css';export default function VinculosPage({ pa
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [graphNodes]);
+  });
 
   const handleNodeClick = (node: Node) => {
     console.log("Node selected: ", node);
