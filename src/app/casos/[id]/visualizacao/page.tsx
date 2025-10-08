@@ -1,12 +1,12 @@
 import { CaseContainer } from '@/components/CaseContainer';
 import { VisualizationTab } from '@/components/VisualizationTab';
 
-export default async function VinculosDadosPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function VinculosDadosPage({ params }: PageProps) {
+  const { id } = await params;
 
   return (
     <CaseContainer caseId={id}>
