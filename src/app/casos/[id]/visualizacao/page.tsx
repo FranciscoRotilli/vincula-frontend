@@ -1,20 +1,16 @@
-import React from 'react';
-
 import { CaseContainer } from '@/components/CaseContainer';
-import { t } from '@/texts'
+import { VisualizationTab } from '@/components/VisualizationTab';
 
-export default async function visualizacaoDosDadosPage({
-  params,
-}: {
+interface PageProps {
   params: Promise<{ id: string }>;
-}) {
+}
+
+export default async function VinculosDadosPage({ params }: PageProps) {
   const { id } = await params;
+
   return (
     <CaseContainer caseId={id}>
-      <div>
-        {}
-        <h1>{t('container.vis')} {id}</h1>
-      </div>
+      <VisualizationTab caseId={id} />
     </CaseContainer>
   );
 }

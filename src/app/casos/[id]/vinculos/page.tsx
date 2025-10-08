@@ -4,6 +4,7 @@ import React, { use, useEffect,useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
+import { t } from '@/texts';
 
 import styles from './page.module.css';
 
@@ -41,10 +42,10 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   }, [id]);
 
   const filterFields: FieldConfig[] = [
-    { key: 'investigado', label: 'Investigado', type: 'select', options: investigado, placeholder: 'Selecione' },
-    { key: 'cpfCnpj', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
-    { key: 'destino', label: 'Destino', type: 'input', placeholder: 'Digite o CPF/CNPJ de destino' },
-    { key: 'baseDados', label: 'Base de dados', type: 'select', options: baseOptions, placeholder: 'Selecione' },
+    { key: 'investigado', label: t('filter.label1'), type: 'select', options: investigado, placeholder: t('filter.placeholder1') },
+    { key: 'cpfCnpj', label: t('filter.label2'), type: 'input', placeholder: t('filter.placeholder2') },
+    { key: 'destino', label: t('filter.label3'), type: 'input', placeholder: t('filter.placeholder3') },
+    { key: 'baseDados', label: t('filter.label4'), type: 'select', options: baseOptions, placeholder: t('filter.placeholder1') },
   ];
 
   const handleFilter = (newFilters: FilterValues) => {
