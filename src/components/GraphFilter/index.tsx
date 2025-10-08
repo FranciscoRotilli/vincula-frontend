@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 
 import Filter, { FieldConfig, FilterValues } from '../Filter';
 import filterStyles from '../Filter/Filter.module.css';
@@ -22,6 +22,14 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
   const [investigatedOptions, setInvestigatedOptions] = useState<
     { value: string; label: string }[]
   >([]);
+
+  useEffect(() => {
+    setInvestigatedOptions(investigated.map(item => ({ value: item, label: item })));
+  }, [investigated]);
+
+  useEffect(() => {
+    setArchivesOptions(archives.map(item => ({ value: item, label: item })));
+  }, [archives]);
 
   const filterFields: FieldConfig[] = [
     {
@@ -65,8 +73,13 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
   };
 
   return (
-    <div className={filterStyles.containerOverride}>
-      <Filter fields={filterFields} onFilter={handleFilter} onClear={handleClear} />
-    </div>
+    <Filter 
+      fields={filterFields} 
+      onFilter={handleFilter} 
+      onClear={handleClear}
+      customStyles={{
+        container: filterStyles.containerOverride
+      }}
+    />
   );
 }
