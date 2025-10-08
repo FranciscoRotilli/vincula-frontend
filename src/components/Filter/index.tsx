@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import React, { useEffect, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
@@ -34,14 +35,14 @@ export type FilterProps = {
   fields: FieldConfig[];
   onFilter: (filters: FilterValues) => void;
   onClear?: () => void;
+  onSaveFilter?: (filters: FilterValues) => void;
   defaultValues?: FilterValues;
   disabled?: boolean;
   customStyles?: {
     container?: string;
+    fieldsRow?: string;
     inputWrapper?: string;
     actions?: string;
-    filterButton?: string;
-    clearButton?: string;
   };
 };
 
@@ -53,11 +54,20 @@ const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,
   onClear,
+  onSaveFilter,
   defaultValues = {},
   disabled = false,
   customStyles = {},
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
+  const [showSaveButton, setShowSaveButton] = useState(false);
+
+  useEffect(() => {
+    const hasActiveFilter = Object.values(filters).some(
+      (v) => typeof v === 'string' && v.trim() !== ''
+    );
+    setShowSaveButton(hasActiveFilter);
+  }, [filters]);
 
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -103,7 +113,12 @@ const Filter: React.FC<FilterProps> = ({
 
   const handleClear = () => {
     setFilters({ ...defaultValues });
+    setShowSaveButton(false);
     onClear?.();
+  };
+
+  const handleSave = () => {
+    if (onSaveFilter) onSaveFilter(filters);
   };
 
   return (
@@ -111,7 +126,7 @@ const Filter: React.FC<FilterProps> = ({
       className={`${styles.filterContainer} ${customStyles?.container || ''}`}
       data-testid="filter-component"
     >
-      <div className={styles.fieldsRow}>
+      <div className={`${styles.fieldsRow} ${customStyles?.fieldsRow || ''}`}>
         {fields.map((field) =>
           field.type === 'input' ? (
             <Input
@@ -152,11 +167,11 @@ const Filter: React.FC<FilterProps> = ({
             size="icon"
             label=""
             onClick={handleClear}
-            className={`${styles.filterButton} ${customStyles?.clearButton || ''}`}
+            className={styles.iconButton}
             disabled={disabled}
           />
         )}
-        <div className={styles.filterIcon}>
+        <div className={styles.saveFilter}>
           <Button
             data-testid="filter-button"
             icon={<FiFilter />}
@@ -164,9 +179,22 @@ const Filter: React.FC<FilterProps> = ({
             size="icon"
             label=""
             onClick={handleFilter}
-            className={`${styles.filterButton} ${customStyles?.filterButton || ''}`}
+            className={styles.iconButton}
             disabled={disabled}
           />
+
+          {onSaveFilter && showSaveButton && (
+            <Button
+              data-testid="save-filter-button"
+              icon={<BookmarkAddIcon />}
+              variant="contained"
+              size="icon"
+              label=""
+              onClick={handleSave}
+              className={styles.iconButton}
+              disabled={disabled}
+            />
+          )}
         </div>
       </div>
     </div>
