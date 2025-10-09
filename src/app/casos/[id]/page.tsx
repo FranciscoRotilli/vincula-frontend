@@ -28,6 +28,7 @@ import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
+import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
@@ -507,25 +508,24 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
       onSecondary={() => setShowChangeResponsibleModal(false)}
       >
-            <select
-              value={novoResponsavel}
-              onChange={(e) => setNovoResponsavel(e.target.value)}
-              className={styles.input}
-              style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
-              disabled={isLoadingUsers}
-            >
-              <option value="">
-                {isLoadingUsers 
-                  ? 'Carregando usuários...' 
-                  : 'Selecione o novo responsável'
+            <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
+              <ReactSelect
+                isClearable
+                isDisabled={isLoadingUsers}
+                options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
+                value={(users || [])
+                  .map((u) => ({ value: u.id, label: u.name }))
+                  .find((opt) => opt.value === novoResponsavel) || null}
+                onChange={(opt: SingleValue<{ value: string; label: string }>) =>
+                  setNovoResponsavel(opt?.value ?? '')
                 }
-              </option>
-              {users?.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
+                placeholder={isLoadingUsers ? 'Carregando usuários...' : 'Selecione o novo responsável'}
+                styles={{
+                  control: (provided: any) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
+                } as StylesConfig}
+                menuPlacement="auto"
+              />
+            </div>
           </ConfirmationModal>
         )}
     </CaseContainer>

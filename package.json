@@ -29,6 +29,7 @@
     "react-icons": "^5.5.0"
   },
   "devDependencies": {
+    "@types/react-select": "^5.0.0",
     "@eslint/eslintrc": "^3",
     "@rushstack/eslint-patch": "^1.12.0",
     "@testing-library/jest-dom": "^6.8.0",
