@@ -64,9 +64,9 @@ export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }
   const nodes: AppNode[] = apiData.nodes.map(rawNode => {
     return {
       id: rawNode.id,
-      caption: rawNode.type === 'Person' ? rawNode.name : rawNode.type,
+      caption: rawNode.identity ? rawNode.name : rawNode.type,
       size: 30,
-      color: rawNode.type === 'Person' ? '#f0ad4e' : '#e04141',
+      color: rawNode.identity ? '#f0ad4e' : '#e04141',
       properties: {
         identity: rawNode.identity,
         case_number: rawNode.case_number,
@@ -106,12 +106,12 @@ export const generateRelationshipName = (
   let personName = '';
   let nonPersonType = '';
   
-  if (fromNode?.properties?.type === 'Person') {
-    personName = fromNode.properties?.name as string || fromNode.caption || 'Person';
-    nonPersonType = toNode?.properties?.type as string || 'Unknown';
-  } else if (toNode?.properties?.type === 'Person') {
-    personName = toNode.properties?.name as string || toNode.caption || 'Person';
-    nonPersonType = fromNode?.properties?.type as string || 'Unknown';
+  if (fromNode?.properties?.identity) {
+    personName = fromNode.properties?.name as string || fromNode.caption || 'Fulano';
+    nonPersonType = toNode?.properties?.type as string || 'Desconhecido';
+  } else if (toNode?.properties?.identity) {
+    personName = toNode.properties?.name as string || toNode.caption || 'Fulano';
+    nonPersonType = fromNode?.properties?.type as string || 'Desconhecido';
   }
   
   return `${personName} → ${nonPersonType} (${quantity})`;
@@ -124,9 +124,9 @@ export const getRelationshipSourceDatabase = (
   const fromNode = graphNodes.find(node => node.id === selectedElement.from);
   const toNode = graphNodes.find(node => node.id === selectedElement.to);
   
-  if (fromNode?.properties?.type !== 'Person') {
+  if (!fromNode?.properties?.identity) {
     return fromNode?.properties?.type as string;
-  } else if (toNode?.properties?.type !== 'Person') {
+  } else if (!toNode?.properties?.identity) {
     return toNode?.properties?.type as string;
   }
   return 'N/A';
