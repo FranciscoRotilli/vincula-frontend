@@ -57,9 +57,11 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   ];
 
   return (
-    <section className={styles.filesContainer}>
+    <>
       <div className={styles.uploadSection}>
-        <strong>{t('files.title', { count: caseData?.archives?.length ?? 0 })}</strong>
+        <h1 className={styles.sectionTitle}>
+          {t('files.title', { count: caseData?.archives?.length ?? 0 })}
+        </h1>
         <p className={styles.filesDescription}>{t('files.description')}</p>
         <Button
           className={styles.uploadButton}
@@ -67,6 +69,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
           icon={<MdOutlineCloudUpload />}
           variant="contained"
           label="Upload"
+          size="large"
           onClick={() => setIsUploadModalOpen(true)}
         />
       </div>
@@ -93,6 +96,6 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
       />
-    </section>
+    </>
   );
 }

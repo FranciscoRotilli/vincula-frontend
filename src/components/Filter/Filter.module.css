@@ -55,7 +55,7 @@
   outline: none;
 }
 
-.filterButton {
+.iconButton {
   min-width: 40px;
   min-height: 40px;
   padding: 0;
@@ -108,6 +108,9 @@
     align-items: stretch;
     gap: 0.7rem;
   }
+	.inputWrapper {
+		min-width: 100%;
+	}
 }
 
 .label {
@@ -115,4 +118,29 @@
   margin-left: 0.25em;
   margin-bottom: 0.35em;
   font-size: 0.875em;
+}
+
+.saveFilter {
+  display: flex;
+}
+.containerOverride {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 8.3125rem;
+  background: var(--white);
+  border: 0.0625rem solid var(--input-border);
+  border-radius: 0.3125rem;
+  padding: 2.125rem 2.9375rem;
+  display: flex;
+  align-items: center;
+	overflow: auto;
+}
+
+.containerOverride .actions {
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-end;
+  height: 4.0625rem;
+  flex-shrink: 0;
+  padding-bottom: 0;
 }

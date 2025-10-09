@@ -39,7 +39,7 @@ export default function LoginPage() {
       { username: usuario, password: senha },
       {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onSuccess: (data : any) => {
+        onSuccess: (data: any) => {
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('refresh_token', data.refresh_token);
           router.push('/casos');
@@ -56,7 +56,7 @@ export default function LoginPage() {
     <main className={styles.page}>
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
-			</div>
+      </div>
       <section className={styles.center}>
         <div className={styles.card}>
           <div className={styles.logoGroup}>

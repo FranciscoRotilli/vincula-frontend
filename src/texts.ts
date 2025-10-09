@@ -51,6 +51,14 @@ export const texts = {
 
   'filter.situation': 'Situação',
 
+  'graph.filter.investigated': 'Investigado',
+  'graph.filter.cpfCnpj': 'CPF / CNPJ',
+  'graph.filter.cpfCnpjDescription': 'Insira o nome do cpf / cnpj',
+  'graph.filter.destination': 'Destino',
+  'graph.filter.destinationDescription': 'Insira o nome ou cpf / cnpj destino',
+	'graph.filter.database': 'Base de dados',
+	'graph.filter.databaseDescription': 'Selecione',
+
   'modal.caseName': 'Nome do caso:',
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
@@ -75,6 +83,28 @@ export const texts = {
   'files.title': 'Arquivos ({count})',
   'files.description':
     'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
+
+  'filter.label1': 'Investigado',
+  'filter.label2': 'CPF/CNPJ',
+  'filter.label3': 'Destino',
+  'filter.label4': 'Base de dados',
+  'filter.apply': 'Aplicar Filtros',
+  'filter.clear': 'Limpar Filtros',
+
+  'filter.placeholder1': 'Selecione',
+  'filter.placeholder2': 'Digite o CPF/CNPJ',
+  'filter.placeholder3': 'Digite o CPF/CNPJ de destino',
+
+  'visualization.filters': 'Filtros',
+  'visualization.filtersDesc': 'Clique em um filtro para aplicá-lo',
+  'visualization.availableFiles': 'Arquivos Disponíveis ({count})',
+  'visualization.availableFilesDesc': 'Clique em um arquivo para carregar seus dados para a tabela',
+  'visualization.noFiles': 'Nenhum arquivo disponível.',
+  'visualization.noData': 'Nenhum dado encontrado.',
+  'visualization.loading': '...',
+  'visualization.clearButton': 'Limpar',
+  'visualization.filesLoadError': 'Falha ao carregar arquivos.',
+  'visualization.dataLoadError': 'Falha ao carregar dados do arquivo.',
 
   'footer.copy': '© Ministério Público do Estado do Rio Grande do Sul',
   'cases.title.changeNameDesc': 'Altere o nome do caso abaixo.',

@@ -1,14 +1,14 @@
 export function maskCpfCnpj(value: string) {
   const digits = value.replace(/\D/g, '');
   if (digits.length <= 11) {
-    // CPF: xxx.xxx.xxx-xx
+
     let cpf = digits.slice(0, 11);
     cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
     cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
     cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
     return cpf;
   } else {
-    // CNPJ: xx.xxx.xxx/xxxx-xx
+
     let cnpj = digits.slice(0, 14);
     cnpj = cnpj.replace(/^(\d{2})(\d)/, '$1.$2');
     cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');

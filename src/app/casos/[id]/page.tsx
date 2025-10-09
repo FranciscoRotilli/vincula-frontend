@@ -221,7 +221,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     <CaseContainer caseId={id}>
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
-          <div className={styles.caseDetails}>
+          <div className={styles.caseDetails} data-testid="case-details">
             <h2>{caseDetails.name}</h2>
             <div className={styles.detailsRow}>
               <div>
@@ -241,31 +241,31 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          <div className={styles.actionsBox}>
+          <div className={styles.actionsBox} data-testid="case-actions">
             <h1 className={styles.sectionHeader}>
               {t('cases.title.actions', { defaultValue: 'Ações' })}
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="large"
+                size="small"
                 label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
@@ -273,7 +273,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          <div className={styles.envolvidosBox}>
+          <div className={styles.envolvidosBox} data-testid="case-involved">
             <div className={styles.sectionHeader}>
               <strong>
                 {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
@@ -335,7 +335,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               />
             </div>
           </div>
-          <div className={styles.arquivosBox}>
+          <div className={styles.arquivosBox} data-testid="case-files">
             <FilesSection caseId={caseId} />
           </div>
         </div>
