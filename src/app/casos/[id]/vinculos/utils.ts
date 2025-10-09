@@ -58,24 +58,53 @@ export const calculateWidth = (quantity: number, allQuantities: number[]) => {
   return 5;
 };
 
+export const calculateNodeSize = (
+  rels: AppRelationship[],
+  nodeId: string,
+  allQuantities: number[]
+) => {
+
+  const default_size = 30;
+
+  console.log("rels: " + rels[0])
+  console.log("node: " + nodeId)
+  const quantity = rels
+    .filter(rel => rel.from === nodeId)
+    .reduce((sum, rel) => sum + (Number(rel.properties?.quantity) || 0), 0);
+  console.log("aqui " + quantity)
+  
+  if (
+    !allQuantities.length ||
+    typeof quantity !== 'number' ||
+    quantity <= 0
+  ) return default_size;
+
+  const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
+  
+  if (validQuantities.length === 0) return 1;
+  if (validQuantities.length === 1) return quantity > 0 ? default_size * 2 : default_size;
+  
+  const min = validQuantities[0];
+  const max = validQuantities[validQuantities.length - 1];
+  
+  if (min === max) return 2;
+  
+  const logMin = Math.log(min);
+  const logMax = Math.log(max);
+  const logQuantity = Math.log(quantity);
+  
+  const normalized = (logQuantity - logMin) / (logMax - logMin);
+  
+  if (normalized <= 0.1) return default_size;
+  if (normalized <= 0.3) return default_size * 1.3;
+  if (normalized <= 0.6) return default_size * 1.8;
+  if (normalized <= 0.85) return default_size * 2;
+  return default_size * 2.5;
+
+};
+
 export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }) => {
   const allQuantities = apiData.edges.map(edge => edge.quantity).filter(q => q != null) as number[];
-  
-  const nodes: AppNode[] = apiData.nodes.map(rawNode => {
-    return {
-      id: rawNode.id,
-      caption: rawNode.identity ? rawNode.name : rawNode.type,
-      size: 30,
-      color: rawNode.identity ? '#f0ad4e' : '#e04141',
-      properties: {
-        identity: rawNode.identity,
-        case_number: rawNode.case_number,
-        file_name: Array.isArray(rawNode.file_name) ? rawNode.file_name.join(', ') : rawNode.file_name,
-        phone_number: Array.isArray(rawNode.phone_number) ? rawNode.phone_number.join(', ') : rawNode.phone_number,
-        type: rawNode.type,
-      },
-    };
-  });
   
   const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
     return {
@@ -88,6 +117,22 @@ export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }
         file_name: Array.isArray(rawEdge.file_name) ? rawEdge.file_name.join(', ') : rawEdge.file_name,
         quantity: rawEdge.quantity,
         rif_involvment: rawEdge.rif_involvment,
+      },
+    };
+  });
+
+  const nodes: AppNode[] = apiData.nodes.map(rawNode => {
+    return {
+      id: rawNode.id,
+      caption: rawNode.identity ? rawNode.name : rawNode.type,
+      size: rawNode.identity ? calculateNodeSize(rels, rawNode.id, allQuantities) : 40,
+      color: rawNode.identity ? '#f0ad4e' : '#e04141',
+      properties: {
+        identity: rawNode.identity,
+        case_number: rawNode.case_number,
+        file_name: Array.isArray(rawNode.file_name) ? rawNode.file_name.join(', ') : rawNode.file_name,
+        phone_number: Array.isArray(rawNode.phone_number) ? rawNode.phone_number.join(', ') : rawNode.phone_number,
+        type: rawNode.type,
       },
     };
   });
@@ -131,3 +176,4 @@ export const getRelationshipSourceDatabase = (
   }
   return 'N/A';
 };
+

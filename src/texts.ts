@@ -129,6 +129,9 @@ export const texts = {
   'graph.resetZoom': 'Resetar Zoom',
   'graph.fullscreen': 'Tela Cheia',
   'graph.exitFullscreen': 'Sair da Tela Cheia',
+  'graph.loading': 'Carregando grafo...',
+  'graph.errorTitle': 'Erro ao carregar o grafo',
+  'graph.errorUnknown': 'Erro desconhecido',
 } as const;
 
 export type TextKey = keyof typeof texts;

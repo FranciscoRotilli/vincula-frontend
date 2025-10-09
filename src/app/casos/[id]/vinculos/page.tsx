@@ -10,7 +10,7 @@ import { CircularProgress } from '@mui/material';
 import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { use, useCallback, useEffect, useRef, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -19,7 +19,6 @@ import NodeModal from '@/components/NodeModal';
 import { useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
 
-import mockData from './MOCK_GRAFO.json';
 import styles from './page.module.css';
 import { 
   AppNode, 
@@ -44,25 +43,17 @@ import {
 
   useEffect(() => {
     if (graphData) {
-      console.log('Dados do grafo recebidos:', graphData); // DEBUG, remover
       const { nodes, rels } = transformApiData(graphData);
       setGraphNodes(nodes);
       setGraphRels(rels);
-    } else if (graphError) {
-      // MOCK, remover quando endpoint funcional
-      console.warn('Erro ao carregar grafo, usando dados mock:', graphError);
-      
-      const { nodes: mockNodes, rels: mockRels } = transformApiData(mockData);
-      setGraphNodes(mockNodes);
-      setGraphRels(mockRels);
     }
-  }, [graphData, graphError]);
+  }, [graphData]);
 
-  const fitNodes = () => {
+  const fitNodes = useCallback(() => {
     if (nvlRef.current && graphNodes.length > 0) {
       nvlRef.current.fit(graphNodes.map((n) => n.id));
     }
-  };
+  }, [graphNodes]);
 
   const zoomIn = () => {
     if (nvlRef.current) {
@@ -113,15 +104,17 @@ import {
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
-  });
+  }, [isFullscreen, fitNodes]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fitNodes();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  });
+    if (graphNodes.length > 0) {
+      const timer = setTimeout(() => {
+        fitNodes();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [graphNodes, fitNodes]);
 
   const handleNodeClick = (node: Node) => {
     console.log("Node selected: ", node);
@@ -232,7 +225,31 @@ import {
               gap: '10px'
             }}>
               <CircularProgress size={40} />
-              <span>Carregando grafo...</span>
+              <span>{t('graph.loading')}</span>
+            </div>
+          )}
+
+          {graphError && !isLoadingGraph && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1001,
+              background: 'rgba(255, 255, 255, 0.9)',
+              padding: '20px',
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '10px',
+              textAlign: 'center',
+              color: '#d32f2f'
+            }}>
+              <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{t('graph.errorTitle')}</span>
+              <span style={{ fontSize: '14px', color: '#666' }}>
+                {graphError instanceof Error ? graphError.message : t('graph.errorUnknown')}
+              </span>
             </div>
           )}
         
