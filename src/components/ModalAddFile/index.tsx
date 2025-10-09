@@ -1,6 +1,7 @@
 'use client';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { CircularProgress } from '@mui/material';
 import React, { useId, useRef, useState } from 'react';
 
 import Modal from '@/components/Modals';
@@ -45,6 +46,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
   const [type, setType] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [isSavingFile, setIsSavingFile] = useState(false);
 
   const [errors, setErrors] = useState<{ origin?: string; type?: string; file?: string }>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -157,12 +159,17 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
       file,
     };
 
+    setIsSavingFile(true);
+
     addFileMutation.mutate(
       { caseId, newFile },
       {
         onSuccess: () => {
-          onSubmit();
-          onClose();
+          setTimeout(() => {
+            onSubmit();
+            setIsSavingFile(false);
+            onClose();
+          }, 6000);
         },
       }
     );
@@ -319,7 +326,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
 
         <div className={styles.actions}>
           <button type="button" className={styles.primaryButton} onClick={handleSubmit}>
-            {t('addFile.add')}
+            {isSavingFile ? <CircularProgress size={20} /> : t('addFile.add')}
           </button>
         </div>
       </Modal>
