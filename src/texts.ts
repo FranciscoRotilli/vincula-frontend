@@ -63,8 +63,8 @@ export const texts = {
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
   'modal.caseNumber': 'Número do caso',
-  'modal.owner': 'Responsável',
-  'modal.status': 'Número do caso',
+  'modal.owner': 'Responsável:',
+  'modal.status': 'Situação:',
 
   'addFile.origin': 'Origem',
   'addFile.required': '*',

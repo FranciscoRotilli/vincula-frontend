@@ -1,12 +1,14 @@
 .uploadSection {
-  padding-bottom: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  padding: 1.5rem;
 }
 
 .uploadButton {
-  max-width: 8rem;
+  width: 8rem;
+  height: 2.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .sectionTitle {
@@ -14,7 +16,8 @@
 }
 
 .filesDescription {
-  font-size: 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
   color: #444;
-  margin-bottom: 1rem;
+  padding: 1.6rem 0 2rem; 
 }
