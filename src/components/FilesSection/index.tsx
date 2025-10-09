@@ -1,7 +1,7 @@
 'use client';
 
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useState } from 'react';
-import { MdOutlineCloudUpload } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
 import { useCaseById } from '@/hooks/useCase';
@@ -66,7 +66,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         <Button
           className={styles.uploadButton}
           data-testid="upload-file-button"
-          icon={<MdOutlineCloudUpload />}
+          icon={<CloudUploadIcon />}
           variant="contained"
           label="Upload"
           size="large"
@@ -78,6 +78,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         <Table
           columns={columns}
           data={caseData?.archives ?? []}
+          data-testid="files-table"
           loading={isLoading}
           variant="outlined"
           rowActions={rowActions}

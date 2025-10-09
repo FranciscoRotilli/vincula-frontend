@@ -80,7 +80,7 @@
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem var(--button-primary-shadow); /* 0 2px 8px */
-  padding: 2rem;
+  padding: 1.5rem 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -88,8 +88,9 @@
 
 .detailsRow {
   display: flex;
-  gap: 2.5rem;
-  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+  gap-row: 1rem;
 }
 
 .actionsBox {
@@ -98,7 +99,7 @@
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem var(--button-primary-shadow); /* 0 2px 8px */
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -109,26 +110,42 @@
 .actionsRow {
   display: flex;
   flex-direction: row;
-  gap: 1rem; /* 27px */
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.envolvidosBox,
-.arquivosBox {
+.investigatedSection,
+.filesSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   min-height: 0;
   max-height: 32.4375rem; /* 519px */
   position: relative;
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem #0001; /* 0 2px 8px */
-  padding: 2rem;
 }
 
 .sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.title3 {
   font-size: 1.15rem;
-  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
+.body5 {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .sectionDescription {
@@ -137,10 +154,10 @@
   margin-bottom: 1rem;
 }
 
-.addEnvolvidoRow {
+.addInvestigated {
   display: flex;
+  align-items: flex-end;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .input {
@@ -150,6 +167,7 @@
   font-size: 1rem;
   background: var(--white);
   min-width: 11.25rem; /* 180px */
+  width: 80%;
 }
 
 .uploadButton {
@@ -172,4 +190,5 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  width: 100%; 
 }

@@ -50,7 +50,7 @@ export default function GenericTable<T extends { id: number | string }>({
   onSort,
 }: GenericTableProps<T>) {
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(columns[0].key);
+  const [orderBy, setOrderBy] = useState<keyof T>(columns && columns.length > 0 ? columns[0].key as keyof T : '' as keyof T);
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -59,7 +59,7 @@ export default function GenericTable<T extends { id: number | string }>({
   const isSortingServerSide = !!sorting;
   const shouldHavePagination = (pagination?.totalItems ?? 0) > 5 || data.length > 5;
 
-  const currentOrderBy = isSortingServerSide ? sorting.sortBy : orderBy;
+  const currentOrderBy = (isSortingServerSide ? sorting.sortBy : orderBy) as keyof T;
   const currentOrder = isSortingServerSide ? sorting.sortDir : order;
 
   const clientSideRows = useMemo(() => {
@@ -70,13 +70,29 @@ export default function GenericTable<T extends { id: number | string }>({
 
   const rows = isPaginationServerSide ? data : clientSideRows;
 
+  if (!columns || columns.length === 0) {
+    return (
+      <Paper className={styles.tablePaper}>
+        <TableContainer className={styles.tableContainer} data-testid="cases-table">
+          <div className={styles.emptyAndLoadingContainer}>
+            {loading ? (
+              <CircularProgress size={40} className={styles.loading} />
+            ) : (
+              <Box sx={{ p: 2, textAlign: 'center' }}>{t('genericTable.noData')}</Box>
+            )}
+          </div>
+        </TableContainer>
+      </Paper>
+    );
+  }
+
   const handleSort = (property: keyof T) => {
     const isAsc = currentOrderBy === property && currentOrder === 'asc';
-    const newDirection = isAsc ? 'desc' : 'asc';
+    const newDirection: Order = isAsc ? 'desc' : 'asc';
     if (isSortingServerSide) {
       onSort?.({ sortBy: property, sortDir: newDirection });
     } else {
-      setOrder(isAsc ? 'desc' : 'asc');
+      setOrder(newDirection);
       setOrderBy(property);
     }
   };
@@ -102,7 +118,7 @@ export default function GenericTable<T extends { id: number | string }>({
       }
       setSelected(newSelected);
     }
-    if (onRowClick) onRowClick(row);
+    onRowClick?.(row);
   };
 
   const isSelected = (id: number | string) => selected.includes(id);
@@ -160,7 +176,7 @@ export default function GenericTable<T extends { id: number | string }>({
                       className={styles.tableCellLabel}
                       active={currentOrderBy === column.key}
                       direction={currentOrderBy === column.key ? currentOrder : 'asc'}
-                      onClick={() => handleSort(column.key)}
+                      onClick={() => handleSort(column.key as keyof T)}
                     >
                       {column.label}
                       {currentOrderBy === column.key && (
@@ -206,7 +222,7 @@ export default function GenericTable<T extends { id: number | string }>({
                         </TableCell>
                       )}
                       {columns.map((column) => {
-                        const value = row[column.key];
+                        const value = row[column.key as keyof T];
                         return (
                           <TableCell key={String(column.key)} align={column.align || 'left'}>
                             {column.render ? column.render(value, row) : (value as React.ReactNode)}
