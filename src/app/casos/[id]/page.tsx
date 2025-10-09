@@ -5,6 +5,7 @@ import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
+import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
@@ -16,11 +17,11 @@ import {
   useDeleteCase,
   useUpdateCaseCanView,
   useUpdateCaseName,
-  useUpdateCaseSituation,
   useUpdateCaseOwner,
+  useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect } from '@/hooks/useSuspect';
-import { useUsers, User } from '@/hooks/useUsers';
+import { useUsers } from '@/hooks/useUsers';
 import { t } from '@/texts';
 import { CaseItem, SuspectInput } from '@/types/Cases';
 import { File } from '@/types/Files';
@@ -28,7 +29,6 @@ import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
-import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
@@ -102,7 +102,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           setNovoResponsavel(''); 
           router.push('/casos'); 
         },
-        onError: (error: any) => {
+        onError: (error) => {
           console.error('Failed to update case owner:', error);
         },
       }
@@ -521,7 +521,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 }
                 placeholder={isLoadingUsers ? 'Carregando usuários...' : 'Selecione o novo responsável'}
                 styles={{
-                  control: (provided: any) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
+                  control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
                 } as StylesConfig}
                 menuPlacement="auto"
               />

@@ -9,8 +9,8 @@ import {
   getCases,
   updateCaseCanView,
   updateCaseName,
-  updateCaseSituation,
   updateCaseOwner,
+  updateCaseSituation,
 } from '@/services/caseService';
 import {
   ApiSortingParams,
@@ -88,6 +88,12 @@ export function useCases(
   });
 }
 
+type ApiError = { status?: number; message?: string };
+
+function isApiError(err: unknown): err is ApiError {
+  return typeof err === 'object' && err !== null && ('status' in err || 'message' in err);
+}
+
 export function useCaseById(caseId: string) {
   const router = useRouter();
   
@@ -96,15 +102,19 @@ export function useCaseById(caseId: string) {
     queryFn: () => getCaseById(caseId),
     refetchOnWindowFocus: false,
     retry: (failureCount, error) => {
-      const status = (error as any).status;
-      if (status === 403 || error.message.includes('permissão')) {
+      const status = isApiError(error) ? error.status : undefined;
+      const message = isApiError(error) && typeof error.message === 'string' ? error.message : '';
+
+      if (status === 403 || message.includes('permissão')) {
         return false;
       }
       return failureCount < 3;
     },
     onError: (error) => {
-      const status = (error as any).status;
-      if (status === 403 || error.message.includes('permissão')) {
+      const status = isApiError(error) ? error.status : undefined;
+      const message = isApiError(error) && typeof error.message === 'string' ? error.message : '';
+
+      if (status === 403 || message.includes('permissão')) {
         router.push('/casos');
       }
     },
