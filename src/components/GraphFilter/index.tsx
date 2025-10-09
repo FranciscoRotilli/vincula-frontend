@@ -12,7 +12,7 @@ type GraphFilterProps = {
 
 const baseOptions = [
   { value: 'SIMBA', label: 'SIMBA' },
-  { value: 'SINTEL', label: 'SINTEL' },
+  { value: 'SITTEL', label: 'SITTEL' },
   { value: 'RIF', label: 'RIF' },
 ];
 

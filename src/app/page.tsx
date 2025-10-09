@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
-import GraphFilter from '@/components/GraphFilter';
 import Input from '@/components/Input';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
@@ -55,10 +54,6 @@ export default function LoginPage() {
 
   return (
     <main className={styles.page}>
-      <GraphFilter
-        archives={['arquivo 1', 'arquivo 2']}
-        investigated={['investigado 1', 'investigado 2']}
-      />
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
       </div>
