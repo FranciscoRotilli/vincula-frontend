@@ -209,12 +209,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
-          <span>
-            {isError && isError.message.includes('permissão') 
-              ? 'Você não tem mais permissão para acessar este caso. O responsável pode ter sido alterado.'
-              : t('cases.errorMessage')
-            }
-          </span>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -223,14 +217,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
             />
-            {!isError?.message.includes('permissão') && (
-              <Button
-                size="medium"
-                label={t('cases.reload')}
-                className={styles.reloadButton}
-                onClick={() => refetch()}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -516,9 +502,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 value={(users || [])
                   .map((u) => ({ value: u.id, label: u.name }))
                   .find((opt) => opt.value === novoResponsavel) || null}
-                onChange={(opt: SingleValue<{ value: string; label: string }>) =>
-                  setNovoResponsavel(opt?.value ?? '')
-                }
+                onChange={(newValue, _actionMeta) => {
+                  const opt = newValue as SingleValue<{ value: string; label: string }>;
+                  setNovoResponsavel(opt?.value ?? '');
+                }}
                 placeholder={isLoadingUsers ? 'Carregando usuários...' : 'Selecione o novo responsável'}
                 styles={{
                   control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),

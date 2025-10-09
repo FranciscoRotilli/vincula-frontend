@@ -95,30 +95,12 @@ function isApiError(err: unknown): err is ApiError {
 }
 
 export function useCaseById(caseId: string) {
-  const router = useRouter();
-  
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
     queryFn: () => getCaseById(caseId),
     refetchOnWindowFocus: false,
-    retry: (failureCount, error) => {
-      const status = isApiError(error) ? error.status : undefined;
-      const message = isApiError(error) && typeof error.message === 'string' ? error.message : '';
-
-      if (status === 403 || message.includes('permissão')) {
-        return false;
-      }
-      return failureCount < 3;
-    },
-    onError: (error) => {
-      const status = isApiError(error) ? error.status : undefined;
-      const message = isApiError(error) && typeof error.message === 'string' ? error.message : '';
-
-      if (status === 403 || message.includes('permissão')) {
-        router.push('/casos');
-      }
-    },
   });
 
   return queryResult;
+
 }
