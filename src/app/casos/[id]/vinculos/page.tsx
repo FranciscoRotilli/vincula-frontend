@@ -28,7 +28,7 @@ import {
   generateRelationshipName,
   getRelationshipSourceDatabase,
   transformApiData} from './utils';
-  
+
   export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);

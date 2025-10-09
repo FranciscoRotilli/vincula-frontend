@@ -12,6 +12,7 @@ interface InteractiveGraphProps {
   onNodeClick?: (node: Node, hitTargets: HitTargets, event: MouseEvent) => void;
   onRelationshipClick?: (rel: Relationship, hitTargets: HitTargets, event: MouseEvent) => void;
   onCanvasClick?: (event: MouseEvent) => void;
+  onHover?: (element: Node | Relationship, hitElements: HitTargets, event: MouseEvent) => void;
 }
 
 const Graph = forwardRef<NVL, InteractiveGraphProps>(({
@@ -21,6 +22,7 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
   onNodeClick,
   onRelationshipClick,
   onCanvasClick,
+  onHover,
 }, ref) => {
   const mouseEventCallbacks: MouseEventCallbacks = {
     onZoom: true,
@@ -29,6 +31,7 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
     onNodeClick: onNodeClick,
     onRelationshipClick: onRelationshipClick,
     onCanvasClick: onCanvasClick,
+    onHover: onHover,
   }
 
   const [renderer, setRenderer] = useState<Renderer>("webgl")
@@ -42,7 +45,12 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
           rels={rels}
           zoom={zoom}
           mouseEventCallbacks={mouseEventCallbacks}
-          nvlOptions={{renderer}}
+          nvlOptions={{
+            renderer,
+            styling: {
+              dropShadowColor: 'black'
+            }
+          }}
           nvlCallbacks={{
             onLayoutDone: () => {
               setRenderer('canvas')
