@@ -240,7 +240,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     <CaseContainer caseId={id}>
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
-          <div className={styles.caseDetails}>
+          <div className={styles.caseDetails} data-testid="case-details">
             <h2>{caseDetails.name}</h2>
             <div className={styles.detailsRow}>
               <div>
@@ -260,7 +260,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          <div className={styles.actionsBox}>
+          <div className={styles.actionsBox} data-testid="case-actions">
             <h1 className={styles.sectionHeader}>
               {t('cases.title.actions', { defaultValue: 'Ações' })}
             </h1>
@@ -298,7 +298,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          <div className={styles.envolvidosBox}>
+          <div className={styles.envolvidosBox} data-testid="case-involved">
             <div className={styles.sectionHeader}>
               <strong>
                 {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
@@ -360,7 +360,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               />
             </div>
           </div>
-          <div className={styles.arquivosBox}>
+          <div className={styles.arquivosBox} data-testid="case-files">
             <FilesSection caseId={caseId} />
           </div>
         </div>
