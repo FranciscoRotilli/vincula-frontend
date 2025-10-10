@@ -73,11 +73,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso },
+      { caseId, name: novoNomeCaso as CaseItem['name']},
       {
         onSuccess: () => {
           setShowNameModal(false);
         },
+        onError: (error) => {
+          console.error('Failed to update case name: ', error);
+        }
       }
     );
   };
@@ -342,7 +345,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             <input
               type="text"
               value={novoNomeCaso}
-              onChange={(e) => setNovoNomeCaso(e.target.value)}
+              onChange={(e) => setNovoNomeCaso(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
               placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
