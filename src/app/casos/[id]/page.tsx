@@ -100,7 +100,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onSuccess: () => {
           setShowChangeResponsibleModal(false);
           setNovoResponsavel(''); 
-          router.push('/casos'); 
+          refetch(); 
         },
         onError: (error) => {
           console.error('Failed to update case owner:', error);
