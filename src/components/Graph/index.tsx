@@ -3,7 +3,7 @@ import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
 import type NVL from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useMemo,useState } from 'react'
 
 interface InteractiveGraphProps {
   nodes: Node[];
@@ -24,25 +24,58 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
   onCanvasClick,
   onHover,
 }, ref) => {
+  const [renderer, setRenderer] = useState<Renderer>("webgl");
+  const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
+
+  const handleHover = (
+    element: Node | Relationship,
+    hitElements: HitTargets,
+    event: MouseEvent
+  ) => {
+    setHoveredElementId(element.id);
+    if (onHover) {
+      onHover(element, hitElements, event);
+    }
+  };
+
+  const handleCanvasClick = (event: MouseEvent) => {
+    setHoveredElementId(null);
+    if (onCanvasClick) {
+      onCanvasClick(event);
+    }
+  };
+
   const mouseEventCallbacks: MouseEventCallbacks = {
     onZoom: true,
     onPan: true,
     onDrag: true,
     onNodeClick: onNodeClick,
     onRelationshipClick: onRelationshipClick,
-    onCanvasClick: onCanvasClick,
-    onHover: onHover,
-  }
+    onCanvasClick: handleCanvasClick,
+    onHover: handleHover,
+  };
 
-  const [renderer, setRenderer] = useState<Renderer>("webgl")
+  const styledNodes = useMemo(() => {
+    return nodes.map(node => ({
+      ...node,
+      dropShadow: node.id === hoveredElementId,
+    }));
+  }, [nodes, hoveredElementId]);
+
+  const styledRels = useMemo(() => {
+    return rels.map(rel => ({
+      ...rel,
+      dropShadow: rel.id === hoveredElementId,
+    }));
+  }, [rels, hoveredElementId]);
 
   return (
     <>
       <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         <InteractiveNvlWrapper
           ref={ref}
-          nodes={nodes}
-          rels={rels}
+          nodes={styledNodes}
+          rels={styledRels}
           zoom={zoom}
           mouseEventCallbacks={mouseEventCallbacks}
           nvlOptions={{
