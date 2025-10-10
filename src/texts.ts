@@ -14,6 +14,7 @@ export const texts = {
   'cases.title.changeName': 'Alterar nome',
   'cases.title.changeSituation': 'Alterar situação',
   'cases.title.allowView': 'Permitir visualização',
+  'cases.title.allowViewDesc': 'Selecione um usuário para compartilhar o acesso ao caso.',
   'cases.title.delete': 'Excluir caso',
   'cases.title.investigated': 'Investigados',
   'cases.title.investigatedDesc':

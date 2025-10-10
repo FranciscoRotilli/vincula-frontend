@@ -3,7 +3,7 @@ import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
-import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
+import { FiAlertCircle, FiEdit2, FiUpload, FiUserPlus } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
@@ -26,6 +26,7 @@ import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
+import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
@@ -37,6 +38,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -247,7 +249,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 size="small"
                 label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
                 variant="contained"
-                onClick={handleToggleCanView}
+                onClick={() => {
+                  setShowAllowVisualizationModal(true);
+                }}
               />
               <Button
                 size="small"
@@ -451,6 +455,26 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
+        )}
+
+        {showAllowVisualizationModal && (
+          <AllowVisualizationModal
+            isOpen={showAllowVisualizationModal}
+            onClose={() => setShowAllowVisualizationModal(false)}
+            icon={<FiUserPlus size={36} color="#ff3636" />}
+            title={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
+            description={t('cases.title.allowViewDesc', {
+              defaultValue: 'Selecione um usuário para compartilhar o acesso ao caso.',
+            })}
+            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            onPrimary={() => {
+              setShowAllowVisualizationModal(false);
+              window.location.reload();
+            }}
+            caseId={id}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowAllowVisualizationModal(false)}
+          />
         )}
       </div>
     </CaseContainer>

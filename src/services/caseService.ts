@@ -7,6 +7,8 @@ import {
   PaginationParams,
 } from '@/types/Cases';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export type CaseResponse = { caseName: string };
 
 type ErrorWithMessage = { message: string };
@@ -116,4 +118,14 @@ export async function deleteCase(caseId: string) {
   } catch {
     return { ok: true };
   }
+}
+
+export async function allowUserToViewCase(caseId: string, userId: string) {
+    const resp = await fetch(`${API_URL}/case/addtocase/${caseId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+    });
+    if (!resp.ok) await throwIfError(resp, 'Falha ao conceder permissão de visualização');
+    return resp.json();
 }
