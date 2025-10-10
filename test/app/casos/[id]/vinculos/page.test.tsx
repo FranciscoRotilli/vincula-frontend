@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { beforeEach,describe, expect, it, vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import VinculosPage from '../../../../../src/app/casos/[id]/vinculos/page';
 import GeneralInfoPage from '../../../../../src/app/casos/[id]/page';
@@ -86,7 +87,12 @@ describe('VinculosPage', () => {
 
   it('opens change-responsible modal and calls update owner mutation', async () => {
     const params = Promise.resolve({ id: '123' });
-    render(<GeneralInfoPage params={params} />);
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <GeneralInfoPage params={params} />
+      </QueryClientProvider>
+    );
 
     const openButton = await screen.findByText('Alterar responsável');
     fireEvent.click(openButton);
