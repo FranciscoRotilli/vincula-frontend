@@ -46,10 +46,6 @@ export type FilterProps = {
   };
 };
 
-const isCaseStatus = (value: string): value is CaseStatus => {
-  return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
-};
-
 const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,

@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
 
-import Button from '../Button';
-import styles from './AllowVisualizationModal.module.css';
-import { getUsers } from '@/services/userService';
-import { CustomSelect } from '../Select';
 import { getCurrentUser } from '@/services/auth';
 import { allowUserToViewCase } from '@/services/caseService';
+import { getUsers } from '@/services/userService';
+
+import Button from '../Button';
+import { CustomSelect } from '../Select';
+import styles from './AllowVisualizationModal.module.css';
 
 type AllowVisualizationModalProps = {
   isOpen: boolean;
@@ -41,10 +42,9 @@ export default function AllowVisualizationModal({
   secondaryColor,
   children,
 }: Readonly<AllowVisualizationModalProps>) {
-  if (!isOpen) return null;
   const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
   const [selectedUser, setSelectedUser] = useState<{ id: string; name: string } | null>(null);
-  const [user, setUser] = useState<{ id: string; name: string } | null>(null);
+  const [ ,setUser] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     getCurrentUser()
@@ -60,6 +60,8 @@ export default function AllowVisualizationModal({
       })
       .catch((err) => console.error('Erro ao buscar usuário logado:', err));
   }, []);
+
+  if (!isOpen) return null;
 
   const modalContent = (
     <div className={styles.overlay}>
@@ -92,6 +94,7 @@ export default function AllowVisualizationModal({
               try {
                 await allowUserToViewCase(caseId, selectedUser.id);
                 onPrimary();
+                window.location.reload();
               } catch (err) {
                 alert('Erro ao salvar usuário.');
               }

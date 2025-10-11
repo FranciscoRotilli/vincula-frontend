@@ -17,7 +17,7 @@ const baseOptions = [
 ];
 
 export default function GraphFilter({ archives, investigated }: Readonly<GraphFilterProps>) {
-  const [filters, setFilters] = useState<FilterValues>({});
+  const [, setFilters] = useState<FilterValues>({});
   const [archivesOptions, setArchivesOptions] = useState<{ value: string; label: string }[]>([]);
   const [investigatedOptions, setInvestigatedOptions] = useState<
     { value: string; label: string }[]

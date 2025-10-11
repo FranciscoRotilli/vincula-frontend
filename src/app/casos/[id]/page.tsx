@@ -6,6 +6,7 @@ import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload, FiUserPlus } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
+import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
 import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
@@ -14,7 +15,6 @@ import GenericTable from '@/components/GenericTable';
 import {
   useCaseById,
   useDeleteCase,
-  useUpdateCaseCanView,
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
@@ -26,7 +26,6 @@ import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
-import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
 
 type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
@@ -53,7 +52,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
   const [novoNome, setNovoNome] = useState('');
   const [novoTelefone, setNovoTelefone] = useState('');
@@ -61,7 +59,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
-  const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
@@ -93,17 +90,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         },
         onError: (error) => {
           console.error('Failed to update case situation:', error);
-        },
-      }
-    );
-  };
-
-  const handleToggleCanView = () => {
-    updateCanViewMutation.mutate(
-      { caseId, canView: !visualizacaoPermitida },
-      {
-        onSuccess: () => {
-          setVisualizacaoPermitida((v) => !v);
         },
       }
     );
