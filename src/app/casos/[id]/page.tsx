@@ -448,10 +448,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
             icon={<FiUserPlus size={36} color="#ff3636" />}
-            title={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
-            description={t('cases.title.allowViewDesc', {
-              defaultValue: 'Selecione um usuário para compartilhar o acesso ao caso.',
-            })}
+            title={t('cases.title.allowView')}
+            description={t('cases.title.allowViewDesc')}
             primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
             onPrimary={() => {
               setShowAllowVisualizationModal(false);
@@ -460,6 +458,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             caseId={id}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowAllowVisualizationModal(false)}
+            data-test-id="allow-visualization-modal"
           />
         )}
       </div>

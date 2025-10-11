@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
@@ -6,6 +5,7 @@ import { FiX } from 'react-icons/fi';
 import { getCurrentUser } from '@/services/auth';
 import { allowUserToViewCase } from '@/services/caseService';
 import { getUsers } from '@/services/userService';
+import { t } from '@/texts';
 
 import Button from '../Button';
 import { CustomSelect } from '../Select';
@@ -66,7 +66,12 @@ export default function AllowVisualizationModal({
   const modalContent = (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <button className={styles.close} onClick={onClose} aria-label="Fechar">
+        <button
+          className={styles.close}
+          onClick={onClose}
+          aria-label="Fechar"
+          data-test-id="allow-visualization-modal-close-btn"
+        >
           <FiX size={26} />
         </button>
         {icon && <div className={styles.icon}>{icon}</div>}
@@ -75,7 +80,7 @@ export default function AllowVisualizationModal({
         {children}
         <CustomSelect
           options={users.map((u) => ({ value: u.id, label: u.name }))}
-          placeholder="Selecione um usuário"
+          placeholder={t('cases.title.allowView.select.placeholder')}
           value={selectedUser?.name ?? null}
           onChange={(v) => {
             const selected = users.find((u) => u.id === v);
@@ -99,12 +104,14 @@ export default function AllowVisualizationModal({
                 alert('Erro ao salvar usuário.');
               }
             }}
+            data-test-id="allow-visualization-modal-save-btn"
           />
           <Button
             label={secondaryLabel}
             variant="outlined"
             className={`${styles.btnSecondary}${secondaryColor ? ' ' + styles.customSecondaryColor : ''}`}
             onClick={onSecondary}
+            data-test-id="allow-visualization-modal-cancel-btn"
           />
         </div>
       </div>

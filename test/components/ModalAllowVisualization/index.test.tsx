@@ -1,12 +1,13 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { vi } from 'vitest';
 
-import { getUsers } from '@/services/userService';
+import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
 import { getCurrentUser } from '@/services/auth';
 import { allowUserToViewCase } from '@/services/caseService';
-import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
+import { getUsers } from '@/services/userService';
 
 vi.mock('@/services/userService');
 vi.mock('@/services/auth');
