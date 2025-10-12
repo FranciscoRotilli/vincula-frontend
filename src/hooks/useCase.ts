@@ -7,6 +7,7 @@ import {
   getCaseById,
   getCaseGraph,
   getCases,
+  GraphFilters,
   updateCaseCanView,
   updateCaseName,
   updateCaseSituation,
@@ -89,10 +90,17 @@ export function useCaseById(caseId: string) {
   return queryResult;
 }
 
-export function useCaseGraph(caseId: string, identities?: string[]) {
+export function useCaseGraph(caseId: string, filters?: GraphFilters) {
   return useQuery({
-    queryKey: ['caseGraph', caseId, identities],
-    queryFn: () => getCaseGraph(caseId, identities),
+    queryKey: [
+      'caseGraph', 
+      caseId, 
+      filters?.investigated,
+      filters?.cpf_cnpj,
+      filters?.origin,
+      filters?.archive,
+    ],
+    queryFn: () => getCaseGraph(caseId, filters),
     refetchOnWindowFocus: false,
     enabled: !!caseId,
   });

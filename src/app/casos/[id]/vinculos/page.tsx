@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import { CircularProgress } from '@mui/material';
 import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
-import React, { use, useCallback, useEffect, useRef, useState } from 'react';
+import React, { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
+import { GraphAlerts } from '@/components/GraphAlerts';
 import NodeModal from '@/components/NodeModal';
 import { useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
@@ -37,9 +39,26 @@ import {
   const [filters, setFilters] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
 
-  const { data: graphData, isLoading: isLoadingGraph, error: graphError } = useCaseGraph(id);
+  const graphFilters = useMemo(() => ({
+    cpf_cnpj: filters.investigado ? String(filters.investigado) : 
+              (filters.cpfCnpj ? String(filters.cpfCnpj) : undefined),
+    investigated: filters.nome ? String(filters.nome) : undefined,
+    origin: filters.baseDados ? String(filters.baseDados) : undefined,
+    archive: filters.arquivo ? String(filters.arquivo) : undefined,
+  }), [filters]);
+
+  const hasActiveFilters = useMemo(() => {
+    return Object.values(graphFilters).some(value => value !== undefined && value !== '');
+  }, [graphFilters]);
+
+  const { 
+    data: graphData, 
+    isLoading: isLoadingGraph, 
+    error: graphError 
+  } = useCaseGraph(id, graphFilters);
 
   useEffect(() => {
     if (graphData) {
@@ -117,7 +136,6 @@ import {
   }, [graphNodes, fitNodes]);
 
   const handleNodeClick = (node: Node) => {
-    console.log("Node selected: ", node);
     setSelectedElement(node as AppNode);
   }
 
@@ -139,12 +157,14 @@ import {
         const data = await response.json();
         
         const suspects = data.suspects || [];
-        const suspectNames = suspects.map((suspect: { name: string }) => suspect.name);
-        setInvestigated(suspectNames);
-
-        const caseArchives = data.archives || [];
-        const archiveNames = caseArchives.map((archive: { name: string }) => archive.name);
-        setArchives(archiveNames);
+        const options = [
+          { value: '', label: 'Todos' },
+          ...suspects.map((suspect: { name: string; cpf_cnpj: string }) => ({
+            value: suspect.cpf_cnpj,
+            label: `${suspect.name} - ${suspect.cpf_cnpj}`,
+          }))
+        ];
+        setInvestigado(options);
       } catch (error) {
         console.error(error);
       }
@@ -152,19 +172,54 @@ import {
     fetchCaseData();
   }, [id]);
 
+  const filterFields: FieldConfig[] = [
+    { key: 'investigado', label: 'Investigado (CPF/CNPJ)', type: 'select', options: investigado, placeholder: 'Selecione' },
+    { key: 'nome', label: 'Nome', type: 'input', placeholder: 'Digite o nome' },
+    { key: 'cpfCnpj', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
+    { key: 'baseDados', label: 'Base de dados', type: 'select', options: baseOptions, placeholder: 'Selecione' },
+    { key: 'arquivo', label: 'Arquivo', type: 'input', placeholder: 'Nome do arquivo' },
+  ];
+
+  const handleFilter = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+  };
+
+  const handleClear = () => {
+    setFilters({});
+  };
+
   return (
     <CaseContainer caseId={id}>
-      <Filter
-        fields={filterFields}
-        onFilter={handleFilter}
-        onClear={handleClear}
-        customStyles={{
-          container: styles.containerOverride,
-        }}
-      />
+      {!isFullscreen && showFilters && (
+        <Filter
+          fields={filterFields}
+          onFilter={handleFilter}
+          onClear={handleClear}
+          autoFilter={true}
+          debounceMs={2000}
+          customStyles={{
+            container: styles.containerOverride,
+          }}
+        />
+      )}
       
       <div className={isFullscreen ? styles.fullscreenContainer : ''}>
-        <div className={styles.graphContainer}>
+        <div className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}>
+          {isFullscreen && showFilters && (
+            <div className={styles.fullscreenFilters}>
+              <Filter
+                fields={filterFields}
+                onFilter={handleFilter}
+                onClear={handleClear}
+                autoFilter={true}
+                debounceMs={2000}
+                customStyles={{
+                  container: styles.containerOverride,
+                }}
+              />
+            </div>
+          )}
+          
           <div className={styles.graphControls}>
             <Tooltip title={t('graph.zoomIn')} placement="right">
               <button 
@@ -190,6 +245,14 @@ import {
                 <FitScreenIcon />
               </button>
             </Tooltip>
+            <Tooltip title={showFilters ? t('graph.hideFilters') : t('graph.showFilters')} placement="right">
+              <button 
+                onClick={() => setShowFilters(!showFilters)}
+                className={styles.controlButton}
+              >
+                {showFilters ? <FilterListOffIcon /> : <FilterListIcon />}
+              </button>
+            </Tooltip>
             <Tooltip title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')} placement="right">
               <button 
                 onClick={toggleFullscreen}
@@ -209,49 +272,14 @@ import {
             onCanvasClick={handleCanvasClick}
           />
 
-          {isLoadingGraph && (
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 1001,
-              background: 'rgba(255, 255, 255, 0.9)',
-              padding: '20px',
-              borderRadius: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <CircularProgress size={40} />
-              <span>{t('graph.loading')}</span>
-            </div>
-          )}
-
-          {graphError && !isLoadingGraph && (
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 1001,
-              background: 'rgba(255, 255, 255, 0.9)',
-              padding: '20px',
-              borderRadius: '8px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '10px',
-              textAlign: 'center',
-              color: '#d32f2f'
-            }}>
-              <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{t('graph.errorTitle')}</span>
-              <span style={{ fontSize: '14px', color: '#666' }}>
-                {graphError instanceof Error ? graphError.message : t('graph.errorUnknown')}
-              </span>
-            </div>
-          )}
+          <GraphAlerts
+            isLoading={isLoadingGraph}
+            hasError={!!graphError}
+            errorMessage={graphError instanceof Error ? graphError.message : undefined}
+            hasActiveFilters={hasActiveFilters}
+            hasNodes={graphNodes.length > 0}
+            caseId={id}
+          />
         
           {selectedElement && (
             <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>

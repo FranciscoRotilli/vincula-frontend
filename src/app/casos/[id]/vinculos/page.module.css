@@ -8,6 +8,11 @@
   height: calc(100vh - 350px);
   width: 100%;
   margin-top: 20px;
+  transition: height 0.3s ease;
+}
+
+.graphContainerExpanded {
+  height: calc(100vh - 220px);
 }
 
 .graphControls {
@@ -18,6 +23,11 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.fullscreenContainer .graphControls {
+  top: auto;
+  bottom: 10px;
 }
 
 .controlButton {
@@ -54,6 +64,19 @@
 .fullscreenContainer .graphContainer {
   height: 100vh;
   margin-top: 0;
+}
+
+.fullscreenContainer .graphContainerExpanded {
+  height: 100vh;
+}
+
+.fullscreenFilters {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .pointer {

@@ -28,8 +28,10 @@ export interface RawEdge {
 }
 
 export const baseOptions = [
+  { value: '', label: 'Todos' },
   { value: 'SIMBA', label: 'SIMBA' },
-  { value: 'SINTEL', label: 'SINTEL' },
+  { value: 'SITTEL', label: 'SITTEL' },
+  { value: 'RIF', label: 'RIF' },
 ];
 
 export const calculateWidth = (quantity: number, allQuantities: number[]) => {
@@ -66,12 +68,9 @@ export const calculateNodeSize = (
 
   const default_size = 30;
 
-  console.log("rels: " + rels[0])
-  console.log("node: " + nodeId)
   const quantity = rels
     .filter(rel => rel.from === nodeId)
     .reduce((sum, rel) => sum + (Number(rel.properties?.quantity) || 0), 0);
-  console.log("aqui " + quantity)
   
   if (
     !allQuantities.length ||
@@ -81,13 +80,13 @@ export const calculateNodeSize = (
 
   const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
   
-  if (validQuantities.length === 0) return 1;
+  if (validQuantities.length === 0) return default_size;
   if (validQuantities.length === 1) return quantity > 0 ? default_size * 2 : default_size;
   
   const min = validQuantities[0];
   const max = validQuantities[validQuantities.length - 1];
   
-  if (min === max) return 2;
+  if (min === max) return default_size * 1.5;
   
   const logMin = Math.log(min);
   const logMax = Math.log(max);

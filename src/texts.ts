@@ -132,6 +132,14 @@ export const texts = {
   'graph.loading': 'Carregando grafo...',
   'graph.errorTitle': 'Erro ao carregar o grafo',
   'graph.errorUnknown': 'Erro desconhecido',
+  'graph.noResults': 'Nenhum resultado encontrado',
+  'graph.noResultsDescription': 'Não foram encontrados vínculos para os filtros aplicados.',
+  'graph.noResultsHint': 'Tente ajustar os critérios de busca.',
+  'graph.noData': 'Nenhum dado encontrado',
+  'graph.noDataDescription': 'Por favor, envie pelo menos um arquivo ao caso para gerar o grafo de vínculos.',
+  'graph.goToGeneralInfo': 'Ir para Informações Gerais',
+  'graph.showFilters': 'Mostrar Filtros',
+  'graph.hideFilters': 'Ocultar Filtros',
 } as const;
 
 export type TextKey = keyof typeof texts;

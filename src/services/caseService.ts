@@ -123,13 +123,30 @@ export async function deleteCase(caseId: string) {
   }
 }
 
-export async function getCaseGraph(caseId: string, identities?: string[]) {
+export interface GraphFilters {
+  investigated?: string;
+  cpf_cnpj?: string;
+  origin?: string;
+  archive?: string;
+}
+
+export async function getCaseGraph(caseId: string, filters?: GraphFilters) {
   const params = new URLSearchParams();
   
-  if (identities && identities.length > 0) {
-    identities.forEach(identity => {
-      params.append('identity', identity);
-    });
+  if (filters?.investigated) {
+    params.append('investigated', filters.investigated);
+  }
+  
+  if (filters?.cpf_cnpj) {
+    params.append('cpf_cnpj', filters.cpf_cnpj);
+  }
+  
+  if (filters?.origin) {
+    params.append('origin', filters.origin);
+  }
+  
+  if (filters?.archive) {
+    params.append('archive', filters.archive);
   }
   
   const qs = params.toString();

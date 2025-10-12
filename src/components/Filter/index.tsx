@@ -1,6 +1,5 @@
 'use client';
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
@@ -38,6 +37,8 @@ export type FilterProps = {
   onSaveFilter?: (filters: FilterValues) => void;
   defaultValues?: FilterValues;
   disabled?: boolean;
+  autoFilter?: boolean;
+  debounceMs?: number;
   customStyles?: {
     container?: string;
     fieldsRow?: string;
@@ -46,7 +47,7 @@ export type FilterProps = {
   };
 };
 
-const isCaseStatus = (value: string): value is CaseStatus => {
+const _isCaseStatus = (value: string): value is CaseStatus => {
   return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
 
@@ -57,17 +58,30 @@ const Filter: React.FC<FilterProps> = ({
   onSaveFilter,
   defaultValues = {},
   disabled = false,
+  autoFilter = false,
+  debounceMs = 2000,
   customStyles = {},
 }) => {
   const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
-  const [showSaveButton, setShowSaveButton] = useState(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const hasActiveFilter = Object.values(filters).some(
-      (v) => typeof v === 'string' && v.trim() !== ''
-    );
-    setShowSaveButton(hasActiveFilter);
-  }, [filters]);
+    if (!autoFilter) return;
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      onFilter(filters);
+    }, debounceMs);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [filters, autoFilter, debounceMs, onFilter]);
 
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -87,11 +101,19 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   const handleSelectChange = (key: string) => (value: string | null) => {
-  setFilters((prev) => ({
-    ...prev,
-    [key]: value && value !== '' ? value : undefined,
-  }));
-};
+    const newFilters = {
+      ...filters,
+      [key]: value && value !== '' ? value : undefined,
+    };
+    setFilters(newFilters);
+    
+    if (autoFilter) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      onFilter(newFilters);
+    }
+  };
 
   const handleFilter = () => {
     let isValid = true;

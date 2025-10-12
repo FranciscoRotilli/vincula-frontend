@@ -3,7 +3,7 @@ import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
 import type NVL from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 
 interface InteractiveGraphProps {
   nodes: Node[];
@@ -23,6 +23,23 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
   onCanvasClick,
 }, ref) => {
   const [renderer, setRenderer] = useState<Renderer>("webgl");
+  const [layoutDone, setLayoutDone] = useState(false);
+
+  useEffect(() => {
+    setRenderer("webgl");
+    setLayoutDone(false);
+  }, [nodes.length, rels.length]);
+
+  useEffect(() => {
+    if (!layoutDone && nodes.length > 0) {
+      const timeout = setTimeout(() => {
+        setRenderer('canvas');
+        setLayoutDone(true);
+      }, 2000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [layoutDone, nodes.length]);
 
   const mouseEventCallbacks: MouseEventCallbacks = {
     onZoom: true,
@@ -51,7 +68,8 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
           }}
           nvlCallbacks={{
             onLayoutDone: () => {
-              setRenderer('canvas')
+              setRenderer('canvas');
+              setLayoutDone(true);
             }
           }}
         />
