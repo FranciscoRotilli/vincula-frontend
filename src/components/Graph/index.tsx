@@ -3,7 +3,7 @@ import type { HitTargets, Node, Relationship, Renderer } from '@neo4j-nvl/base'
 import type NVL from '@neo4j-nvl/base'
 import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
-import React, { forwardRef, useMemo,useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 
 interface InteractiveGraphProps {
   nodes: Node[];
@@ -12,7 +12,6 @@ interface InteractiveGraphProps {
   onNodeClick?: (node: Node, hitTargets: HitTargets, event: MouseEvent) => void;
   onRelationshipClick?: (rel: Relationship, hitTargets: HitTargets, event: MouseEvent) => void;
   onCanvasClick?: (event: MouseEvent) => void;
-  onHover?: (element: Node | Relationship, hitElements: HitTargets, event: MouseEvent) => void;
 }
 
 const Graph = forwardRef<NVL, InteractiveGraphProps>(({
@@ -22,28 +21,8 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
   onNodeClick,
   onRelationshipClick,
   onCanvasClick,
-  onHover,
 }, ref) => {
   const [renderer, setRenderer] = useState<Renderer>("webgl");
-  const [hoveredElementId, setHoveredElementId] = useState<string | null>(null);
-
-  const handleHover = (
-    element: Node | Relationship,
-    hitElements: HitTargets,
-    event: MouseEvent
-  ) => {
-    setHoveredElementId(element.id);
-    if (onHover) {
-      onHover(element, hitElements, event);
-    }
-  };
-
-  const handleCanvasClick = (event: MouseEvent) => {
-    setHoveredElementId(null);
-    if (onCanvasClick) {
-      onCanvasClick(event);
-    }
-  };
 
   const mouseEventCallbacks: MouseEventCallbacks = {
     onZoom: true,
@@ -51,31 +30,17 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
     onDrag: true,
     onNodeClick: onNodeClick,
     onRelationshipClick: onRelationshipClick,
-    onCanvasClick: handleCanvasClick,
-    onHover: handleHover,
+    onCanvasClick: onCanvasClick,
+    onHover: true,
   };
-
-  const styledNodes = useMemo(() => {
-    return nodes.map(node => ({
-      ...node,
-      dropShadow: node.id === hoveredElementId,
-    }));
-  }, [nodes, hoveredElementId]);
-
-  const styledRels = useMemo(() => {
-    return rels.map(rel => ({
-      ...rel,
-      dropShadow: rel.id === hoveredElementId,
-    }));
-  }, [rels, hoveredElementId]);
 
   return (
     <>
       <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         <InteractiveNvlWrapper
           ref={ref}
-          nodes={styledNodes}
-          rels={styledRels}
+          nodes={nodes}
+          rels={rels}
           zoom={zoom}
           mouseEventCallbacks={mouseEventCallbacks}
           nvlOptions={{
