@@ -1,6 +1,5 @@
 import { SuspectInput } from '@/types/Cases';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function addSuspect(caseId: string, suspect: SuspectInput) {
   const response = await fetch(`/api/case/${caseId}/suspect`, {
