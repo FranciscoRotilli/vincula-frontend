@@ -89,6 +89,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         onClose={() => setIsUploadModalOpen(false)}
         onSubmit={() => refetch()}
         caseId={caseId}
+        data-testid="add-file-modal"
       />
       <RemoveModal
         isOpen={isRemoveModalOpen}

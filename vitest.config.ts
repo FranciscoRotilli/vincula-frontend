@@ -8,7 +8,6 @@ export default defineConfig({
     include: ['test/**/*.{test,spec}.{ts,tsx}', 'src/**/*.{test,spec}.{ts,tsx}'],
     css: true,
     globals: true,
-    testTimeout: 10000,
   },
   resolve: {
     alias: {
