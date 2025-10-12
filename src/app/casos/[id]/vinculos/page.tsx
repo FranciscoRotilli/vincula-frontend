@@ -37,18 +37,37 @@ import {
   const [graphNodes, setGraphNodes] = useState<AppNode[]>([]);
   const [graphRels, setGraphRels] = useState<AppRelationship[]>([]);
   const [filters, setFilters] = useState<FilterValues>({});
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
 
-  const graphFilters = useMemo(() => ({
-    cpf_cnpj: filters.investigado ? String(filters.investigado) : 
-              (filters.cpfCnpj ? String(filters.cpfCnpj) : undefined),
-    investigated: filters.nome ? String(filters.nome) : undefined,
-    origin: filters.baseDados ? String(filters.baseDados) : undefined,
-    archive: filters.arquivo ? String(filters.arquivo) : undefined,
-  }), [filters]);
+  const isValidCpfCnpjLength = (value: string): boolean => {
+    if (!value) return false;
+    const cleaned = value.replace(/[^a-zA-Z0-9]/g, '');
+    return cleaned.length === 11 || cleaned.length === 14;
+  };
+
+  const graphFilters = useMemo(() => {
+    let cpfCnpjValue: string | undefined = undefined;
+    
+    if (filters.investigado) {
+      cpfCnpjValue = String(filters.investigado);
+    } else if (filters.cpfCnpj) {
+      const cpfCnpjInput = String(filters.cpfCnpj);
+      if (isValidCpfCnpjLength(cpfCnpjInput)) {
+        cpfCnpjValue = cpfCnpjInput;
+      }
+    }
+
+    return {
+      cpf_cnpj: cpfCnpjValue,
+      investigated: filters.nome ? String(filters.nome) : undefined,
+      origin: filters.baseDados ? String(filters.baseDados) : undefined,
+      archive: filters.arquivo ? String(filters.arquivo) : undefined,
+    };
+  }, [filters]);
 
   const hasActiveFilters = useMemo(() => {
     return Object.values(graphFilters).some(value => value !== undefined && value !== '');
@@ -186,6 +205,16 @@ import {
 
   const handleClear = () => {
     setFilters({});
+    setFilterValues({});
+  };
+
+  const validateFilterField = (key: string, value: string): string | undefined => {
+    if (key === 'cpfCnpj' && value) {
+      if (!isValidCpfCnpjLength(value)) {
+        return ' ';
+      }
+    }
+    return undefined;
   };
 
   return (
@@ -193,10 +222,13 @@ import {
       {!isFullscreen && showFilters && (
         <Filter
           fields={filterFields}
+          values={filterValues}
+          onValuesChange={setFilterValues}
           onFilter={handleFilter}
           onClear={handleClear}
           autoFilter={true}
           debounceMs={2000}
+          validateField={validateFilterField}
           customStyles={{
             container: styles.containerOverride,
           }}
@@ -209,10 +241,13 @@ import {
             <div className={styles.fullscreenFilters}>
               <Filter
                 fields={filterFields}
+                values={filterValues}
+                onValuesChange={setFilterValues}
                 onFilter={handleFilter}
                 onClear={handleClear}
                 autoFilter={true}
                 debounceMs={2000}
+                validateField={validateFilterField}
                 customStyles={{
                   container: styles.containerOverride,
                 }}
