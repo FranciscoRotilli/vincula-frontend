@@ -3,7 +3,7 @@ import { SuspectInput } from '@/types/Cases';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function addSuspect(caseId: string, suspect: SuspectInput) {
-  const response = await fetch(`${API_URL}/case/${caseId}/suspect`, {
+  const response = await fetch(`/api/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export async function addSuspect(caseId: string, suspect: SuspectInput) {
 }
 
 export async function deleteSuspect(caseId: string, suspectId: string) {
-  const response = await fetch(`${API_URL}/case/${caseId}/suspect/${suspectId}`, {
+  const response = await fetch(`/api/case/${caseId}/suspect/${suspectId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
