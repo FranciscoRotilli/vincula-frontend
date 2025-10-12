@@ -25,9 +25,9 @@ const ORIGIN_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'CADASTRO_ASSINANTES', label: 'Cadastros dos Assinantes' },
-  { value: 'EXTRATO_DETALHADO', label: 'Extrato Detalhado' },
-  { value: 'RIF', label: 'RIF' },
+  { value: 'CADASTRO_ASSINANTES', label: t('addFile.sittelLabel') },
+  { value: 'EXTRATO_DETALHADO', label: t('addFile.simbaLabel') },
+  { value: 'RIF', label: t('addFile.rifLabel') },
 ];
 
 const MAX_SIZE_MB = 50;

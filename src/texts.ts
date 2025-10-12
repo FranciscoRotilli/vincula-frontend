@@ -64,6 +64,9 @@ export const texts = {
   'addFile.type': 'Tipo',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
+  'addFile.simbaLabel': 'ExtratoDetalhado',
+  'addFile.sittelLabel': 'Cadastros dos Assinantes',
+  'addFile.rifLabel': 'RIF',
 
   'removeFileModal.title': 'Remover arquivo?',
   'removeFileModal.description':
