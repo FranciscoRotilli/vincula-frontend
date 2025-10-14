@@ -5,9 +5,9 @@ import { apiFetch } from '@/lib/backend';
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { caseId: string; suspectId: string } }
+  { params }: { params: Promise<{ caseId: string; suspectId: string }> }
 ) {
-  const { caseId, suspectId } = params;
+  const { caseId, suspectId } = await params;
 
   try {
     const resp = await apiFetch(`/case/${caseId}/suspect/${suspectId}`, {
