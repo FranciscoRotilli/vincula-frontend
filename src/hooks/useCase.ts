@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   addCase,
+  allowUserToViewCase,
   CaseResponse,
   deleteCase,
   getCaseById,
@@ -81,4 +82,11 @@ export function useCaseById(caseId: string) {
   });
 
   return queryResult;
+}
+
+export function useAllowVisualization() {
+    return useMutation({
+        mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
+            allowUserToViewCase(caseId, userId),
+    });
 }

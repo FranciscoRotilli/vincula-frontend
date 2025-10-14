@@ -3,16 +3,17 @@ import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
-import { FiAlertCircle, FiEdit2, FiUpload, FiUserPlus } from 'react-icons/fi';
+import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 
-import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
 import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
+import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import {
+    useAllowVisualization,
   useCaseById,
   useDeleteCase,
   useUpdateCaseName,
@@ -60,6 +61,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
   const deleteCaseMutation = useDeleteCase();
+  const allowViewMutation = useAllowVisualization();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
@@ -69,6 +71,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
+  const [usuarioSelecionado] = useState('');
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
@@ -123,6 +126,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       }
     );
   };
+
+  const handleAllowVisualization = () => {
+    allowViewMutation.mutate({caseId, userId: usuarioSelecionado }, {onSuccess: () => {
+        setShowAllowVisualizationModal(false);
+        window.location.reload()
+    }});
+  }
 
   const handleRemoveEnvolvido = (index: number) => {
     setEnvolvidos(envolvidos.filter((_, i) => i !== index));
@@ -447,18 +457,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           <AllowVisualizationModal
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
-            icon={<FiUserPlus size={36} color="#ff3636" />}
-            title={t('cases.title.allowView')}
-            description={t('cases.title.allowViewDesc')}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
-            onPrimary={() => {
-              setShowAllowVisualizationModal(false);
-              window.location.reload();
-            }}
             caseId={id}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowAllowVisualizationModal(false)}
-            data-test-id="allow-visualization-modal"
+            onSubmit={() => handleAllowVisualization()}
           />
         )}
       </div>

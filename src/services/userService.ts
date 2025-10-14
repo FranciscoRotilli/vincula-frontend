@@ -1,9 +1,7 @@
 import { UserResponse } from "@/types/User";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export async function getUsers(): Promise<UserResponse[]> {
-    const res = await fetch(`${API_URL}/user/`, {
+    const res = await fetch('/api/user/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

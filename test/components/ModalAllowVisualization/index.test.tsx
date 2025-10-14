@@ -4,7 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { vi } from 'vitest';
 
-import AllowVisualizationModal from '@/components/AllowVisualizationModal/AllowVisualizationModal';
+import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import { getCurrentUser } from '@/services/auth';
 import { allowUserToViewCase } from '@/services/caseService';
 import { getUsers } from '@/services/userService';
@@ -99,10 +99,10 @@ describe('AllowVisualizationModal', () => {
   });
 
   it('permite selecionar usuário e chamar allowUserToViewCase', async () => {
-    const onPrimary = vi.fn();
+    const onSubmit = vi.fn();
     mockedAllowUserToViewCase.mockResolvedValue({});
 
-    openModal({ onPrimary });
+    openModal({ onSubmit });
     await waitFor(() => expect(mockedGetUsers).toHaveBeenCalled());
 
     const select = await screen.findByTestId('mock-select');
@@ -114,7 +114,7 @@ describe('AllowVisualizationModal', () => {
     await waitFor(() =>
       expect(mockedAllowUserToViewCase).toHaveBeenCalledWith('case-123', 'user-2')
     );
-    expect(onPrimary).toHaveBeenCalled();
+    expect(onSubmit).toHaveBeenCalled();
   });
 
   it('mostra alerta em caso de erro na chamada do backend', async () => {
@@ -134,10 +134,10 @@ describe('AllowVisualizationModal', () => {
     alertMock.mockRestore();
   });
 
-  it('chama onSecondary ao clicar em Cancelar', async () => {
-    const onSecondary = vi.fn();
-    openModal({ onSecondary });
+  it('chama onClose ao clicar em Cancelar', async () => {
+    const onClose = vi.fn();
+    openModal({ onClose });
     fireEvent.click(screen.getByRole('button', { name: /Cancelar/i }));
-    expect(onSecondary).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
   });
 });

@@ -7,8 +7,6 @@ import {
   PaginationParams,
 } from '@/types/Cases';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export type CaseResponse = { caseName: string };
 
 type ErrorWithMessage = { message: string };
@@ -120,12 +118,16 @@ export async function deleteCase(caseId: string) {
   }
 }
 
-export async function allowUserToViewCase(caseId: string, userId: string) {
-    const resp = await fetch(`${API_URL}/case/addtocase/${caseId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+export async function allowUserToViewCase(caseId: string, user_id: string) {
+    const resp = await fetch(`/api/cases/addtocase/${caseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id }),
     });
-    if (!resp.ok) await throwIfError(resp, 'Falha ao conceder permissão de visualização');
+
+    if (resp.status === 204) {
+        return null;
+    }
+
     return resp.json();
 }
