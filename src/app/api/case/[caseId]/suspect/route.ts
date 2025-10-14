@@ -1,5 +1,6 @@
 // src/app/api/cases/[caseId]/suspect/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+
 import { apiFetch } from '@/lib/backend';
 
 export async function POST(

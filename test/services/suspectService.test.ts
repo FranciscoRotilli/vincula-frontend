@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { addSuspect, deleteSuspect } from '../../src/services/suspectService';
+
 import { SuspectInput } from '@/types/Cases';
+
+import { addSuspect, deleteSuspect } from '../../src/services/suspectService';
 
 vi.stubGlobal('fetch', vi.fn());
 
