@@ -7,17 +7,14 @@ import { vi } from 'vitest';
 
 import AddFileModal from '@/components/ModalAddFile';
 
-// utilitário para criar arquivo mock
 const makeFile = (name: string, type: string) =>
   new File([new Blob(['x'], { type })], name, { type });
 
-// utilitário para renderizar com QueryClientProvider
 function renderWithQueryClient(ui: React.ReactElement) {
   const queryClient = new QueryClient();
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 }
 
-// helper para abrir o modal com props padrão
 const openModal = (overrides: Partial<React.ComponentProps<typeof AddFileModal>> = {}) => {
   const props = {
     isOpen: true,
