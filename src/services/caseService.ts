@@ -108,7 +108,7 @@ export async function updateCaseCanView(caseId: string, canView: boolean) {
 }
 
 export async function deleteCase(caseId: string) {
-  const resp = await fetch(`/api/cases/${caseId}`, { method: 'DELETE' });
+  const resp = await fetch(`${caseId}`, { method: 'DELETE' });
   if (!resp.ok) await throwIfError(resp, 'Falha ao excluir caso');
 
   try {

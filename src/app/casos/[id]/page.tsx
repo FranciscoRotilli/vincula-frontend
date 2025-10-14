@@ -113,7 +113,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
+        router.push('/casos');
       },
+      onError: (error) => {
+        console.error('Failed to delete case:', error);
+      }
     });
   };
 
