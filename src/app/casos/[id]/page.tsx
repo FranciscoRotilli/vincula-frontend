@@ -271,7 +271,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               />
                <Button
                 size="small"
-                label={t('cases.title.changeResponsible', { defaultValue: 'Alterar responsável' })}
+                label={t('cases.title.changeResponsible')}
                 variant="contained"
                 onClick={() => setShowChangeResponsibleModal(true)}
               />
@@ -287,14 +287,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           <div className={styles.investigatedSection} data-testid="investigated-section">
             <div className={styles.sectionHeader}>
               <h1 className={styles.title3}>
-                {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
+                {t('cases.title.investigated')} (
                 {envolvidos.length})
               </h1>
               <p className={styles.body5}>
-              {t('cases.title.investigatedDesc', {
-                defaultValue:
-                  'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
-              })}
+              {t('cases.title.investigatedDesc', )}
               </p>
             <div className={styles.addInvestigated} data-testid="add-investigated">
               <Input
@@ -318,7 +315,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 inputMode="numeric"
                 label='Telefone'
                 //pattern="[0-9]*"
-                placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
+                placeholder={t('cases.title.inputPhone')}
                 value={novoTelefone}
                 onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
                 className={styles.input}
@@ -356,13 +353,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeName', { defaultValue: 'Alterar nome do caso' })}
-            description={t('cases.title.changeNameDesc', {
-              defaultValue: 'Altere o nome do caso abaixo.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeName')}
+            description={t('cases.title.changeNameDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateName}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowNameModal(false)}
           >
             <input
@@ -371,7 +366,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               onChange={(e) => setNovoNomeCaso(e.target.value)}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
-              placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
+              placeholder={t('cases.title.inputName')}
             />
           </ConfirmationModal>
         )}
@@ -381,13 +376,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
-            description={t('cases.title.changeSituationDesc', {
-              defaultValue: 'Selecione a nova situação do caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeSituation')}
+            description={t('cases.title.changeSituationDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateSituation}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowSituationModal(false)}
           >
             <select
@@ -397,16 +390,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
             >
               <option value="">
-                {t('cases.title.selectSituation', { defaultValue: 'Selecione a situação' })}
+                {t('cases.title.selectSituation')}
               </option>
               <option value="Em andamento">
-                {t('cases.title.situationOngoing', { defaultValue: 'Em andamento' })}
+                {t('cases.title.situationOngoing')}
               </option>
               <option value="Suspenso">
-                {t('cases.title.situationSuspended', { defaultValue: 'Suspenso' })}
+                {t('cases.title.situationSuspended')}
               </option>
               <option value="Encerrado">
-                {t('cases.title.situationClosed', { defaultValue: 'Encerrado' })}
+                {t('cases.title.situationClosed')}
               </option>
             </select>
           </ConfirmationModal>
@@ -417,14 +410,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
             icon={<TbTrash size={36} color="#ff3636" />}
-            title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
-            description={t('cases.title.deleteWarning', {
-              defaultValue:
-                'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
-            })}
-            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
+            title={t('cases.title.delete')}
+            description={t('cases.title.deleteWarning')}
+            primaryLabel={t('cases.title.delete')}
             onPrimary={handleDeleteCase}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowDeleteCaseModal(false)}
           />
         )}
@@ -434,14 +424,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showRemoveFileModal.open}
             onClose={() => setShowRemoveFileModal({ open: false, index: null })}
             icon={<FiAlertCircle size={36} color="#ff3636" />}
-            title={t('cases.title.removeFile', { defaultValue: 'Remover arquivo?' })}
-            description={t('cases.title.removeFileWarning', {
-              defaultValue:
-                'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
-            })}
-            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
+            title={t('cases.title.removeFile')}
+            description={t('cases.title.removeFileWarning')}
+            primaryLabel={t('cases.title.remove')}
             onPrimary={() => handleRemoveArquivo(showRemoveFileModal.index!)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
           />
         )}
@@ -451,14 +438,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showRemoveEnvolvidoModal.open}
             onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
             icon={<FiAlertCircle size={36} color="#ff3636" />}
-            title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
-            description={t('cases.title.removeInvestigatedWarning', {
-              defaultValue:
-                'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
-            })}
-            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
+            title={t('cases.title.removeInvestigated')}
+            description={t('cases.title.removeInvestigatedWarning')}
+            primaryLabel={t('cases.title.remove')}
             onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
           />
         )}
@@ -468,13 +452,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showUploadModal}
             onClose={() => setShowUploadModal(false)}
             icon={<FiUpload size={36} color="#ff3636" />}
-            title={t('cases.title.addFile', { defaultValue: 'Adicionar arquivo' })}
-            description={t('cases.title.addFileDesc', {
-              defaultValue: 'Selecione um arquivo para anexar ao caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.addFile')}
+            description={t('cases.title.addFileDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={() => setShowUploadModal(false)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
         )}
@@ -485,13 +467,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       isOpen={showChangeResponsibleModal}
       onClose={() => setShowChangeResponsibleModal(false)}
       icon={<FiEdit2 size={36} color="#ff3636" />}
-      title={t('cases.title.changeResponsible', { defaultValue: 'Alterar responsável' })}
-      description={t('cases.title.changeResponsibleDesc', {
-        defaultValue: 'Digite o nome do novo responsável pelo caso.',
-      })}
-      primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+      title={t('cases.title.changeResponsible')}
+      description={t('cases.title.changeResponsibleDesc')}
+      primaryLabel={t('cases.title.save')}
       onPrimary={handleUpdateOwner}
-      secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+      secondaryLabel={t('cases.title.cancel')}
       onSecondary={() => setShowChangeResponsibleModal(false)}
       >
             <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
