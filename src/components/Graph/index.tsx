@@ -53,7 +53,7 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
 
   return (
     <>
-      <div style={{ height: '100%', border: '1px solid black', position: 'relative' }} data-testid="graph-wrapper">
+      <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         <InteractiveNvlWrapper
           ref={ref}
           nodes={nodes}
