@@ -273,6 +273,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 size="small"
                 label={t('cases.title.changeResponsible')}
                 variant="contained"
+                data-testid="btn-change-responsible"
                 onClick={() => setShowChangeResponsibleModal(true)}
               />
               <Button
@@ -466,6 +467,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <ConfirmationModal
       isOpen={showChangeResponsibleModal}
       onClose={() => setShowChangeResponsibleModal(false)}
+      data-testid="modal-change-responsible"
       icon={<FiEdit2 size={36} color="#ff3636" />}
       title={t('cases.title.changeResponsible')}
       description={t('cases.title.changeResponsibleDesc')}
@@ -486,7 +488,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   const opt = newValue as SingleValue<{ value: string; label: string }>;
                   setNovoResponsavel(opt?.value ?? '');
                 }}
-                placeholder={isLoadingUsers ? 'Carregando usuários...' : 'Selecione o novo responsável'}
+                placeholder={
+                  isLoadingUsers
+                    ? t('cases.title.loadingUsers')
+                    : t('cases.title.selectResponsible')
+                }
                 styles={{
                   control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
                 } as StylesConfig}

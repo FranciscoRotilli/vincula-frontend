@@ -22,6 +22,8 @@ export const texts = {
   'cases.title.inputCpfCnpj': 'Insira o CPF / CNPJ',
   'cases.title.inputPhone': 'Insira o telefone',
   'cases.title.files': 'Arquivos',
+  'cases.title.loadingUsers': 'Carregando usuários...',
+  'cases.title.selectResponsible': 'Selecione o novo responsável',
   'cases.title.filesDesc':
     'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
   'cases.title.upload': 'Upload',
