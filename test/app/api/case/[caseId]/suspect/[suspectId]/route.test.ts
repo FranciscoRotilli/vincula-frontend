@@ -13,7 +13,7 @@ vi.mock('@/lib/backend', () => ({
 describe('DELETE /api/cases/[caseId]/suspect/[suspectId]', () => {
   const mockApiFetch = vi.mocked(apiFetch);
   const mockRequest = {} as NextRequest;
-  const params = { params: { caseId: 'case-123', suspectId: 'suspect-456' } };
+  const params = { params: Promise.resolve({ caseId: 'case-123', suspectId: 'suspect-456' }) };
 
   beforeEach(() => {
     vi.clearAllMocks();

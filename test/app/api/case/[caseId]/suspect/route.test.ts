@@ -10,7 +10,7 @@ vi.mock('@/lib/backend', () => ({
 
 describe('POST /api/cases/[caseId]/suspect', () => {
   const mockApiFetch = vi.mocked(apiFetch);
-  const params = { params: { caseId: 'case-123' } };
+  const params = { params: Promise.resolve({ caseId: 'case-123' }) };
   const suspectPayload = { name: 'John Doe', cpf: '123.456.789-00' };
 
   beforeEach(() => {
@@ -74,7 +74,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
     const body = await response.json();
 
     expect(response.status).toBe(500);
-    expect(body.error).toBe('Falha ao adicionar suspeito: ');
+    expect(body.error).toBe('Falha ao adicionar suspeito');
     expect(body.details).toContain('Unexpected token');
   });
 
@@ -91,7 +91,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
 
     expect(response.status).toBe(500);
     expect(body).toEqual({
-      error: 'Falha ao adicionar suspeito: ',
+      error: 'Falha ao adicionar suspeito',
       details: String(error),
     });
   });
