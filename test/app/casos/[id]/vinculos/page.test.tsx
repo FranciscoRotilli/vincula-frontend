@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
+import * as React from 'react';
 import { beforeEach,describe, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -7,22 +7,10 @@ import VinculosPage from '../../../../../src/app/casos/[id]/vinculos/page';
 import GeneralInfoPage from '../../../../../src/app/casos/[id]/page';
 
 vi.mock('@/components/CaseContainer', () => ({
-  CaseContainer: ({ children, ...props }) => (
+  CaseContainer: ({ children, ...props }: { children?: React.ReactNode; [key: string]: any }) => (
     <div data-testid="aba-container" {...props}>{children}</div>
   ),
 }));
-
-vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    use: (p: Promise<any>) => {
-      let result: any;
-      p.then(r => { result = r });
-      return result || { id: 'mock-id' };
-    }
-  };
-});
 
 const mutateMock = vi.fn((args, opts) => opts?.onSuccess && opts.onSuccess());
 vi.mock('@/hooks/useCase', () => ({
@@ -74,6 +62,18 @@ vi.mock('react-select', () => ({
 describe('VinculosPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+
+    // espiona apenas React.use para evitar mockar todo o módulo react
+    vi.spyOn(React, 'use').mockImplementation((p: Promise<any>) => {
+      let result: any;
+      // mantém comportamento assíncrono similar ao original usado nos testes
+      p.then(r => { result = r });
+      return result || { id: 'mock-id' };
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('render page components correctly', async () => {
