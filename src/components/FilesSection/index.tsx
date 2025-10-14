@@ -7,7 +7,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useCaseById } from '@/hooks/useCase';
 import { useRemoveFile } from '@/hooks/useFile';
 import { t } from '@/texts';
-import { File } from '@/types/Files';
+import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
 
 import Button from '../Button';
@@ -16,7 +16,7 @@ import AddFileModal from '../ModalAddFile';
 import RemoveModal from '../Modals/RemoveModal';
 import styles from './FilesSection.module.css';
 
-const columns: Column<File>[] = [
+const columns: Column<FileResponse>[] = [
   { key: 'name', label: 'NOME', align: 'left' },
   { key: 'creation_date', label: 'DATA DE INCLUSÃO', align: 'left' },
   { key: 'size', label: 'TAMANHO', align: 'left' },
@@ -28,10 +28,10 @@ type FilesSectionProps = {
 
 export default function FilesSection({ caseId }: FilesSectionProps) {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const [fileToRemove, setFileToRemove] = useState<File | null>(null);
+  const [fileToRemove, setFileToRemove] = useState<FileResponse | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-  const { data: caseData, isLoading } = useCaseById(caseId);
+  const { data: caseData, isLoading, refetch } = useCaseById(caseId);
   const removeFileMutation = useRemoveFile(caseId);
 
   const handleRemove = () => {
@@ -49,7 +49,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
     {
       label: 'Delete',
       icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
-      onClick: (row: File) => {
+      onClick: (row: FileResponse) => {
         setFileToRemove(row);
         setIsRemoveModalOpen(true);
       },
@@ -88,7 +88,9 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
       <AddFileModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        onSubmit={() => console.log('Add file')}
+        onSubmit={() => refetch()}
+        caseId={caseId}
+        data-testid="add-file-modal"
       />
       <RemoveModal
         isOpen={isRemoveModalOpen}
