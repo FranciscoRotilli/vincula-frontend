@@ -218,27 +218,29 @@ import {
   };
 
   return (
-    <CaseContainer caseId={id}>
+    <CaseContainer caseId={id} data-testid="aba-vinculos">
       {!isFullscreen && showFilters && (
-        <Filter
-          fields={filterFields}
-          values={filterValues}
-          onValuesChange={setFilterValues}
-          onFilter={handleFilter}
-          onClear={handleClear}
-          autoFilter={true}
-          debounceMs={2000}
-          validateField={validateFilterField}
-          customStyles={{
-            container: styles.containerOverride,
-          }}
-        />
+        <div data-testid="filter-component">
+          <Filter
+            fields={filterFields}
+            values={filterValues}
+            onValuesChange={setFilterValues}
+            onFilter={handleFilter}
+            onClear={handleClear}
+            autoFilter={true}
+            debounceMs={2000}
+            validateField={validateFilterField}
+            customStyles={{
+              container: styles.containerOverride,
+            }}
+          />
+        </div>
       )}
       
-      <div className={isFullscreen ? styles.fullscreenContainer : ''}>
+      <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
         <div className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}>
           {isFullscreen && showFilters && (
-            <div className={styles.fullscreenFilters}>
+            <div className={styles.fullscreenFilters} data-testid="fullscreen-filter-component">
               <Filter
                 fields={filterFields}
                 values={filterValues}
@@ -255,11 +257,12 @@ import {
             </div>
           )}
           
-          <div className={styles.graphControls}>
+          <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
               <button 
                 onClick={zoomIn}
                 className={styles.controlButton}
+                data-testid="zoom-in-button"
               >
                 <ZoomInIcon />
               </button>
@@ -268,6 +271,7 @@ import {
               <button 
                 onClick={zoomOut}
                 className={styles.controlButton}
+                data-testid="zoom-out-button"
               >
                 <ZoomOutIcon />
               </button>
@@ -276,6 +280,7 @@ import {
               <button 
                 onClick={fitNodes}
                 className={styles.controlButton}
+                data-testid="fit-nodes-button"
               >
                 <FitScreenIcon />
               </button>
@@ -284,6 +289,7 @@ import {
               <button 
                 onClick={() => setShowFilters(!showFilters)}
                 className={styles.controlButton}
+                data-testid="toggle-filters-button"
               >
                 {showFilters ? <FilterListOffIcon /> : <FilterListIcon />}
               </button>
@@ -292,32 +298,37 @@ import {
               <button 
                 onClick={toggleFullscreen}
                 className={styles.controlButton}
+                data-testid="toggle-fullscreen-button"
               >
                 {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
               </button>
             </Tooltip>
           </div>
 
-          <Graph
-            ref={nvlRef}
-            nodes={graphNodes}
-            rels={graphRels}
-            onNodeClick={handleNodeClick}
-            onRelationshipClick={handleRelationshipClick}
-            onCanvasClick={handleCanvasClick}
-          />
+          <div data-testid="graph-component">
+            <Graph
+              ref={nvlRef}
+              nodes={graphNodes}
+              rels={graphRels}
+              onNodeClick={handleNodeClick}
+              onRelationshipClick={handleRelationshipClick}
+              onCanvasClick={handleCanvasClick}
+            />
+          </div>
 
-          <GraphAlerts
-            isLoading={isLoadingGraph}
-            hasError={!!graphError}
-            errorMessage={graphError instanceof Error ? graphError.message : undefined}
-            hasActiveFilters={hasActiveFilters}
-            hasNodes={graphNodes.length > 0}
-            caseId={id}
-          />
+          <div data-testid="graph-alerts">
+            <GraphAlerts
+              isLoading={isLoadingGraph}
+              hasError={!!graphError}
+              errorMessage={graphError instanceof Error ? graphError.message : undefined}
+              hasActiveFilters={hasActiveFilters}
+              hasNodes={graphNodes.length > 0}
+              caseId={id}
+            />
+          </div>
         
           {selectedElement && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }} data-testid="node-modal-container">
               <NodeModal
                 isOpen={true}
                 onClose={() => setSelectedElement(null)}
