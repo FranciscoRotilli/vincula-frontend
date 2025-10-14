@@ -44,3 +44,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ca
     });
   }
 }
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
+  const { caseId } = await params;
+
+  const resp = await apiFetch(`/case/${caseId}`, { method: 'DELETE' });
+
+  const text = await resp.text();
+
+  if (!text) {
+    return new NextResponse(null, { status: resp.status });
+  }
+}

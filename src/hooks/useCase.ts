@@ -57,12 +57,13 @@ export function useUpdateCaseCanView() {
 }
 
 export function useDeleteCase() {
-  const QueryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (caseId: string) => deleteCase(caseId),
-    onSuccess: () => {
-      QueryClient.invalidateQueries({ queryKey: ['cases'] });
+    onSuccess: (_data, caseId) => { 
+      queryClient.invalidateQueries({ queryKey: ['cases'] }); 
+      queryClient.invalidateQueries({ queryKey: ['case', caseId] });
     },
   });
 }
