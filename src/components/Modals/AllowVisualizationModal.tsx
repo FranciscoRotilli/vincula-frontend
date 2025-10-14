@@ -54,7 +54,6 @@ export default function AllowVisualizationModal({
       await onSubmit();
       onClose();
     } catch (err) {
-        console.log(err)
       alert('Erro ao salvar usuário.');
     } finally {
     }
