@@ -15,7 +15,6 @@ function renderWithQueryClient(ui: React.ReactElement) {
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 }
 
-// helper para abrir o modal com props padrão
 const openModal = (overrides: Partial<React.ComponentProps<typeof AddFileModal>> = {}) => {
   const props = {
     isOpen: true,
