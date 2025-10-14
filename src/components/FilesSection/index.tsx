@@ -1,7 +1,7 @@
 'use client';
 
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useState } from 'react';
-import { MdOutlineCloudUpload } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
 import { useCaseById } from '@/hooks/useCase';
@@ -57,16 +57,19 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   ];
 
   return (
-    <section className={styles.filesContainer}>
+    <>
       <div className={styles.uploadSection}>
-        <strong>{t('files.title', { count: caseData?.archives?.length ?? 0 })}</strong>
+        <h1 className={styles.sectionTitle}>
+          {t('files.title', { count: caseData?.archives?.length ?? 0 })}
+        </h1>
         <p className={styles.filesDescription}>{t('files.description')}</p>
         <Button
           className={styles.uploadButton}
           data-testid="upload-file-button"
-          icon={<MdOutlineCloudUpload />}
+          icon={<CloudUploadIcon />}
           variant="contained"
           label="Upload"
+          size="large"
           onClick={() => setIsUploadModalOpen(true)}
         />
       </div>
@@ -75,6 +78,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         <Table
           columns={columns}
           data={caseData?.archives ?? []}
+          data-testid="files-table"
           loading={isLoading}
           variant="outlined"
           rowActions={rowActions}
@@ -95,6 +99,6 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
       />
-    </section>
+    </>
   );
 }

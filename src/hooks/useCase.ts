@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-// import { useMockData } from '@/app/casos/teste/page';
 import {
   addCase,
   CaseResponse,
@@ -38,9 +37,15 @@ export function useUpdateCaseName() {
 }
 
 export function useUpdateCaseSituation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ caseId, situation }: { caseId: string; situation: CaseItem['status'] }) =>
       updateCaseSituation(caseId, situation),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
   });
 }
 
