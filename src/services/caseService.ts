@@ -78,7 +78,13 @@ export async function updateCaseName(caseId: string, name: string) {
     headers: { 'Content-Type': 'application/json' },
   });
   if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar nome do caso');
-  return resp.json();
+  try {
+    const data = resp.json();
+    return {data, name: resp.status};
+  }
+  catch {
+    return {data: null, status: resp.status}
+  }
 }
 
 export async function updateCaseSituation(caseId: string, status: string) {

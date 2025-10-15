@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   addCase,
@@ -30,9 +30,14 @@ export function useCase() {
 }
 
 export function useUpdateCaseName() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
       updateCaseName(caseId, name),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({queryKey: ['case', variables.caseId]});
+      queryClient.invalidateQueries({queryKey: ['cases']});
+    }
   });
 }
 
