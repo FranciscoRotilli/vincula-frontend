@@ -1,11 +1,13 @@
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   addCase,
   CaseResponse,
   deleteCase,
   getCaseById,
+  getCaseGraph,
   getCases,
+  GraphFilters,
   updateCaseCanView,
   updateCaseName,
   updateCaseSituation,
@@ -86,4 +88,20 @@ export function useCaseById(caseId: string) {
   });
 
   return queryResult;
+}
+
+export function useCaseGraph(caseId: string, filters?: GraphFilters) {
+  return useQuery({
+    queryKey: [
+      'caseGraph', 
+      caseId, 
+      filters?.investigated,
+      filters?.cpf_cnpj,
+      filters?.origin,
+      filters?.archive,
+    ],
+    queryFn: () => getCaseGraph(caseId, filters),
+    refetchOnWindowFocus: false,
+    enabled: !!caseId,
+  });
 }

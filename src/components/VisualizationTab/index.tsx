@@ -24,7 +24,7 @@ type RowRecord = Record<string, unknown> & { id: string };
 
 export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   const [data, setData] = useState<FileData | null>(null);
-  const [dataError, setDataError] = useState<string | null>(null);
+  const [_dataError, setDataError] = useState<string | null>(null);
   const [files, setFiles] = useState<AvailableFile[]>([]);
   const [filesError, setFilesError] = useState<string | null>(null);
   const [filteredData, setFilteredData] = useState<FileData | null>(null);
