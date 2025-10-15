@@ -4,8 +4,8 @@ import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { CaseStatus } from '@/types/Cases';
-import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 
+// import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
@@ -58,7 +58,7 @@ const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,
   onClear,
-  onSaveFilter,
+  // onSaveFilter,
   defaultValues = {},
   values: controlledValues,
   onValuesChange,
@@ -163,9 +163,9 @@ const Filter: React.FC<FilterProps> = ({
     onClear?.();
   };
 
-  const handleSave = () => {
-    if (onSaveFilter) onSaveFilter(filters);
-  };
+  // const handleSave = () => {
+  //   if (onSaveFilter) onSaveFilter(filters);
+  // };
 
   return (
     <div
@@ -230,7 +230,7 @@ const Filter: React.FC<FilterProps> = ({
             disabled={disabled}
           />
 
-          {onSaveFilter && showSaveButton && (
+          {/* {onSaveFilter && showSaveButton && (
             <Button
               data-testid="save-filter-button"
               icon={<BookmarkAddIcon />}
@@ -241,7 +241,7 @@ const Filter: React.FC<FilterProps> = ({
               className={styles.iconButton}
               disabled={disabled}
             />
-          )}
+          )} */}
         </div>
       </div>
     </div>
