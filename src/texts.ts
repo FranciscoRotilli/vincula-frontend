@@ -63,8 +63,8 @@ export const texts = {
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
   'modal.caseNumber': 'Número do caso',
-  'modal.owner': 'Responsável',
-  'modal.status': 'Número do caso',
+  'modal.owner': 'Responsável:',
+  'modal.status': 'Situação:',
 
   'addFile.origin': 'Origem',
   'addFile.required': '*',
@@ -72,6 +72,9 @@ export const texts = {
   'addFile.type': 'Tipo',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
+  'addFile.simbaLabel': 'ExtratoDetalhado',
+  'addFile.sittelLabel': 'Cadastros dos Assinantes',
+  'addFile.rifLabel': 'RIF',
 
   'removeFileModal.title': 'Remover arquivo?',
   'removeFileModal.description':

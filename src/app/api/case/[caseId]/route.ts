@@ -20,6 +20,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ cas
   }
 }
 
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await params;
   const body = await req.json();

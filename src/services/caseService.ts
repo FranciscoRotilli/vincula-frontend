@@ -37,7 +37,7 @@ async function throwIfError(resp: Response, fallback: string) {
 }
 
 export async function addCase(name: string): Promise<CaseResponse> {
-  const resp = await fetch('/api/cases', {
+  const resp = await fetch('/api/case', {
     method: 'POST',
     body: JSON.stringify({ name }),
     headers: { 'Content-Type': 'application/json' },
@@ -52,7 +52,7 @@ export async function getCases(
   sortingParams: ApiSortingParams
 ): Promise<CasesResponse> {
   const qs = toQueryString({ ...paginationParams, ...filterParams, ...sortingParams });
-  const resp = await fetch(`/api/cases${qs}`, {
+  const resp = await fetch(`/api/case${qs}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
@@ -62,7 +62,7 @@ export async function getCases(
 }
 
 export async function getCaseById(caseId: string): Promise<CompleteCaseResponse> {
-  const resp = await fetch(`/api/cases/${caseId}`, {
+  const resp = await fetch(`/api/case/${caseId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
@@ -72,7 +72,7 @@ export async function getCaseById(caseId: string): Promise<CompleteCaseResponse>
 }
 
 export async function updateCaseName(caseId: string, name: string) {
-  const resp = await fetch(`/api/cases/${caseId}`, {
+  const resp = await fetch(`/api/case/${caseId}`, {
     method: 'PATCH',
     body: JSON.stringify({ name }),
     headers: { 'Content-Type': 'application/json' },
@@ -88,7 +88,7 @@ export async function updateCaseName(caseId: string, name: string) {
 }
 
 export async function updateCaseSituation(caseId: string, status: string) {
-  const resp = await fetch(`/api/cases/${caseId}`, {
+  const resp = await fetch(`/api/case/${caseId}`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
     headers: { 'Content-Type': 'application/json' },
@@ -104,7 +104,7 @@ export async function updateCaseSituation(caseId: string, status: string) {
 }
 
 export async function updateCaseCanView(caseId: string, canView: boolean) {
-  const resp = await fetch(`/api/cases/${caseId}`, {
+  const resp = await fetch(`/api/case/${caseId}`, {
     method: 'PATCH',
     body: JSON.stringify({ canView }),
     headers: { 'Content-Type': 'application/json' },
@@ -114,7 +114,7 @@ export async function updateCaseCanView(caseId: string, canView: boolean) {
 }
 
 export async function deleteCase(caseId: string) {
-  const resp = await fetch(`/api/cases/${caseId}`, { method: 'DELETE' });
+  const resp = await fetch(`/api/case/${caseId}`, { method: 'DELETE' });
   if (!resp.ok) await throwIfError(resp, 'Falha ao excluir caso');
 
   try {
@@ -123,3 +123,5 @@ export async function deleteCase(caseId: string) {
     return { ok: true };
   }
 }
+
+

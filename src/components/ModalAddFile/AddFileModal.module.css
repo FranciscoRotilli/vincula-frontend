@@ -1,5 +1,5 @@
 .form {
-  font-family: "AG", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "AG", system-ui, -apple-system, "Segoe UI", Poppins, Arial, sans-serif;
   color: var(--text);
   display: flex;
   flex-direction: column;
@@ -64,7 +64,7 @@
   position: relative;
   min-height: 8.75rem;
   border: .125rem dashed color-mix(in oklab, var(--text) 30%, var(--surface));
-  border-radius: .75rem;
+  border-radius: .313rem;
   background: var(--surface);
   display: grid;
   place-items: center;

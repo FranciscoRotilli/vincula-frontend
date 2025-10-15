@@ -4,7 +4,7 @@ enum FileOrigin {
   RIFF,
 }
 
-export interface File {
+export interface FileResponse {
   id: string;
   url: string;
   creation_date: Date;
@@ -13,4 +13,10 @@ export interface File {
   origin: FileOrigin;
   document_type: string;
   size: string;
+}
+
+export interface FileRequest {
+  origin: string;
+  file_type: string;
+  file: File;
 }

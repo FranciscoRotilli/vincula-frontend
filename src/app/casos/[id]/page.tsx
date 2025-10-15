@@ -1,4 +1,5 @@
 'use client';
+import AddIcon from '@mui/icons-material/Add';
 import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import { CaseContainer } from '@/components/CaseContainer';
 import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
+import Input from '@/components/Input';
 import {
   useCaseById,
   useDeleteCase,
@@ -18,10 +20,10 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem, SuspectInput } from '@/types/Cases';
-import { File } from '@/types/Files';
+import { CaseItem, SuspectRequest } from '@/types/Cases';
+import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
@@ -65,9 +67,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
   const addSuspectMutation = useAddSuspect();
+  const deleteSuspectMutation = useDeleteSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
 
@@ -119,7 +122,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    const newSuspect: SuspectInput = {
+    const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
       phone_number: novoTelefone,
@@ -140,8 +143,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleRemoveEnvolvido = (index: number) => {
-    setEnvolvidos(envolvidos.filter((_, i) => i !== index));
-    setShowRemoveEnvolvidoModal({ open: false, index: null });
+    if (index === null || index === undefined) return;
+    const suspect = envolvidos[index];
+
+    deleteSuspectMutation.mutate(
+      { caseId, suspectId: suspect.id.toString() },
+      {
+        onSuccess: () => {
+          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Erro ao remover investigado:', error);
+        },
+      }
+    );
   };
 
   const handleRemoveArquivo = (index: number) => {
@@ -210,102 +227,99 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails} data-testid="case-details">
-            <h2>{caseDetails.name}</h2>
-            <div className={styles.detailsRow}>
+            <h2 className={styles.h2} data-testid='case-name'>{caseDetails.name}</h2>
+            <div className={styles.detailsRow} data-testid="case-informations">
               <div>
                 <strong>{t('modal.owner')}</strong> {caseDetails.owner}
               </div>
               <div>
-                <strong>{t('modal.creationDate')}</strong> {caseDetails.creation_date}
-              </div>
-              <div>
-                <strong>{t('filter.situation')}</strong> {caseDetails.status}
-              </div>
-            </div>
-            <div className={styles.detailsRow}>
-              <div>
                 <strong>{t('modal.caseNumber')}</strong> #{caseDetails.case_number}
+              </div>
+              <div>
+                <strong>{t('modal.status')}</strong> {caseDetails.status}
+              </div>
+              <div>
+                <strong>{t('modal.creationDate')}</strong> {caseDetails.creation_date}
               </div>
             </div>
           </div>
 
-          <div className={styles.actionsBox} data-testid="case-actions">
-            <h1 className={styles.sectionHeader}>
-              {t('cases.title.actions', { defaultValue: 'Ações' })}
+          <div className={styles.actionsBox} data-testid="case-action-buttons">
+            <h1 className={styles.title3}>
+              {t('cases.title.actions')}
             </h1>
             <div className={styles.actionsRow}>
               <Button
-                size="small"
-                label={t('cases.title.changeName', { defaultValue: 'Alterar nome' })}
+                size="medium"
+                label={t('cases.title.changeName')}
                 variant="contained"
                 onClick={() => setShowNameModal(true)}
               />
               <Button
-                size="small"
-                label={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
+                size="medium"
+                label={t('cases.title.changeSituation')}
                 variant="contained"
                 onClick={() => setShowSituationModal(true)}
               />
               <Button
-                size="small"
-                label={t('cases.title.allowView', { defaultValue: 'Permitir visualização' })}
+                size="medium"
+                label={t('cases.title.allowView')}
                 variant="contained"
                 onClick={handleToggleCanView}
               />
               <Button
-                size="small"
-                label={t('cases.title.delete', { defaultValue: 'Excluir caso' })}
+                size="medium"
+                label={t('cases.title.delete')}
                 variant="outlined"
                 onClick={() => setShowDeleteCaseModal(true)}
               />
             </div>
           </div>
 
-          <div className={styles.envolvidosBox} data-testid="case-involved">
+          <div className={styles.investigatedSection} data-testid="investigated-section">
             <div className={styles.sectionHeader}>
-              <strong>
+              <h1 className={styles.title3}>
                 {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
                 {envolvidos.length})
-              </strong>
-            </div>
-            <div className={styles.sectionDescription}>
+              </h1>
+              <p className={styles.body5}>
               {t('cases.title.investigatedDesc', {
                 defaultValue:
                   'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
               })}
-            </div>
-            <div className={styles.addEnvolvidoRow}>
-              <input
-                type="text"
-                placeholder={t('cases.title.inputName', { defaultValue: 'Insira o nome' })}
+              </p>
+            <div className={styles.addInvestigated} data-testid="add-investigated">
+              <Input
+                placeholder={t('cases.title.inputName')}
+                label='Nome'
                 value={novoNome}
                 onChange={(e) => setNovoNome(e.target.value)}
                 className={styles.input}
               />
-              <input
-                type="text"
+              <Input
                 inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder={t('cases.title.inputCpfCnpj', { defaultValue: 'Insira o CPF / CNPJ' })}
+                label='CPF / CNPJ'
+                //pattern="[0-9]*"
+                placeholder={t('cases.title.inputCpfCnpj')}
                 value={maskCpfCnpj(novoCpf)}
                 onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
                 className={styles.input}
-                maxLength={18}
+                //maxLength={18}
               />
-              <input
-                type="text"
+              <Input
                 inputMode="numeric"
-                pattern="[0-9]*"
+                label='Telefone'
+                //pattern="[0-9]*"
                 placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
                 value={novoTelefone}
                 onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
                 className={styles.input}
-                maxLength={15}
+                //maxLength={15}
               />
               <Button
-                icon={<span style={{ fontWeight: 'bold', fontSize: '1.5em' }}>+</span>}
+                icon={<AddIcon />}
                 variant="contained"
-                size="small"
+                size="icon"
                 label=""
                 onClick={handleAddEnvolvido}
                 disabled={
@@ -313,7 +327,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 }
               />
             </div>
-            <div className={styles.GenericTable__container}>
+            </div>
+            <div className={styles.GenericTable__container} data-testid="involved-table">
               <GenericTable<EnvolvidoRow>
                 columns={envolvidosColumns}
                 data={envolvidos}
@@ -323,7 +338,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               />
             </div>
           </div>
-          <div className={styles.arquivosBox} data-testid="case-files">
+          <div className={styles.filesSection} data-testid="files-section">
             <FilesSection caseId={caseId} />
           </div>
         </div>
