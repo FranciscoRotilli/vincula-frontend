@@ -18,17 +18,6 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
   const ref = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    // The app expects to navigate to /casos on initial render when used in tests
-    // and in the container component the navigation happens through the container.
-    // Ensure we call the provided onNavigate handler once on mount.
-    try {
-      onNavigate('/casos');
-    } catch {
-      // swallow errors from test spies or environments that don't support navigation
-    }
-  }, [onNavigate]);
-
-  React.useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (ref.current && e.target instanceof Node && !ref.current.contains(e.target)) {
         setOpen(false);
