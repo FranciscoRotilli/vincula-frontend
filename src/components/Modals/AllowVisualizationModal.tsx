@@ -75,7 +75,7 @@ export default function AllowVisualizationModal({
         <CustomSelect
           options={users.map((u) => ({ value: u.id, label: u.name }))}
           placeholder={t('cases.title.allowView.select.placeholder')}
-          value={selectedUser?.id ?? null}
+          value={selectedUser?.name ?? null} 
           onChange={(v) => {
             const selected = users.find((u) => u.id === v);
             setSelectedUser(selected ?? null);
