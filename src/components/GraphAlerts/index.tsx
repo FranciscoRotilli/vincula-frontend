@@ -28,8 +28,8 @@ export const GraphAlerts: React.FC<GraphAlertsProps> = ({
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <div className={styles.loadingContent}>
+      <div className={styles.container} data-testid="graph-alert-cointainer">
+        <div className={styles.loadingContent} data-testid="graph-alert-loading">
           <CircularProgress size={40} />
           <span>{t('graph.loading')}</span>
         </div>
@@ -39,8 +39,8 @@ export const GraphAlerts: React.FC<GraphAlertsProps> = ({
 
   if (hasError) {
     return (
-      <div className={styles.container}>
-        <div className={styles.errorContent}>
+      <div className={styles.container} data-testid="graph-alert-cointainer-error">
+        <div className={styles.errorContent} data-testid="graph-alert-error">
           <span className={styles.errorTitle}>{t('graph.errorTitle')}</span>
           <span className={styles.errorMessage}>
             {errorMessage || t('graph.errorUnknown')}
@@ -52,8 +52,8 @@ export const GraphAlerts: React.FC<GraphAlertsProps> = ({
 
   if (hasActiveFilters && !hasNodes) {
     return (
-      <div className={styles.container}>
-        <div className={styles.warningContent}>
+      <div className={styles.container} data-testid="graph-alert-cointainer">
+        <div className={styles.warningContent} data-testid="graph-alert-warning">
           <span className={styles.warningTitle}>{t('graph.noResults')}</span>
           <span className={styles.warningDescription}>
             {t('graph.noResultsDescription')}
@@ -68,14 +68,14 @@ export const GraphAlerts: React.FC<GraphAlertsProps> = ({
 
   if (!hasActiveFilters && !hasNodes) {
     return (
-      <div className={styles.container}>
-        <div className={styles.emptyContent}>
+      <div className={styles.container} data-testid="graph-alert-cointainer">
+        <div className={styles.emptyContent} data-testid="graph-alert-empty">
           <span className={styles.emptyIcon}>📊</span>
           <span className={styles.emptyTitle}>{t('graph.noData')}</span>
           <span className={styles.emptyDescription}>
             {t('graph.noDataDescription')}
           </span>
-          <div className={styles.buttonContainer}>
+          <div className={styles.buttonContainer} data-testid="graph-alert-button">
             <Button
               label={t('graph.goToGeneralInfo')}
               variant="contained"

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -235,7 +234,7 @@ import {
         />
       )}
       
-      <div className={isFullscreen ? styles.fullscreenContainer : ''}>
+      <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
         <div className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}>
           {isFullscreen && showFilters && (
             <div className={styles.fullscreenFilters}>
@@ -255,7 +254,7 @@ import {
             </div>
           )}
           
-          <div className={styles.graphControls}>
+          <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
               <button 
                 onClick={zoomIn}
@@ -317,7 +316,7 @@ import {
           />
         
           {selectedElement && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }} data-testid="graph-details-modal">
               <NodeModal
                 isOpen={true}
                 onClose={() => setSelectedElement(null)}

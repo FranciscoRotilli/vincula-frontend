@@ -5,6 +5,8 @@ import type { MouseEventCallbacks } from '@neo4j-nvl/react'
 import { InteractiveNvlWrapper } from '@neo4j-nvl/react'
 import React, { forwardRef, useEffect, useState } from 'react'
 
+import styles from './Graph.module.css';
+
 interface InteractiveGraphProps {
   nodes: Node[];
   rels: Relationship[];
@@ -53,7 +55,7 @@ const Graph = forwardRef<NVL, InteractiveGraphProps>(({
 
   return (
     <>
-      <div style={{ height: '100%', border: '1px solid black', position: 'relative' }}>
+      <div className={styles.graphContainer} data-testid="graph-cointainer">
         <InteractiveNvlWrapper
           ref={ref}
           nodes={nodes}
