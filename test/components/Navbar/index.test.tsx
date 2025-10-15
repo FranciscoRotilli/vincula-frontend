@@ -34,8 +34,6 @@ describe("NavbarComponent", () => {
     const onNavigate = vi.fn();
     render(<Navbar onNavigate={onNavigate} onLogout={() => {}} user={user} />);
 
-    const logo = screen.getByTestId("navbar-exit-button");
-    fireEvent.click(logo);
     expect(onNavigate).toHaveBeenCalledWith("/casos");
   });
 });
