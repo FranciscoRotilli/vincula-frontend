@@ -3,6 +3,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -112,7 +113,9 @@ export default function Casos() {
       await caseMutation.mutateAsync(apiPayload);
       setIsModalOpen(false);
       refetch();
+        toast.success('Caso criado com sucesso.')
     } catch (error) {
+        toast.error('Não foi possível criar o caso.')
       console.error('Erro ao criar caso:', error);
       throw error;
     }

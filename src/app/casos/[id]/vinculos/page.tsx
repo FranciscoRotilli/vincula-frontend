@@ -193,6 +193,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         }));
         setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
+        toast.error('Erro ao carregar dados do caso.')
         console.error(error);
       }
     }
