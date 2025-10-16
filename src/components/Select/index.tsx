@@ -33,7 +33,7 @@ export const CustomSelect: React.FC<SelectProps> = ({
   required,
   isControlled = false,
   style,
-  testId,
+  testId
 }) => {
   const [internalValue, setInternalValue] = useState<string>('');
 
@@ -61,6 +61,12 @@ export const CustomSelect: React.FC<SelectProps> = ({
         displayEmpty
         data-testid={testId}
         MenuProps={{
+          disablePortal: true,
+          PaperProps: {
+            style: {
+              zIndex: 1500,
+            },
+          },
           sx: { zIndex: 10001 },
         }}
         renderValue={(selected) => {

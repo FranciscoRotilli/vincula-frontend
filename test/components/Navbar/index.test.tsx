@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
-import { beforeEach,describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Navbar from "@/components/Navbar";
 
@@ -34,6 +34,10 @@ describe("NavbarComponent", () => {
     const onNavigate = vi.fn();
     render(<Navbar onNavigate={onNavigate} onLogout={() => {}} user={user} />);
 
+    const logo = screen.getByAltText(/vincula logo/i);
+    fireEvent.click(logo);
+
     expect(onNavigate).toHaveBeenCalledWith("/casos");
+    expect(onNavigate).toHaveBeenCalledTimes(1);
   });
 });
