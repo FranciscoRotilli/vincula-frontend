@@ -84,7 +84,7 @@ const Modal = ({
             )}
             {description && (
               <div
-                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginBottom: 8 }}
+                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginTop: 8, marginBottom: 8 }}
               >
                 {description}
               </div>

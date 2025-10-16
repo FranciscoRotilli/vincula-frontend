@@ -13,10 +13,11 @@ import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal'
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import {
+    useAllowVisualization,
   useCaseById,
   useDeleteCase,
-  useUpdateCaseCanView,
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
@@ -39,6 +40,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -53,7 +55,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
   const [novoNome, setNovoNome] = useState('');
   const [novoTelefone, setNovoTelefone] = useState('');
@@ -61,8 +62,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
-  const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
+  const allowViewMutation = useAllowVisualization();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
@@ -73,6 +74,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
+  const [usuarioSelecionado] = useState('');
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
@@ -97,17 +99,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         },
         onError: (error) => {
           console.error('Failed to update case situation:', error);
-        },
-      }
-    );
-  };
-
-  const handleToggleCanView = () => {
-    updateCanViewMutation.mutate(
-      { caseId, canView: !visualizacaoPermitida },
-      {
-        onSuccess: () => {
-          setVisualizacaoPermitida((v) => !v);
         },
       }
     );
@@ -145,6 +136,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       }
     );
   };
+
+  const handleAllowVisualization = () => {
+    allowViewMutation.mutate({caseId, userId: usuarioSelecionado }, {onSuccess: () => {
+        setShowAllowVisualizationModal(false);
+        window.location.reload()
+    }});
+  }
 
   const handleRemoveEnvolvido = (index: number) => {
     if (index === null || index === undefined) return;
@@ -269,7 +267,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 size="medium"
                 label={t('cases.title.allowView')}
                 variant="contained"
-                onClick={handleToggleCanView}
+                onClick={() => {
+                  setShowAllowVisualizationModal(true);
+                }}
               />
               <Button
                 size="medium"
@@ -473,6 +473,15 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
+        )}
+
+        {showAllowVisualizationModal && (
+          <AllowVisualizationModal
+            isOpen={showAllowVisualizationModal}
+            onClose={() => setShowAllowVisualizationModal(false)}
+            caseId={id}
+            onSubmit={() => handleAllowVisualization()}
+          />
         )}
       </div>
     </CaseContainer>
