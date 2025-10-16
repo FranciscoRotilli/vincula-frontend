@@ -63,7 +63,6 @@ export default function AllowVisualizationModal({
     <Modal
       isOpen={isOpen}
       title={t('cases.title.allowView')}
-      size="large"
       onClose={onClose}
       onAction={handleSubmit}
       actionButton={t('cases.title.save')}
