@@ -35,6 +35,7 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
           width={150}
           height={45}
           alt="Vincula Logo"
+          data-testid="navbar-logo"
           style={{ cursor: 'pointer' }}
           onClick={() => onNavigate('/casos')}
         />

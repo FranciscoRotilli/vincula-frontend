@@ -46,7 +46,7 @@ describe('NodeModal', () => {
         phone="11999999999"
       />
     );
-    const closeButton = screen.getByRole('button', { name: /fechar/i });
+    const closeButton = screen.getByLabelText('Fechar');
     fireEvent.click(closeButton);
     expect(onClose).toHaveBeenCalledTimes(1);
 
