@@ -60,6 +60,9 @@ export const CustomSelect: React.FC<SelectProps> = ({
         sx={style}
         displayEmpty
         data-testid={testId}
+        MenuProps={{
+          sx: { zIndex: 10001 },
+        }}
         renderValue={(selected) => {
           if (selected === '') {
             return <span className={styles.placeholder}>{placeholder}</span>;

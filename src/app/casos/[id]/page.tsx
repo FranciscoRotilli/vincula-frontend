@@ -20,10 +20,10 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
 import { t } from '@/texts';
-import { CaseItem, SuspectInput } from '@/types/Cases';
-import { File } from '@/types/Files';
+import { CaseItem, SuspectRequest } from '@/types/Cases';
+import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
@@ -67,19 +67,23 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
 
   const addSuspectMutation = useAddSuspect();
+  const deleteSuspectMutation = useDeleteSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso },
+      { caseId, name: novoNomeCaso as CaseItem['name']},
       {
         onSuccess: () => {
           setShowNameModal(false);
         },
+        onError: (error) => {
+          console.error('Failed to update case name: ', error);
+        }
       }
     );
   };
@@ -122,7 +126,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
-    const newSuspect: SuspectInput = {
+    const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
       phone_number: novoTelefone,
@@ -143,8 +147,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleRemoveEnvolvido = (index: number) => {
-    setEnvolvidos(envolvidos.filter((_, i) => i !== index));
-    setShowRemoveEnvolvidoModal({ open: false, index: null });
+    if (index === null || index === undefined) return;
+    const suspect = envolvidos[index];
+
+    deleteSuspectMutation.mutate(
+      { caseId, suspectId: suspect.id.toString() },
+      {
+        onSuccess: () => {
+          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Erro ao remover investigado:', error);
+        },
+      }
+    );
   };
 
   const handleRemoveArquivo = (index: number) => {
@@ -346,7 +364,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             <input
               type="text"
               value={novoNomeCaso}
-              onChange={(e) => setNovoNomeCaso(e.target.value)}
+              onChange={(e) => setNovoNomeCaso(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
               placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}

@@ -57,6 +57,7 @@ export default function Casos() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 10 });
   const [filters, setFilters] = useState<FilterValues>({});
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const apiFilterParams = mapUiFiltersToApiParams(filters);
   const [sorting, setSorting] = useState<Sorting<CaseItem>>({
     sortBy: 'creation_date',
@@ -94,6 +95,7 @@ export default function Casos() {
 
   const handleClear = () => {
     setFilters({});
+    setFilterValues({});
     setPagination((p) => ({ ...p, page: 1 }));
   };
 
@@ -140,8 +142,12 @@ export default function Casos() {
         <div className={styles.tableContainer}>
           <Filter
             fields={filterFields}
+            values={filterValues}
+            onValuesChange={setFilterValues}
             onFilter={handleFilter}
             onClear={handleClear}
+            autoFilter={true}
+            debounceMs={2000}
           />
           <Table
             columns={columns}
