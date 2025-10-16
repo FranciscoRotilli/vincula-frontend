@@ -168,7 +168,7 @@ import {
   useEffect(() => {
     async function fetchCaseData() {
       try {
-        const response = await fetch(`/api/cases/${id}`);
+        const response = await fetch(`/api/case/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch case data');
         }

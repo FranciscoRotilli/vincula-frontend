@@ -8,7 +8,7 @@ vi.mock('@/lib/backend', () => ({
   apiFetch: vi.fn(),
 }));
 
-describe('/api/cases/[caseId]', () => {
+describe('/api/case/[caseId]', () => {
   const mockApiFetch = vi.mocked(apiFetch);
   const mockRequest = {} as NextRequest;
   const params = { params: Promise.resolve({ caseId: 'case-123' }) };
@@ -50,7 +50,7 @@ describe('/api/cases/[caseId]', () => {
 
     it('should return an updated JSON response on success', async () => {
       // Create a fresh request for this test
-      const patchRequest = new NextRequest('http://localhost/api/cases/case-123', {
+      const patchRequest = new NextRequest('http://localhost/api/case/case-123', {
         method: 'PATCH',
         body: JSON.stringify(updatePayload),
       });
@@ -73,7 +73,7 @@ describe('/api/cases/[caseId]', () => {
 
     it('should return an empty response with the correct status when apiFetch returns no body', async () => {
       // Create a fresh request for this test as well
-      const patchRequest = new NextRequest('http://localhost/api/cases/case-123', {
+      const patchRequest = new NextRequest('http://localhost/api/case/case-123', {
         method: 'PATCH',
         body: JSON.stringify(updatePayload),
       });

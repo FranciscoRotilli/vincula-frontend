@@ -1,4 +1,4 @@
-// src/app/api/cases/[caseId]/suspect/[suspectId]/route.ts
+// src/app/[caseId]/suspect/[suspectId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiFetch } from '@/lib/backend';

@@ -44,7 +44,7 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   useEffect(() => {
     async function fetchSuspects() {
       try {
-        const response = await fetch(`/api/cases/${caseId}`);
+        const response = await fetch(`/api/case/${caseId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch suspects');
         }
