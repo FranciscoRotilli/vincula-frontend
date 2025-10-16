@@ -67,6 +67,7 @@ export const CustomSelect: React.FC<SelectProps> = ({
               zIndex: 1500,
             },
           },
+          sx: { zIndex: 10001 },
         }}
         renderValue={(selected) => {
           if (selected === '') {

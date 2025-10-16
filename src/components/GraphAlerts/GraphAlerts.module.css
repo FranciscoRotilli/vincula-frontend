@@ -1,0 +1,94 @@
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: #d32f2f;
+}
+
+.errorTitle {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.errorMessage {
+  font-size: 14px;
+  color: #666;
+}
+
+.warningContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: #ff9800;
+}
+
+.warningTitle {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.warningDescription {
+  font-size: 14px;
+  color: #666;
+}
+
+.warningHint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+.emptyContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+  max-width: 400px;
+  padding: 10px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.emptyDescription {
+  font-size: 14px;
+  color: #666;
+}
+
+.buttonContainer {
+  margin-top: 10px;
+}

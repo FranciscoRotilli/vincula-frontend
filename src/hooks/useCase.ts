@@ -6,7 +6,9 @@ import {
   CaseResponse,
   deleteCase,
   getCaseById,
+  getCaseGraph,
   getCases,
+  GraphFilters,
   updateCaseCanView,
   updateCaseName,
   updateCaseSituation,
@@ -31,9 +33,14 @@ export function useCase() {
 }
 
 export function useUpdateCaseName() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
       updateCaseName(caseId, name),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({queryKey: ['case', variables.caseId]});
+      queryClient.invalidateQueries({queryKey: ['cases']});
+    }
   });
 }
 
@@ -89,4 +96,20 @@ export function useAllowVisualization() {
         mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
             allowUserToViewCase(caseId, userId),
     });
+}
+
+export function useCaseGraph(caseId: string, filters?: GraphFilters) {
+  return useQuery({
+    queryKey: [
+      'caseGraph', 
+      caseId, 
+      filters?.investigated,
+      filters?.cpf_cnpj,
+      filters?.origin,
+      filters?.archive,
+    ],
+    queryFn: () => getCaseGraph(caseId, filters),
+    refetchOnWindowFocus: false,
+    enabled: !!caseId,
+  });
 }

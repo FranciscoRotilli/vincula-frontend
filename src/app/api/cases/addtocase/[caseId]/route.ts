@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { apiFetch } from "@/lib/backend";
 
-export async function PATCH(req: NextRequest, { params }: { params: { caseId: string } }) {
-    const { caseId } = params;
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
+    const { caseId } = await params;
     const body = await req.json();
 
     const resp = await apiFetch(`/case/addtocase/${caseId}`, {

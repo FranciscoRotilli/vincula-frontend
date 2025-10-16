@@ -1,19 +1,7 @@
 'use client';
 
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Alert, Button, CircularProgress, Paper } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import ButtonCerto from '@/components/Button';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -25,15 +13,18 @@ import {
   getAvailableFiles,
   getFileData,
 } from '../../services/mock/visualizationService';
+import GenericTable from '../GenericTable';
 import styles from './VisualizationTab.module.css';
 
 interface VisualizationTabProps {
   caseId: string;
 }
 
+type RowRecord = Record<string, unknown> & { id: string };
+
 export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   const [data, setData] = useState<FileData | null>(null);
-  const [dataError, setDataError] = useState<string | null>(null);
+  const [_dataError, setDataError] = useState<string | null>(null);
   const [files, setFiles] = useState<AvailableFile[]>([]);
   const [filesError, setFilesError] = useState<string | null>(null);
   const [filteredData, setFilteredData] = useState<FileData | null>(null);
@@ -51,25 +42,25 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
-      async function fetchSuspects() {
-        try {
-          const response = await fetch(`/api/cases/${caseId}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch suspects');
-          }
-          const data = await response.json();
-          const suspects = data.suspects || [];
-          const options = suspects.map((suspect: { name: string }) => ({
-            value: suspect.name,
-            label: `${suspect.name}`,
-          }));
-          setInvestigado(options);
-        } catch (error) {
-          console.error(error);
+    async function fetchSuspects() {
+      try {
+        const response = await fetch(`/api/cases/${caseId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch suspects');
         }
+        const data = await response.json();
+        const suspects = data.suspects || [];
+        const options = suspects.map((suspect: { name: string }) => ({
+          value: suspect.name,
+          label: `${suspect.name}`,
+        }));
+        setInvestigado(options);
+      } catch (error) {
+        console.error(error);
       }
-      fetchSuspects();
-    }, [caseId]);
+    }
+    fetchSuspects();
+  }, [caseId]);
 
   useEffect(() => {
     setIsLoadingFiles(true);
@@ -151,8 +142,7 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   const renderFileChips = () => {
     if (isLoadingFiles) return <CircularProgress size={24} />;
     if (filesError) return <Alert severity="error">{filesError}</Alert>;
-    if (files.length === 0)
-      return <Typography>{t('visualization.noFiles')}</Typography>;
+    if (files.length === 0) return <div>{t('visualization.noFiles')}</div>;
 
     return (
       <div className={styles.chipsContainer}>
@@ -173,59 +163,32 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
     );
   };
 
-  const renderDataTable = () => {
-    if (isLoadingData) return <CircularProgress sx={{ mt: 2 }} />;
-    if (dataError) return <Alert severity="error">{dataError}</Alert>;
+  // 🔁 Mapeia colunas (strings) para o formato do GenericTable
+  const gtColumns = useMemo(() => {
+    const source = filteredData ?? data;
+    if (!source) return [];
+    return source.columns.map((col) => ({
+      key: col as keyof RowRecord, // o GenericTable tipa com keyof T
+      label: col,
+      align: 'left' as const,
+    }));
+  }, [filteredData, data]);
 
-    const dataToRender = filteredData || data;
-    if (!dataToRender || dataToRender.rows.length === 0) {
-      const hasFilters =
-        filters.investigado?.trim() ||
-        filters.cpfCnpj?.trim() ||
-        filters.destino?.trim();
-      const message = hasFilters
-        ? 'Nenhum resultado encontrado para os filtros aplicados.'
-        : t('visualization.noData');
+  // 🔁 Converte rows para incluir `id` obrigatório
+  const gtRows = useMemo<RowRecord[]>(() => {
+    const source = filteredData ?? data;
+    if (!source) return [];
+    return source.rows.map((row, idx) => ({
+      id: `${selectedFile?.id ?? 'file'}-${idx}`,
+      ...row,
+    }));
+  }, [filteredData, data, selectedFile?.id]);
 
-      return (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <Typography sx={{ mt: 2, color: 'text.secondary' }}>{message}</Typography>
-          {hasFilters && (
-            <Button variant="text" onClick={handleClear} sx={{ mt: 1 }}>
-              {t('visualization.clearButton')}
-            </Button>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <TableContainer className={styles.tableWrapper}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              {dataToRender.columns.map((col) => (
-                <TableCell key={col} className={styles.tableHeaderCell}>
-                  {col}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataToRender.rows.map((row, rowIndex) => (
-              <TableRow key={rowIndex} hover className={styles.tableRow}>
-                {dataToRender.columns.map((col) => (
-                  <TableCell key={`${rowIndex}-${col}`} className={styles.tableCell}>
-                    {String(row[col] || '')}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
+  const hasFiltersApplied =
+    (filters.investigado?.trim() ||
+      filters.cpfCnpj?.trim() ||
+      filters.destino?.trim()) ??
+    false;
 
   const filterFields: FieldConfig[] = [
     {
@@ -254,12 +217,10 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
       <div className={styles.gridContainer}>
         <Paper variant="outlined" className={styles.filters} data-testid="filters">
           <div className={styles.texts}>
-            <Typography variant="h6" gutterBottom>
-              {t('visualization.filters')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <h1 className={styles.title3}>{t('visualization.filters')}</h1>
+            <p className={styles.body5} color="text.secondary">
               {t('visualization.filtersDesc')}
-            </Typography>
+            </p>
           </div>
           <div className={styles.chipsContainer}>
             <ButtonCerto label="CPF - Beto Barbosa" onClick={() => {}} variant="contained" />
@@ -269,44 +230,30 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
 
         <Paper variant="outlined" className={styles.files} data-testid="files">
           <div className={styles.texts}>
-            <Typography variant="h6" gutterBottom>
+            <h1 className={styles.title3}>
               {t('visualization.availableFiles', {
                 count: isLoadingFiles ? t('visualization.loading') : files.length,
               })}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              className={styles.sectionSubtitle}
-            >
+            </h1>
+            <p className={styles.body5} color="text.secondary">
               {t('visualization.availableFilesDesc')}
-            </Typography>
+            </p>
           </div>
           {renderFileChips()}
         </Paper>
 
         {selectedFile && (
           <Paper variant="outlined" className={styles.tableContainer}>
-            <Typography variant="h6" gutterBottom className={styles.fileName}>
+            <div className={styles.title3} style={{ padding: '1rem' }}>
               {selectedFile.name}
-              {filteredData && (
-                <Typography
-                  variant="caption"
-                  component="span"
-                  sx={{ ml: 2, color: 'text.secondary' }}
-                >
-                  ({filteredData.rows.length}{' '}
-                  {filteredData.rows.length === 1 ? 'registro' : 'registros'})
-                </Typography>
-              )}
-            </Typography>
+            </div>
 
             <div className={styles.filterActionsRow}>
               <Filter
                 fields={filterFields}
                 onFilter={handleFilter}
                 onClear={handleClear}
-                  onSaveFilter={(filters) => {
+                onSaveFilter={(filters) => {
                   console.log('Filtro salvo:', filters);
                   alert('Filtro salvo com sucesso!');
                 }}
@@ -318,7 +265,30 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
                 }}
               />
             </div>
-            {renderDataTable()}
+
+            {!isLoadingData && gtRows.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div>
+                  {hasFiltersApplied
+                    ? 'Nenhum resultado encontrado para os filtros aplicados.'
+                    : t('visualization.noData')}
+                </div>
+                {hasFiltersApplied && (
+                  <Button variant="text" onClick={handleClear} sx={{ mt: 1 }}>
+                    {t('visualization.clearButton')}
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <GenericTable<RowRecord>
+                columns={gtColumns}
+                data={gtRows}
+                loading={isLoadingData}
+                variant="outlined"
+                selectable={false}
+                onRowClick={undefined}
+              />
+            )}
           </Paper>
         )}
       </div>
