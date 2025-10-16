@@ -20,6 +20,7 @@ interface SelectProps {
   required?: boolean;
   isControlled?: boolean;
   style?: React.CSSProperties;
+  testId?: string;
 }
 
 export const CustomSelect: React.FC<SelectProps> = ({
@@ -32,18 +33,21 @@ export const CustomSelect: React.FC<SelectProps> = ({
   required,
   isControlled = false,
   style,
+  testId
 }) => {
   const [internalValue, setInternalValue] = useState<string>('');
 
-  const handleValueChange = (event: SelectChangeEvent<string | null>) => {
+  const handleValueChange = (event: SelectChangeEvent<string>) => {
     const newValue = event.target.value === '' ? null : event.target.value;
     if (!isControlled) {
-      setInternalValue(event.target.value!);
+      setInternalValue(event.target.value);
     }
     onChange(newValue);
   };
 
-  const selectValue = isControlled ? (value ?? '') : internalValue;
+  const selectValue = isControlled
+  ? value ?? ''
+  : internalValue ?? '';
 
   return (
     <FormControl fullWidth>
@@ -55,6 +59,16 @@ export const CustomSelect: React.FC<SelectProps> = ({
         required={required}
         sx={style}
         displayEmpty
+        data-testid={testId}
+        MenuProps={{
+          disablePortal: true,
+          PaperProps: {
+            style: {
+              zIndex: 1500,
+            },
+          },
+          sx: { zIndex: 10001 },
+        }}
         renderValue={(selected) => {
           if (selected === '') {
             return <span className={styles.placeholder}>{placeholder}</span>;

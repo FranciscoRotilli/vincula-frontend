@@ -1,152 +1,247 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
+import { CaseStatus } from '@/types/Cases';
+
+// import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
 
 export type FilterValues = {
-  search?: string;
   caseNumber?: string;
   caseName?: string;
   responsible?: string;
-  situation?: string;
+  situation?: CaseStatus;
+	search?: string;
+  [key: string]: string | CaseStatus | undefined;
 };
 
-export type SituationOption = { value: string; label: string };
+export type FieldConfig = {
+	key: string;
+	label: string;
+	placeholder?: string;
+	type: 'input' | 'select';
+	options?: { value: string; label: string }[];
+	testId?: string;
+	isCpfCnpjField?: boolean;
+};
 
 export type FilterProps = {
+  fields: FieldConfig[];
   onFilter: (filters: FilterValues) => void;
   onClear?: () => void;
+  onSaveFilter?: (filters: FilterValues) => void;
   defaultValues?: FilterValues;
-  situations: SituationOption[];
+  values?: FilterValues;
+  onValuesChange?: (values: FilterValues) => void;
   disabled?: boolean;
-  loading?: boolean;
+  autoFilter?: boolean;
+  debounceMs?: number;
+  validateField?: (key: string, value: string) => string | undefined;
+  customStyles?: {
+    container?: string;
+    fieldsRow?: string;
+    inputWrapper?: string;
+    actions?: string;
+  };
+};
+
+const _isCaseStatus = (value: string): value is CaseStatus => {
+  return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
 
 const Filter: React.FC<FilterProps> = ({
+  fields,
   onFilter,
   onClear,
+  // onSaveFilter,
   defaultValues = {},
-  situations,
+  values: controlledValues,
+  onValuesChange,
   disabled = false,
-  loading = false,
+  autoFilter = false,
+  debounceMs = 2000,
+  validateField,
+  customStyles = {},
 }) => {
-  const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
+  const isControlled = controlledValues !== undefined && onValuesChange !== undefined;
+  const [internalFilters, setInternalFilters] = useState<FilterValues>({ ...defaultValues });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleInputChange =
-    (field: keyof FilterValues) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
+  const filters = isControlled ? controlledValues : internalFilters;
+
+  const updateFilters = (updater: FilterValues | ((prev: FilterValues) => FilterValues)) => {
+    if (isControlled && onValuesChange) {
+      if (typeof updater === 'function') {
+        onValuesChange(updater(controlledValues));
+      } else {
+        onValuesChange(updater);
+      }
+    } else {
+      setInternalFilters(updater);
+    }
+  };
+
+  useEffect(() => {
+    if (!autoFilter) return;
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      onFilter(filters);
+    }, debounceMs);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
+  }, [filters, autoFilter, debounceMs, onFilter]);
 
-  const handleSelectChange = (field: keyof FilterValues) => (value: string | null) => {
-    setFilters((prev) => ({
-      ...prev,
-      [field]: value ?? undefined,
-    }));
+  const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    updateFilters((prev) => ({ ...prev, [key]: value }));
+    
+    if (errors[key]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[key];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleSelectChange = (key: string) => (value: string | null) => {
+    const newFilters = {
+      ...filters,
+      [key]: value && value !== '' ? value : undefined,
+    };
+    updateFilters(newFilters);
+    
+    if (autoFilter) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      onFilter(newFilters);
+    }
   };
 
   const handleFilter = () => {
+    if (validateField) {
+      const newErrors: Record<string, string> = {};
+      
+      fields.forEach((field) => {
+        const value = filters[field.key];
+        if (value && typeof value === 'string') {
+          const error = validateField(field.key, value);
+          if (error) {
+            newErrors[field.key] = error;
+          }
+        }
+      });
+      
+      setErrors(newErrors);
+      
+      if (Object.keys(newErrors).length > 0) {
+        return;
+      }
+    }
+    
     onFilter(filters);
   };
 
   const handleClear = () => {
-    setFilters({ ...defaultValues });
-    onClear && onClear();
+    updateFilters({ ...defaultValues });
+    setErrors({});
+    onClear?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleFilter();
-  };
-
-  function handleChange(
-    _arg0: string
-  ):
-    | (React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> &
-        ((event: React.ChangeEvent<HTMLInputElement>) => void))
-    | undefined {
-    return _arg0
-      ? (event) =>
-          setFilters((prev) => ({
-            ...prev,
-            [_arg0]: event.target.value,
-          }))
-      : undefined;
-  }
+  // const handleSave = () => {
+  //   if (onSaveFilter) onSaveFilter(filters);
+  // };
 
   return (
-    <div className={styles.filterContainer}>
-      <div className={styles.fieldsRow}>
-        <Input
-          placeholder="Insira o número do caso"
-          label="Número do caso"
-          value={filters.caseNumber || ''}
-          onChange={handleInputChange('caseNumber')}
-          disabled={disabled}
-          data-testid="case-number-input"
-        />
-        <Input
-          placeholder="Insira o nome do caso"
-          label="Nome do caso"
-          value={filters.caseName || ''}
-          onChange={handleInputChange('caseName')}
-          disabled={disabled}
-          data-testid="case-name-input"
-        />
-        <Input
-          placeholder="Insira o responsável"
-          label="Responsável"
-          value={filters.responsible || ''}
-          onChange={handleInputChange('responsible')}
-          disabled={disabled}
-          data-testid="case-responsible-input"
-        />
-        <div className={styles.inputWrapper}>
-          <label htmlFor="situation-select" data-testid="situation-select" className={styles.label}>
-            Situação
-          </label>
-          <CustomSelect
-            options={situations}
-            value={filters.situation || null}
-            onChange={handleSelectChange('situation')}
-            placeholder="Situação"
-            style={{ height: '2.5rem', width: '11.25rem' }}
-            isControlled
-            data-testid="situation-select"
-          />
-        </div>
+    <div
+      className={`${styles.filterContainer} ${customStyles?.container || ''}`}
+      data-testid="filter-component"
+    >
+      <div className={`${styles.fieldsRow} ${customStyles?.fieldsRow || ''}`}>
+        {fields.map((field) =>
+          field.type === 'input' ? (
+            <Input
+              key={field.key}
+              placeholder={field.placeholder ?? ''}
+              label={field.label}
+              value={(filters[field.key] as string | undefined) ?? ''}
+              onChange={handleInputChange(field.key)}
+              disabled={disabled}
+              error={errors[field.key]}
+              data-testid={field.testId || `${field.key}-input`}
+            />
+          ) : (
+            <div
+              key={field.key}
+              className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
+              data-testid={field.testId || `${field.key}-select`}
+            >
+              <label className={styles.label}>{field.label}</label>
+              <CustomSelect
+                options={field.options || []}
+                value={(filters[field.key] as string | undefined) ?? ''}
+                onChange={handleSelectChange(field.key)}
+                placeholder={field.placeholder ?? ''}
+                style={{ height: '2.5rem', width: '11.25rem' }}
+                isControlled
+              />
+            </div>
+          )
+        )}
       </div>
-      <div className={styles.actions}>
+
+      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
         {onClear && (
           <Button
             data-testid="clear-button"
             icon={<MdOutlineClear />}
             variant="outlined"
             size="icon"
-            label={''}
+            label=""
             onClick={handleClear}
-            className={styles.filterButton}
+            className={styles.iconButton}
             disabled={disabled}
           />
         )}
-        <div className={styles.filterIcon}>
+        <div className={styles.saveFilter}>
           <Button
             data-testid="filter-button"
             icon={<FiFilter />}
             variant="contained"
             size="icon"
-            label={''}
+            label=""
             onClick={handleFilter}
-            className={styles.filterButton}
+            className={styles.iconButton}
             disabled={disabled}
           />
+
+          {/* {onSaveFilter && showSaveButton && (
+            <Button
+              data-testid="save-filter-button"
+              icon={<BookmarkAddIcon />}
+              variant="contained"
+              size="icon"
+              label=""
+              onClick={handleSave}
+              className={styles.iconButton}
+              disabled={disabled}
+            />
+          )} */}
         </div>
       </div>
     </div>

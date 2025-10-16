@@ -1,10 +1,9 @@
 'use client';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
+import LogoutIcon from '@mui/icons-material/Logout';
 import Image from 'next/image';
 import React from 'react';
-
-import { t } from '@/texts';
 
 import s from './index.module.css';
 
@@ -36,6 +35,7 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
           width={150}
           height={45}
           alt="Vincula Logo"
+          data-testid="navbar-logo"
           style={{ cursor: 'pointer' }}
           onClick={() => onNavigate('/casos')}
         />
@@ -48,24 +48,16 @@ export default function Navbar({ onNavigate, onLogout, user }: NavbarProps) {
         </div>
 
         <button
-          data-testid="navbar-arrow-button"
+          data-testid="navbar-exit-button"
           className={s.arrowButton}
-          aria-label="Abrir menu do usuário"
-          aria-haspopup="menu"
+          arial-label="Sair"
           aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
+          onClick={onLogout}
         >
-          <ArrowDropDownIcon />
+          <LogoutIcon />
         </button>
-
-        {open && (
-          <div role="menu" className={s.dropdownMenu}>
-            <button role="menuitem" onClick={onLogout} className={s.dropdownItem} aria-label="Sair">
-              {t('navbar.logout')}
-            </button>
-          </div>
-        )}
-      </div>
+    </div>
     </header>
   );
 }
+

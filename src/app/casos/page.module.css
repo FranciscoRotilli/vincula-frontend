@@ -21,8 +21,7 @@
 }
 
 .btnContainer {
-  padding-right: 40em;
-  padding-bottom: 3em;
+  padding-bottom: 1rem;
 }
 
 .page {
@@ -36,6 +35,16 @@
   margin-bottom: 1em;
   display: inline-block;
   padding-bottom: 0.25em;
+}
+
+.tableContainer {
+  padding: 1rem;
+  background-color: var(--white);
+  border-radius: 6px;
+}
+
+.filterContainer {
+  margin: 0 1rem;
 }
 
 .tableContainer {

@@ -1,4 +1,5 @@
 .button {
+	overflow: hidden;
   display: inline-flex;
   min-width: 2.5rem;
   min-height: 2.5rem;
@@ -16,6 +17,7 @@
   outline: none;
   gap: 0.5em;
   font-family: inherit;
+  font-size: 0.875rem;
 }
 
 /* Size variants */

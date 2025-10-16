@@ -1,19 +1,15 @@
-export type LoggedUser = {
-  name: string;
-  role: string;
-};
+import { UserResponse } from "@/types/User";
 
-// mocked user
-let currentUser: LoggedUser | null = {
-  name: "Cicrano",
-  role: "Promotor",
-};
-
-export async function getCurrentUser(): Promise<LoggedUser | null> {
-  return Promise.resolve(currentUser);
-}
-
-export async function logout(): Promise<void> {
-  currentUser = null;
-  return Promise.resolve();
+export async function getUsers(): Promise<UserResponse[]> {
+    const res = await fetch('/api/user/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+    });
+    if (!res.ok) {
+        throw new Error(`Falha ao adicionar suspeito: ${res.statusText}`);
+    }
+    return res.json();
 }

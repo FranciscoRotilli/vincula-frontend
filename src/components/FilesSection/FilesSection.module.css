@@ -1,0 +1,23 @@
+.uploadSection {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+}
+
+.uploadButton {
+  width: 8rem;
+  height: 2.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+}
+
+.filesDescription {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #444;
+  padding: 1.6rem 0 2rem; 
+}

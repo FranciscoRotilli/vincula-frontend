@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { login, LoginResponse } from '@/services/auth';
+import { login } from '@/services/auth';
+import { LoginResponse } from '@/types/User';
 
 type LoginInput = {
   username: string;
