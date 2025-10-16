@@ -1,17 +1,21 @@
 'use client';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { CircularProgress } from '@mui/material';
 import React, { useId, useRef, useState } from 'react';
 
 import Modal from '@/components/Modals';
+import { useAddFile } from '@/hooks/useFile';
 import { t } from '@/texts';
+import { FileRequest } from '@/types/Files';
 
 import styles from './AddFileModal.module.css';
 
 type AddFileModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (payload: { origin: string; type: string; file: File }) => Promise<void> | void;
+  onSubmit: () => void;
+  caseId: string;
 };
 
 const ORIGIN_OPTIONS = [
@@ -21,9 +25,9 @@ const ORIGIN_OPTIONS = [
 ];
 
 const TYPE_OPTIONS = [
-  { value: 'Cadastros dos Assinantes', label: 'Cadastros dos Assinantes' },
-  { value: 'ExtratoDetalhado', label: 'ExtratoDetalhado' },
-  { value: 'RIF', label: 'RIF' },
+  { value: 'CADASTRO_ASSINANTES', label: t('addFile.sittelLabel') },
+  { value: 'EXTRATO_DETALHADO', label: t('addFile.simbaLabel') },
+  { value: 'RIF', label: t('addFile.rifLabel') },
 ];
 
 const MAX_SIZE_MB = 50;
@@ -32,14 +36,17 @@ const ACCEPT_BY_TYPE: Record<string, string> = {
   csv: '.csv,text/csv',
 };
 
-export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModalProps) {
+export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddFileModalProps) {
   const titleId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addFileMutation = useAddFile();
 
   const [origin, setOrigin] = useState('');
   const [type, setType] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [isSavingFile, setIsSavingFile] = useState(false);
 
   const [errors, setErrors] = useState<{ origin?: string; type?: string; file?: string }>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -137,15 +144,6 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     pickFile(f);
   };
 
-  const reset = () => {
-    setOrigin('');
-    setType('');
-    setFile(null);
-    setDragActive(false);
-    setErrors({});
-    setSubmitAttempted(false);
-  };
-
   const handleSubmit = async () => {
     if (!submitAttempted) setSubmitAttempted(true);
     const errs = validateAll();
@@ -154,14 +152,27 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
       focusFirstInvalid(errs);
       return;
     }
-    await onSubmit({ origin, type, file });
-    reset();
-    onClose();
-  };
 
-  const handleClose = () => {
-    reset();
-    onClose();
+    const newFile: FileRequest = {
+      origin,
+      file_type: type,
+      file,
+    };
+
+    setIsSavingFile(true);
+
+    addFileMutation.mutate(
+      { caseId, newFile },
+      {
+        onSuccess: () => {
+          setTimeout(() => {
+            onSubmit();
+            setIsSavingFile(false);
+            onClose();
+          }, 6000);
+        },
+      }
+    );
   };
 
   const showOriginError = submitAttempted && !!errors.origin;
@@ -172,7 +183,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
     <div className={styles.addfileTheme}>
       <Modal
         isOpen={isOpen}
-        onClose={handleClose}
+        onClose={onClose}
         title="Adicionar arquivo"
         size="medium"
         data-testid="modal-add-file"
@@ -315,7 +326,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit }: AddFileModal
 
         <div className={styles.actions}>
           <button type="button" className={styles.primaryButton} onClick={handleSubmit}>
-            {t('addFile.add')}
+            {isSavingFile ? <CircularProgress size={20} /> : t('addFile.add')}
           </button>
         </div>
       </Modal>

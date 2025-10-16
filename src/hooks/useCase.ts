@@ -3,10 +3,13 @@ import { useRouter } from 'next/navigation';
 
 import {
   addCase,
+  allowUserToViewCase,
   CaseResponse,
   deleteCase,
   getCaseById,
+  getCaseGraph,
   getCases,
+  GraphFilters,
   updateCaseCanView,
   updateCaseName,
   updateCaseOwner,
@@ -32,9 +35,14 @@ export function useCase() {
 }
 
 export function useUpdateCaseName() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
       updateCaseName(caseId, name),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({queryKey: ['case', variables.caseId]});
+      queryClient.invalidateQueries({queryKey: ['cases']});
+    }
   });
 }
 
@@ -59,8 +67,14 @@ export function useUpdateCaseCanView() {
 }
 
 export function useDeleteCase() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (caseId: string) => deleteCase(caseId),
+    onSuccess: (_data, caseId) => { 
+      queryClient.invalidateQueries({ queryKey: ['cases'] }); 
+      queryClient.invalidateQueries({ queryKey: ['case', caseId] });
+    },
   });
 }
 
@@ -103,4 +117,27 @@ export function useCaseById(caseId: string) {
 
   return queryResult;
 
+}
+
+export function useAllowVisualization() {
+    return useMutation({
+        mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
+            allowUserToViewCase(caseId, userId),
+    });
+}
+
+export function useCaseGraph(caseId: string, filters?: GraphFilters) {
+  return useQuery({
+    queryKey: [
+      'caseGraph', 
+      caseId, 
+      filters?.investigated,
+      filters?.cpf_cnpj,
+      filters?.origin,
+      filters?.archive,
+    ],
+    queryFn: () => getCaseGraph(caseId, filters),
+    refetchOnWindowFocus: false,
+    enabled: !!caseId,
+  });
 }

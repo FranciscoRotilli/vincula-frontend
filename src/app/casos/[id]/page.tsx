@@ -14,19 +14,20 @@ import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal'
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import {
+    useAllowVisualization,
   useCaseById,
   useDeleteCase,
-  useUpdateCaseCanView,
   useUpdateCaseName,
   useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
 import { useUsers } from '@/hooks/useUsers';
 import { t } from '@/texts';
-import { CaseItem, SuspectInput } from '@/types/Cases';
-import { File } from '@/types/Files';
+import { CaseItem, SuspectRequest } from '@/types/Cases';
+import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
 import { maskCpfCnpj } from '@/utils/functions';
 
@@ -42,6 +43,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
@@ -57,7 +59,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
 
   const [novoNome, setNovoNome] = useState('');
   const [novoTelefone, setNovoTelefone] = useState('');
@@ -66,27 +67,32 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
-  const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
+  const allowViewMutation = useAllowVisualization();
   const updateOwnerMutation = useUpdateCaseOwner();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
   const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const addSuspectMutation = useAddSuspect();
+  const deleteSuspectMutation = useDeleteSuspect();
 
   const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
+  const [usuarioSelecionado] = useState('');
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso },
+      { caseId, name: novoNomeCaso as CaseItem['name']},
       {
         onSuccess: () => {
           setShowNameModal(false);
         },
+        onError: (error) => {
+          console.error('Failed to update case name: ', error);
+        }
       }
     );
   };
@@ -125,27 +131,20 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleToggleCanView = () => {
-    updateCanViewMutation.mutate(
-      { caseId, canView: !visualizacaoPermitida },
-      {
-        onSuccess: () => {
-          setVisualizacaoPermitida((v) => !v);
-        },
-      }
-    );
-  };
-
   const handleDeleteCase = () => {
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
+        router.push('/casos');
       },
+      onError: (error) => {
+        console.error('Failed to delete case:', error);
+      }
     });
   };
 
   const handleAddEnvolvido = () => {
-    const newSuspect: SuspectInput = {
+    const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
       phone_number: novoTelefone,
@@ -165,9 +164,30 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
+  const handleAllowVisualization = () => {
+    allowViewMutation.mutate({caseId, userId: usuarioSelecionado }, {onSuccess: () => {
+        setShowAllowVisualizationModal(false);
+        window.location.reload()
+    }});
+  }
+
   const handleRemoveEnvolvido = (index: number) => {
-    setEnvolvidos(envolvidos.filter((_, i) => i !== index));
-    setShowRemoveEnvolvidoModal({ open: false, index: null });
+    if (index === null || index === undefined) return;
+    const suspect = envolvidos[index];
+
+    deleteSuspectMutation.mutate(
+      { caseId, suspectId: suspect.id.toString() },
+      {
+        onSuccess: () => {
+          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Erro ao remover investigado:', error);
+        },
+      }
+    );
   };
 
   const handleRemoveArquivo = (index: number) => {
@@ -267,7 +287,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 size="medium"
                 label={t('cases.title.allowView')}
                 variant="contained"
-                onClick={handleToggleCanView}
+                onClick={() => {
+                  setShowAllowVisualizationModal(true);
+                }}
               />
                <Button
                 size="small"
@@ -364,7 +386,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             <input
               type="text"
               value={novoNomeCaso}
-              onChange={(e) => setNovoNomeCaso(e.target.value)}
+              onChange={(e) => setNovoNomeCaso(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
               placeholder={t('cases.title.inputName')}
@@ -460,6 +482,15 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
+        )}
+
+        {showAllowVisualizationModal && (
+          <AllowVisualizationModal
+            isOpen={showAllowVisualizationModal}
+            onClose={() => setShowAllowVisualizationModal(false)}
+            caseId={id}
+            onSubmit={() => handleAllowVisualization()}
+          />
         )}
       </div>
 

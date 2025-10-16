@@ -124,7 +124,7 @@ const Input = forwardRef<HTMLDivElement, InputProps>(({
                     }
                 }}
             />
-            {hasError &&
+            {hasError && error && error.trim() &&
                 <FormHelperText sx={{ marginLeft: '0.2em' }}>
                     {error}
                 </FormHelperText>

@@ -2,3 +2,83 @@
   border-radius: 0.313rem;
   border: 1px solid #ccc;
 }
+
+.graphContainer {
+  position: relative;
+  height: calc(100vh - 350px);
+  width: 100%;
+  margin-top: 20px;
+  transition: height 0.3s ease;
+}
+
+.graphContainerExpanded {
+  height: calc(100vh - 220px);
+}
+
+.graphControls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fullscreenContainer .graphControls {
+  top: auto;
+  bottom: 10px;
+}
+
+.controlButton {
+  width: 42px;
+  height: 42px;
+  background-color: rgba(108, 117, 125, 0.9);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.controlButton:hover {
+  background-color: rgba(108, 117, 125, 1);
+  transform: scale(1.05);
+}
+
+.fullscreenContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: var(--background);
+}
+
+.fullscreenContainer .graphContainer {
+  height: 100vh;
+  margin-top: 0;
+}
+
+.fullscreenContainer .graphContainerExpanded {
+  height: 100vh;
+}
+
+.fullscreenFilters {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pointer {
+  cursor: pointer;
+}

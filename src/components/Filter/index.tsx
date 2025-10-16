@@ -1,12 +1,11 @@
 'use client';
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { CaseStatus } from '@/types/Cases';
-import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 
+// import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
@@ -37,7 +36,12 @@ export type FilterProps = {
   onClear?: () => void;
   onSaveFilter?: (filters: FilterValues) => void;
   defaultValues?: FilterValues;
+  values?: FilterValues;
+  onValuesChange?: (values: FilterValues) => void;
   disabled?: boolean;
+  autoFilter?: boolean;
+  debounceMs?: number;
+  validateField?: (key: string, value: string) => string | undefined;
   customStyles?: {
     container?: string;
     fieldsRow?: string;
@@ -46,7 +50,7 @@ export type FilterProps = {
   };
 };
 
-const isCaseStatus = (value: string): value is CaseStatus => {
+const _isCaseStatus = (value: string): value is CaseStatus => {
   return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
 
@@ -54,72 +58,114 @@ const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,
   onClear,
-  onSaveFilter,
+  // onSaveFilter,
   defaultValues = {},
+  values: controlledValues,
+  onValuesChange,
   disabled = false,
+  autoFilter = false,
+  debounceMs = 2000,
+  validateField,
   customStyles = {},
 }) => {
-  const [filters, setFilters] = useState<FilterValues>({ ...defaultValues });
-  const [showSaveButton, setShowSaveButton] = useState(false);
+  const isControlled = controlledValues !== undefined && onValuesChange !== undefined;
+  const [internalFilters, setInternalFilters] = useState<FilterValues>({ ...defaultValues });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const filters = isControlled ? controlledValues : internalFilters;
+
+  const updateFilters = (updater: FilterValues | ((prev: FilterValues) => FilterValues)) => {
+    if (isControlled && onValuesChange) {
+      if (typeof updater === 'function') {
+        onValuesChange(updater(controlledValues));
+      } else {
+        onValuesChange(updater);
+      }
+    } else {
+      setInternalFilters(updater);
+    }
+  };
 
   useEffect(() => {
-    const hasActiveFilter = Object.values(filters).some(
-      (v) => typeof v === 'string' && v.trim() !== ''
-    );
-    setShowSaveButton(hasActiveFilter);
-  }, [filters]);
+    if (!autoFilter) return;
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      onFilter(filters);
+    }, debounceMs);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [filters, autoFilter, debounceMs, onFilter]);
 
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const field = fields.find(f => f.key === key);
+    updateFilters((prev) => ({ ...prev, [key]: value }));
     
-    let processedValue = value;
-    if (field?.isCpfCnpjField) {
-      const digits = onlyNumbers(value);
-      if (digits.length <= 14) {
-        processedValue = maskCpfCnpj(digits);
-      } else {
+    if (errors[key]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[key];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleSelectChange = (key: string) => (value: string | null) => {
+    const newFilters = {
+      ...filters,
+      [key]: value && value !== '' ? value : undefined,
+    };
+    updateFilters(newFilters);
+    
+    if (autoFilter) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      onFilter(newFilters);
+    }
+  };
+
+  const handleFilter = () => {
+    if (validateField) {
+      const newErrors: Record<string, string> = {};
+      
+      fields.forEach((field) => {
+        const value = filters[field.key];
+        if (value && typeof value === 'string') {
+          const error = validateField(field.key, value);
+          if (error) {
+            newErrors[field.key] = error;
+          }
+        }
+      });
+      
+      setErrors(newErrors);
+      
+      if (Object.keys(newErrors).length > 0) {
         return;
       }
     }
     
-    setFilters((prev) => ({ ...prev, [key]: processedValue }));
-  };
-
-  const handleSelectChange = (key: string) => (value: string | null) => {
-  setFilters((prev) => ({
-    ...prev,
-    [key]: value && value !== '' ? value : undefined,
-  }));
-};
-
-  const handleFilter = () => {
-    let isValid = true;
-    
-    for (const field of fields) {
-      if (field.isCpfCnpjField && filters[field.key]) {
-        const digits = onlyNumbers(filters[field.key] as string);
-        if (digits.length !== 11 && digits.length !== 14) {
-          isValid = false;
-          break;
-        }
-      }
-    }
-    
-    if (isValid) {
-      onFilter(filters);
-    }
+    onFilter(filters);
   };
 
   const handleClear = () => {
-    setFilters({ ...defaultValues });
-    setShowSaveButton(false);
+    updateFilters({ ...defaultValues });
+    setErrors({});
     onClear?.();
   };
 
-  const handleSave = () => {
-    if (onSaveFilter) onSaveFilter(filters);
-  };
+  // const handleSave = () => {
+  //   if (onSaveFilter) onSaveFilter(filters);
+  // };
 
   return (
     <div
@@ -136,6 +182,7 @@ const Filter: React.FC<FilterProps> = ({
               value={(filters[field.key] as string | undefined) ?? ''}
               onChange={handleInputChange(field.key)}
               disabled={disabled}
+              error={errors[field.key]}
               data-testid={field.testId || `${field.key}-input`}
             />
           ) : (
@@ -183,7 +230,7 @@ const Filter: React.FC<FilterProps> = ({
             disabled={disabled}
           />
 
-          {onSaveFilter && showSaveButton && (
+          {/* {onSaveFilter && showSaveButton && (
             <Button
               data-testid="save-filter-button"
               icon={<BookmarkAddIcon />}
@@ -194,7 +241,7 @@ const Filter: React.FC<FilterProps> = ({
               className={styles.iconButton}
               disabled={disabled}
             />
-          )}
+          )} */}
         </div>
       </div>
     </div>
