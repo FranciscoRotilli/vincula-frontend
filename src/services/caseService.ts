@@ -150,7 +150,7 @@ export async function getCaseGraph(caseId: string, filters?: GraphFilters) {
   }
   
   const qs = params.toString();
-  const url = `/api/cases/${caseId}/graph${qs ? `?${qs}` : ''}`;
+  const url = `/api/case/${caseId}/graph${qs ? `?${qs}` : ''}`;
   
   const resp = await fetch(url, {
     method: 'GET',

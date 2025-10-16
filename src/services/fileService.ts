@@ -1,9 +1,7 @@
 import { FileRequest } from '@/types/Files';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export async function removeFile(caseId: string, fileId: string) {
-  const resp = await fetch(`${API_URL}/case/${caseId}/files/${fileId}`, {
+  const resp = await fetch(`/api/case/${caseId}/files/${fileId}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -28,11 +26,8 @@ export async function addFile(caseId: string, newFile: FileRequest) {
   formData.append('file_type', newFile.file_type);
   formData.append('file', newFile.file);
 
-  const resp = await fetch(`${API_URL}/case/${caseId}/files`, {
+  const resp = await fetch(`/api/case/${caseId}/files`, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
     body: formData,
   });
 
