@@ -1,5 +1,3 @@
-// src/app/api/cases/[caseId]/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiFetch } from '@/lib/backend';
@@ -45,7 +43,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ca
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ caseId: string }> }) {
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: Promise<{ caseId: string }> }
+) {
   const { caseId } = await params;
 
   const resp = await apiFetch(`/case/${caseId}`, { method: 'DELETE' });

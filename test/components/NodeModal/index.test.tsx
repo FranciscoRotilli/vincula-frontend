@@ -32,16 +32,28 @@ describe('NodeModal', () => {
   });
 
   it('should close when close button is clicked', () => {
-    render(
+    const { rerender } = render(
       <NodeModal
-        isOpen={true}
-        name="AILSON BARBOSA"
-        quantity={49}
-        cpfCnpj="000.000.000-00"
-        phone="11999999999"
+      isOpen={true}
+      name="AILSON BARBOSA"
+      quantity={49}
+      cpfCnpj="000.000.000-00"
+      phone="11999999999"
+      onClose={() =>
+        rerender(
+        <NodeModal
+          isOpen={false}
+          name="AILSON BARBOSA"
+          quantity={49}
+          cpfCnpj="000.000.000-00"
+          phone="11999999999"
+          onClose={() => {}}
+        />
+        )
+      }
       />
     );
-    const closeButton = screen.getByRole('button', { name: /fechar/i });
+    const closeButton = screen.getByLabelText('Fechar');
     fireEvent.click(closeButton);
     expect(screen.queryByText('AILSON BARBOSA')).not.toBeInTheDocument();
   });

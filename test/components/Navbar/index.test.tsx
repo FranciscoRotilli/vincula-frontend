@@ -33,7 +33,8 @@ describe("NavbarComponent", () => {
   it("navigates to /casos when logo is clicked", () => {
     const onNavigate = vi.fn();
     render(<Navbar onNavigate={onNavigate} onLogout={() => {}} user={user} />);
-
+    const logo = screen.getByTestId("navbar-logo");
+    fireEvent.click(logo);
     expect(onNavigate).toHaveBeenCalledWith("/casos");
   });
 });
