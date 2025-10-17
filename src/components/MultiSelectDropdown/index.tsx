@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import styles from './MultiSelectDropdown.module.css';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
 import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import styles from './MultiSelectDropdown.module.css';
 
 export type Option = { value: string; label: string };
 
