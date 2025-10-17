@@ -79,22 +79,31 @@ export default function MultiSelectDropdown({
       className={`${styles.root} ${className || ''} ${disabled ? styles.isDisabled : ''}`}
       style={{ width }}
     >
-      <button
+      <div
         id={`${rootId}-button`}
-        type="button"
-        className={styles.field}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={expanded}
+        aria-disabled={disabled || undefined}
+        className={styles.field}
         onClick={toggleExpanded}
-        disabled={disabled}
+        onKeyDown={(e) => {
+          if (disabled) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleExpanded();
+          }
+          if (e.key === 'Escape') setExpanded(false);
+        }}
       >
         <div className={styles.chips} role="presentation">
           {selected.length === 0 ? (
             <span className={styles.placeholder}>{placeholder}</span>
           ) : (
-            selected.map(val => {
-              const opt = options.find(o => o.value === val);
+            selected.map((val) => {
+              const opt = options.find((o) => o.value === val);
               const text = opt?.label ?? val;
               return (
                 <span key={val} className={styles.chip}>
@@ -114,7 +123,7 @@ export default function MultiSelectDropdown({
           )}
         </div>
         <ExpandMoreIcon className={expanded ? styles.iconRotated : styles.icon} />
-      </button>
+      </div>
 
       {expanded && (
         <div
