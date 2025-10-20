@@ -2,7 +2,8 @@
 
 import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
 import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+//import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import styles from './MultiSelectDropdown.module.css';
@@ -29,7 +30,7 @@ export default function MultiSelectDropdown({
   onChange,
   placeholder = 'Selecionar',
   maxVisibleOptions = 3,
-  width = '100%',
+  width = '32.438rem',
   disabled = false,
   id,
   className,
@@ -122,7 +123,7 @@ export default function MultiSelectDropdown({
             })
           )}
         </div>
-        <ExpandMoreIcon className={expanded ? styles.iconRotated : styles.icon} />
+        <ArrowDropDownIcon className={expanded ? styles.iconRotated : styles.icon} />
       </div>
 
       {expanded && (
