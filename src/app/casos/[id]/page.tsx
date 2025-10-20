@@ -9,7 +9,7 @@ import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
-import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
+import ConfirmationModal from '@/components/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
@@ -359,7 +359,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowNameModal(false)}
+						onSecondary={() => setShowNameModal(false)}
           >
             <input
               type="text"
