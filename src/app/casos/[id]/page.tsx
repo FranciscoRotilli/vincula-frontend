@@ -15,7 +15,7 @@ import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import {
-    useAllowVisualization,
+  useAllowVisualization,
   useCaseById,
   useDeleteCase,
   useUpdateCaseName,
@@ -60,6 +60,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [novoTelefone, setNovoTelefone] = useState('');
   const [novoCpf, setNovoCpf] = useState('');
 
+  const [validationErrors, setValidationErrors] = useState<{
+    name?: string;
+    cpf_cnpj?: string;
+  }>({});
+
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
   const deleteCaseMutation = useDeleteCase();
@@ -78,7 +83,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso as CaseItem['name']},
+      { caseId, name: novoNomeCaso as CaseItem['name'] },
       {
         onSuccess: () => {
           setShowNameModal(false);
@@ -117,9 +122,34 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
+    let errors: typeof validationErrors = {};
+    let isValid = true;
+
+    const rawCpfCnpj = novoCpf.replace(/\D/g, '');
+
+    if (!novoNome.trim()) {
+      errors.name = 'O nome é obrigatório.';
+      isValid = false;
+    }
+    if (!rawCpfCnpj) {
+      errors.cpf_cnpj = 'CPF/CNPJ é obrigatório.';
+      isValid = false;
+    } else if (rawCpfCnpj.length !== 11 && rawCpfCnpj.length !== 14) {
+      errors.cpf_cnpj = 'CPF/CNPJ inválido.';
+      isValid = false;
+    }
+
+    setValidationErrors(errors);
+
+    if (!isValid) {
+      return;
+    }
+
+    setValidationErrors({});
+
     const newSuspect: SuspectRequest = {
       name: novoNome,
-      cpf_cnpj: novoCpf,
+      cpf_cnpj: rawCpfCnpj,
       phone_number: novoTelefone,
     };
 
@@ -130,18 +160,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           setNovoNome('');
           setNovoCpf('');
           setNovoTelefone('');
-
           refetch();
         },
+        onError: (error) => {
+          console.error('Falha na API ao adicionar investigado:', error);
+        }
       }
     );
   };
 
   const handleAllowVisualization = () => {
-    allowViewMutation.mutate({caseId, userId: usuarioSelecionado }, {onSuccess: () => {
+    allowViewMutation.mutate({ caseId, userId: usuarioSelecionado }, {
+      onSuccess: () => {
         setShowAllowVisualizationModal(false);
         window.location.reload()
-    }});
+      }
+    });
   }
 
   const handleRemoveEnvolvido = (index: number) => {
@@ -287,50 +321,46 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 {envolvidos.length})
               </h1>
               <p className={styles.body5}>
-              {t('cases.title.investigatedDesc', {
-                defaultValue:
-                  'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
-              })}
+                {t('cases.title.investigatedDesc', {
+                  defaultValue:
+                    'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
+                })}
               </p>
-            <div className={styles.addInvestigated} data-testid="add-investigated">
-              <Input
-                placeholder={t('cases.title.inputName')}
-                label='Nome'
-                value={novoNome}
-                onChange={(e) => setNovoNome(e.target.value)}
-                className={styles.input}
-              />
-              <Input
-                inputMode="numeric"
-                label='CPF / CNPJ'
-                //pattern="[0-9]*"
-                placeholder={t('cases.title.inputCpfCnpj')}
-                value={maskCpfCnpj(novoCpf)}
-                onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
-                className={styles.input}
-                //maxLength={18}
-              />
-              <Input
-                inputMode="numeric"
-                label='Telefone'
-                //pattern="[0-9]*"
-                placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
-                value={novoTelefone}
-                onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
-                className={styles.input}
-                //maxLength={15}
-              />
-              <Button
-                icon={<AddIcon />}
-                variant="contained"
-                size="icon"
-                label=""
-                onClick={handleAddEnvolvido}
-                disabled={
-                  !novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)
-                }
-              />
-            </div>
+
+              <div className={styles.addInvestigated} data-testid="add-investigated">
+                <Input
+                  placeholder={t('cases.title.inputName')}
+                  label='Nome'
+                  value={novoNome}
+                  onChange={(e) => setNovoNome(e.target.value)}
+                  className={styles.input}
+                  error={validationErrors.name}
+                />
+                <Input
+                  inputMode="numeric"
+                  label='CPF / CNPJ'
+                  placeholder={t('cases.title.inputCpfCnpj')}
+                  value={maskCpfCnpj(novoCpf)}
+                  onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
+                  className={styles.input}
+                  error={validationErrors.cpf_cnpj}
+                />
+                <Input
+                  inputMode="numeric"
+                  label='Telefone'
+                  placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
+                  value={novoTelefone}
+                  onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
+                  className={styles.input}
+                />
+                <Button
+                  icon={<AddIcon />}
+                  variant="contained"
+                  size="icon"
+                  label=""
+                  onClick={handleAddEnvolvido}
+                />
+              </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">
               <GenericTable<EnvolvidoRow>
