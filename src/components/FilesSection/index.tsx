@@ -98,6 +98,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         onRemove={handleRemove}
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
+        isLoading={removeFileMutation.isPending}
       />
     </>
   );

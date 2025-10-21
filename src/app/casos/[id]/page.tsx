@@ -415,19 +415,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showDeleteCaseModal && (
-          <ConfirmationModal
+          <RemoveModal
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
-            icon={<TbTrash size={36} color="#ff3636" />}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
             description={t('cases.title.deleteWarning', {
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
-            onPrimary={handleDeleteCase}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowDeleteCaseModal(false)}
+            onRemove={handleDeleteCase}
+            isLoading={deleteCaseMutation.isPending}
           />
         )}
 
