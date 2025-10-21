@@ -1,9 +1,8 @@
 'use client';
 
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutlineBlankRounded';
 import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
-//import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import styles from './MultiSelectDropdown.module.css';
