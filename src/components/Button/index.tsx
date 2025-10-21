@@ -3,7 +3,7 @@ import React from 'react';
 import styles from './Button.module.css';
 
 export type ButtonProps = {
-  label: string;
+  label: string | React.ReactNode;
   icon?: React.ReactNode;
   variant?: 'contained' | 'outlined' | 'error';
   size?: 'small' | 'medium' | 'large' | 'icon';
@@ -34,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({
         styles[variant],
         styles[size],
         disabled ? styles.disabled : '',
-        className
+        className,
       ].join(' ')}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}

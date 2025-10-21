@@ -4,6 +4,8 @@ import { CircularProgress, Modal } from '@mui/material';
 import Image from 'next/image';
 import { MdClose } from 'react-icons/md';
 
+import { t } from '@/texts';
+
 import Button from '../Button';
 import styles from './RemoveModal.module.css';
 
@@ -39,7 +41,13 @@ export default function RemoveModal({
 
         <div className={styles.buttons}>
           <Button
-            label={isLoading ? <CircularProgress size={20} /> : 'Remover'}
+            label={
+              isLoading ? (
+                <CircularProgress size={20} className={styles.loading} />
+              ) : (
+                t('cases.title.remove')
+              )
+            }
             variant="contained"
             className={styles.removeButton}
             onClick={onRemove}
