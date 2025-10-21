@@ -32,8 +32,8 @@ async function throwIfError(resp: Response, fallback: string) {
     ? (err as ErrorWithMessage).message
     : `${fallback} (status ${resp.status})`;
   
-  const error = new Error(errorMessage);
-  (error as any).status = resp.status;
+  const error = new Error(errorMessage) as Error & { status?: number };
+  error.status = resp.status;
   throw error;
 }
 
