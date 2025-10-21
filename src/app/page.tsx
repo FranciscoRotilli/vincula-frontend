@@ -7,10 +7,9 @@ import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import MultiSelectDropdown, { type Option as MSDOption } from '@/components/MultiSelectDropdown';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
-
-import MultiSelectDropdown, { type Option as MSDOption } from '@/components/MultiSelectDropdown';
 
 import styles from './page.module.css';
 
@@ -123,10 +122,6 @@ export default function LoginPage() {
           </form>
 
           <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border, #e5e5e5)', paddingTop: '.75rem' }}>
-            <h3 style={{ margin: 0, marginBottom: '.5rem', fontSize: '0.95rem', opacity: 0.9 }}>
-              Preview do MultiSelectDropdown
-            </h3>
-
             <MultiSelectDropdown
               options={PREVIEW_OPTIONS}
               placeholder="Selecionar"
