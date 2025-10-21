@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 import React from 'react';
 
-import Button from '../Button';
 import Modal from '../Modals';
-import styles from './ConfirmationModal.module.css';
 
 type ConfirmationModalProps = {
   isOpen: boolean;
@@ -16,7 +14,6 @@ type ConfirmationModalProps = {
   secondaryLabel: string;
   onSecondary: () => void;
   primaryColor?: string;
-  secondaryColor?: string;
   children?: React.ReactNode;
 };
 
@@ -29,15 +26,15 @@ export default function ConfirmationModal({
   primaryLabel,
   onPrimary,
   secondaryLabel,
-  // primaryColor,
-  children,
+	children,
+	primaryColor,
 }: Readonly<ConfirmationModalProps>) {
-  // const primaryVariant = primaryColor === 'error' ? 'error' : 'contained';
-  // const primaryClass = primaryColor && primaryColor !== 'error' ? styles.customPrimaryColor : '';
-  // const secondaryClass = styles.btnSecondary;
+  const primaryVariant = primaryColor === 'error' ? 'error' : 'primary';
 
   return (
 		<Modal
+			buttonsPosition='center'
+			showCloseIcon={false}
 			onAction={onPrimary}
       isOpen={isOpen}
       onClose={onClose}
@@ -48,7 +45,7 @@ export default function ConfirmationModal({
 			closeOnOverlayClick={true}
 			actionButton={primaryLabel}
 			cancelButton={secondaryLabel}
-			actionButtonColor={'error'}
+			actionButtonColor={primaryVariant}
 		>
 			{children}
     </Modal>
