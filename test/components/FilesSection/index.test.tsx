@@ -22,6 +22,11 @@ describe('FilesSection Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    mockUseRemoveFile.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    });
   });
 
   it('renders loading state', () => {
