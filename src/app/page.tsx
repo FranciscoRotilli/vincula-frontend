@@ -7,7 +7,6 @@ import React, { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-import MultiSelectDropdown, { type Option as MSDOption } from '@/components/MultiSelectDropdown';
 import { useLogin } from '@/hooks/useLogin';
 import { t } from '@/texts';
 
@@ -53,21 +52,11 @@ export default function LoginPage() {
     );
   };
 
-  const PREVIEW_OPTIONS: MSDOption[] = [
-    { value: 'a1', label: 'Opção A1' },
-    { value: 'a2', label: 'Opção A2' },
-    { value: 'a3', label: 'Opção A3' },
-    { value: 'a4', label: 'Opção A4' },
-    { value: 'a5', label: 'Opção A5' },
-    { value: 'a6', label: 'Opção A6' },
-  ];
-
   return (
     <main className={styles.page}>
       <div className={styles.cornerBrand} aria-hidden>
         <Image src="/mp-logo.svg" alt="" width={258} height={84} />
       </div>
-
       <section className={styles.center}>
         <div className={styles.card}>
           <div className={styles.logoGroup}>
@@ -120,14 +109,6 @@ export default function LoginPage() {
               data-testid="login-button"
             />
           </form>
-
-          <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border, #e5e5e5)', paddingTop: '.75rem' }}>
-            <MultiSelectDropdown
-              options={PREVIEW_OPTIONS}
-              placeholder="Selecionar"
-              width="32.438rem"
-            />
-          </div>
         </div>
       </section>
     </main>
