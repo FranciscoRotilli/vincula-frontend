@@ -336,7 +336,16 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
             disabled={isSavingFile}
             aria-busy={isSavingFile}
           >
-            {isSavingFile ? <CircularProgress size={20} /> : t('addFile.add')}
+            {isSavingFile ? (
+              <span className={styles.loadingContent}>
+                <CircularProgress size={20} />
+                <span className={styles.loadingText}>
+                  {t('addFile.adding', { defaultValue: 'Adicionando...' })}
+                </span>
+              </span>
+            ) : (
+              t('addFile.add')
+            )}
           </button>
         </div>
       </Modal>

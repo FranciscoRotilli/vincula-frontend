@@ -316,7 +316,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 //pattern="[0-9]*"
                 placeholder={t('cases.title.inputCpfCnpj')}
                 value={maskCpfCnpj(novoCpf)}
-                onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, '').slice(0, 14))}
                 className={styles.input}
                 //maxLength={18}
               />
@@ -338,10 +338,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 onClick={handleAddEnvolvido}
                 disabled={
                   addSuspectMutation.isPending ||
-                  !novoNome ||
-                  !novoCpf ||
+                  novoNome.trim().length === 0 ||
                   !(novoCpf.length === 11 || novoCpf.length === 14)
                 }
+                loading={addSuspectMutation.isPending}
+                loadingLabel={t('cases.title.addingInvestigated', {
+                  defaultValue: 'Adicionando...',
+                })}
               />
             </div>
             </div>
@@ -374,6 +377,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
             primaryDisabled={updateNameMutation.isPending}
+            primaryLoading={updateNameMutation.isPending}
           >
             <input
               type="text"
@@ -400,6 +404,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
             primaryDisabled={updateSituationMutation.isPending}
+            primaryLoading={updateSituationMutation.isPending}
           >
             <select
               value={novaSituacao}
@@ -433,11 +438,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
+            primaryLabel={t('cases.title.deleteAction', { defaultValue: 'Excluir' })}
             onPrimary={handleDeleteCase}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowDeleteCaseModal(false)}
             primaryDisabled={deleteCaseMutation.isPending}
+            primaryLoading={deleteCaseMutation.isPending}
+            primaryLoadingLabel={t('cases.title.deleting', { defaultValue: 'Excluindo...' })}
           />
         )}
 
@@ -473,6 +480,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
             primaryDisabled={deleteSuspectMutation.isPending}
+            primaryLoading={deleteSuspectMutation.isPending}
           />
         )}
 

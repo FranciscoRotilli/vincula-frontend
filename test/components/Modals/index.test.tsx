@@ -6,6 +6,7 @@ import { describe, expect, vi } from 'vitest';
 
 import Modal from '@/components/Modals';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
 
 vi.mock('next/image', () => ({
@@ -28,6 +29,22 @@ vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
     small: 'small',
     medium: 'medium',
     large: 'large',
+  },
+}));
+
+vi.mock('@/components/ConfirmationModal/ConfirmationModal.module.css', () => ({
+  default: {
+    overlay: 'overlay',
+    modal: 'modal',
+    close: 'close',
+    icon: 'icon',
+    title: 'title',
+    desc: 'desc',
+    actions: 'actions',
+    btnPrimary: 'btnPrimary',
+    btnSecondary: 'btnSecondary',
+    customPrimaryColor: 'customPrimaryColor',
+    customSecondaryColor: 'customSecondaryColor',
   },
 }));
 
@@ -131,6 +148,7 @@ describe('Componente Modal', () => {
     const actionButton = screen.getByRole('button', { name: /Salvar/i });
     expect(actionButton).toBeDisabled();
   });
+
 });
 
 describe('RemoveModal', () => {
@@ -207,5 +225,39 @@ describe('CreateCaseModal', () => {
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith({ caseName: 'Caso Teste' });
     });
+  });
+});
+
+describe('ConfirmationModal', () => {
+  const renderConfirmation = (
+    props: Partial<React.ComponentProps<typeof ConfirmationModal>> = {}
+  ) => {
+    const defaultProps = {
+      isOpen: true,
+      onClose: vi.fn(),
+      title: 'Confirmar ação',
+      primaryLabel: 'Salvar',
+      secondaryLabel: 'Cancelar',
+      onPrimary: vi.fn(),
+      onSecondary: vi.fn(),
+      ...props,
+    } as React.ComponentProps<typeof ConfirmationModal>;
+
+    render(<ConfirmationModal {...defaultProps} />);
+    return defaultProps;
+  };
+
+  it('renderiza label no gerúndio quando primaryLoading é true', () => {
+    renderConfirmation({ primaryLoading: true });
+
+    const primaryButton = screen.getByRole('button', { name: /Salvando/i });
+    expect(primaryButton).toBeDisabled();
+  });
+
+  it('prioriza primaryLoadingLabel explícito', () => {
+    renderConfirmation({ primaryLoading: true, primaryLoadingLabel: 'Excluindo...' });
+
+    const primaryButton = screen.getByRole('button', { name: /Excluindo/i });
+    expect(primaryButton).toBeDisabled();
   });
 });
