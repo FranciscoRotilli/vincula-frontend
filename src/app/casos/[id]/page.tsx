@@ -9,11 +9,11 @@ import { TbTrash } from 'react-icons/tb';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
-import ConfirmationModal from '@/components/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import ConfirmationModal from '@/components/Modals/ConfirmationModal';
 import {
     useAllowVisualization,
   useCaseById,

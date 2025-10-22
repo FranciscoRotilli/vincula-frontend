@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import React from 'react';
 
-import Modal from '../Modals';
+import Modal from '.';
 
 type ConfirmationModalProps = {
   isOpen: boolean;

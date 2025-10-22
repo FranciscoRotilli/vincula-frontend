@@ -2,6 +2,8 @@ import { fireEvent,render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import ConfirmationModal from '@/components/Modals/ConfirmationModal';
+
 vi.mock('../../../src/components/Modals', () => {
   return {
     __esModule: true,
@@ -34,7 +36,7 @@ vi.mock('../../../src/components/Modals', () => {
   };
 });
 
-import ConfirmationModal from '../../../src/components/ConfirmationModal';
+
 
 describe('ConfirmationModal', () => {
   it('renders title, description and children when open', () => {
