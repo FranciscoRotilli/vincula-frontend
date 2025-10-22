@@ -1,7 +1,8 @@
 'use client';
+import { MoreVert } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
@@ -29,10 +30,12 @@ import {
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
 import { useUsers } from '@/hooks/useUsers';
+import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
 import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { CurrentUser } from '@/types/User';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
@@ -43,6 +46,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const caseId = id;
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Erro ao buscar usuário atual:', error);
+      }
+    }
+    fetchCurrentUser();
+  }, []);
+  const isAdmin = currentUser?.role === 'ADMIN';
+  console.log(currentUser?.role)
+
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
@@ -147,22 +166,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  // const handleToggleCanView = () => {
-  //   updateCanViewMutation.mutate(
-  //     { caseId, canView: !visualizacaoPermitida },
-  //     {
-  //       onSuccess: () => {
-  //         setVisualizacaoPermitida((v) => !v);
-  //         toast.success('Usuários com permissão para acessar o caso alterados com sucesso.')
-  //       },
-  //       onError: (error) => {
-  //         toast.error('Não foi possível alterar usuários com permissão para acessar o caso.')
-  //         console.error('Failed to update users with permission to see case:', error);
-  //       }
-  //     }
-  //   );
-  // };
-
   const handleDeleteCase = () => {
     if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
@@ -171,7 +174,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         toast.success(t('toastSuccess.handleDeleteCase'))
         router.push('/casos');
       },
-       onError: (error) => {
+      onError: (error) => {
           toast.error(t('toastError.handleDeleteCase'))
           console.error('Failed to delete case: ', error);
         }
@@ -282,7 +285,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const handleRemoveFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
-    toast.success(t('toastSuccess.handleRemoveArquivo'))
+    toast.success(t('toastSuccess.handleRemoveArquivo'));
+  };
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClickMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
   };
 
   const suspectsColumns: Column<SuspectRow>[] = [
@@ -339,9 +351,38 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails} data-testid="case-details">
-            <h2 className={styles.h2} data-testid="case-name">
-              {caseDetails.name}
-            </h2>
+            <div className={styles.caseNameRow}>
+              <h2 className={styles.h2} data-testid='case-name'>{caseDetails.name}</h2>
+              <div data-testid='case-actions' className={styles.caseActions}>
+                <Tooltip title="Ações">
+                  <IconButton size="medium" onClick={handleClickMenu}>
+                    <MoreVert fontSize="inherit" sx={{ color: 'black' }} />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleCloseMenu}
+                  disableScrollLock={true}
+                  slotProps={{
+                    list: {
+                      'aria-labelledby': 'basic-button',
+                    },
+                    paper: {
+                      elevation: 2,
+                    }
+                  }}
+                >
+                  <MenuItem data-testid="menu-change-name" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowNameModal(true); }}>{t('cases.title.changeName')}</MenuItem>
+                  <MenuItem data-testid="menu-change-situation" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowSituationModal(true); }}>{t('cases.title.changeSituation')}</MenuItem>
+                  <MenuItem data-testid="menu-allow-view" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowAllowVisualizationModal(true); }}>{t('cases.title.allowView')}</MenuItem>
+                  {isAdmin && (
+                    <MenuItem data-testid="menu-delete-case" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowDeleteCaseModal(true); }}>{t('cases.title.delete')}</MenuItem>
+                  )}
+                </Menu>
+              </div>
+            </div>
             <div className={styles.detailsRow} data-testid="case-informations">
               <div>
                 <strong>{t('modal.owner')}</strong> {caseDetails.owner}
@@ -473,6 +514,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showNameModal && (
           <ConfirmationModal
+            data-testid="modal-change-name"
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
@@ -497,6 +539,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showSituationModal && (
           <ConfirmationModal
+            data-testid="modal-change-situation"
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
@@ -594,6 +637,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showAllowVisualizationModal && (
           <AllowVisualizationModal
+            data-testid="modal-allow-visualization"
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
             onSubmit={handleAllowVisualization}
