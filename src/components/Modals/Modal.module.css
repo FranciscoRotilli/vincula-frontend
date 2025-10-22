@@ -160,6 +160,12 @@ button.secondary:hover {
   background-color: var(--button-secondary-active);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
 .small {
   width: 20px;
 }

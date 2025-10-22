@@ -12,6 +12,7 @@ type CreateCaseModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (payload: { caseName: string }) => Promise<void> | void;
+  isSubmitting?: boolean;
 };
 
 const formatDate = (d: Date) => {
@@ -21,7 +22,12 @@ const formatDate = (d: Date) => {
   return `${dd}/${mm}/${yyyy}`;
 };
 
-export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCaseModalProps) {
+export default function CreateCaseModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isSubmitting = false,
+}: CreateCaseModalProps) {
   const [caseName, setCaseName] = useState('');
   const [user, setUser] = useState<CurrentUser | null>(null);
   useEffect(() => {
@@ -40,7 +46,7 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
   const canSave = caseName.trim().length > 0;
 
   const handleSubmit = async () => {
-    if (!canSave) return;
+    if (!canSave || isSubmitting) return;
     await onSubmit({
       caseName: caseName,
     });
@@ -60,7 +66,8 @@ export default function CreateCaseModal({ isOpen, onClose, onSubmit }: CreateCas
       size="medium"
       onClose={handleClose}
       onAction={handleSubmit}
-      actionButton="Adicionar"
+      actionButton={isSubmitting ? 'Adicionando...' : 'Adicionar'}
+      actionDisabled={!canSave || isSubmitting}
       cancelButton="Cancelar"
     >
       <div className={modalStyles.formStack}>

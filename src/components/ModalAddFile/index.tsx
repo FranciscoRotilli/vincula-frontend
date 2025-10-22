@@ -145,6 +145,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
   };
 
   const handleSubmit = async () => {
+    if (isSavingFile) return;
     if (!submitAttempted) setSubmitAttempted(true);
     const errs = validateAll();
     const hasError = Object.values(errs).some(Boolean);
@@ -170,6 +171,9 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
             setIsSavingFile(false);
             onClose();
           }, 6000);
+        },
+        onError: () => {
+          setIsSavingFile(false);
         },
       }
     );
@@ -325,7 +329,13 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
         </div>
 
         <div className={styles.actions}>
-          <button type="button" className={styles.primaryButton} onClick={handleSubmit}>
+          <button
+            type="button"
+            className={styles.primaryButton}
+            onClick={handleSubmit}
+            disabled={isSavingFile}
+            aria-busy={isSavingFile}
+          >
             {isSavingFile ? <CircularProgress size={20} /> : t('addFile.add')}
           </button>
         </div>

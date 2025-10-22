@@ -74,9 +74,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
-  const [usuarioSelecionado] = useState('');
+  
 
   const handleUpdateName = async () => {
+    if (updateNameMutation.isPending) return;
     updateNameMutation.mutate(
       { caseId, name: novoNomeCaso as CaseItem['name']},
       {
@@ -91,6 +92,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleUpdateSituation = async () => {
+    if (updateSituationMutation.isPending) return;
     updateSituationMutation.mutate(
       { caseId, situation: novaSituacao as CaseItem['status'] },
       {
@@ -105,6 +107,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleDeleteCase = () => {
+    if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
@@ -117,6 +120,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
+    if (addSuspectMutation.isPending) return;
     const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
@@ -137,14 +141,20 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleAllowVisualization = () => {
-    allowViewMutation.mutate({caseId, userId: usuarioSelecionado }, {onSuccess: () => {
-        setShowAllowVisualizationModal(false);
-        window.location.reload()
-    }});
-  }
+  const handleAllowVisualization = async (userId: string) => {
+    if (allowViewMutation.isPending) return;
+    try {
+      await allowViewMutation.mutateAsync({ caseId, userId });
+      setShowAllowVisualizationModal(false);
+      refetch();
+    } catch (error) {
+      console.error('Erro ao permitir visualização:', error);
+      throw error;
+    }
+  };
 
   const handleRemoveEnvolvido = (index: number) => {
+    if (deleteSuspectMutation.isPending) return;
     if (index === null || index === undefined) return;
     const suspect = envolvidos[index];
 
@@ -327,7 +337,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 label=""
                 onClick={handleAddEnvolvido}
                 disabled={
-                  !novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)
+                  addSuspectMutation.isPending ||
+                  !novoNome ||
+                  !novoCpf ||
+                  !(novoCpf.length === 11 || novoCpf.length === 14)
                 }
               />
             </div>
@@ -360,6 +373,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
+            primaryDisabled={updateNameMutation.isPending}
           >
             <input
               type="text"
@@ -385,6 +399,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
+            primaryDisabled={updateSituationMutation.isPending}
           >
             <select
               value={novaSituacao}
@@ -422,6 +437,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleDeleteCase}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowDeleteCaseModal(false)}
+            primaryDisabled={deleteCaseMutation.isPending}
           />
         )}
 
@@ -456,6 +472,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            primaryDisabled={deleteSuspectMutation.isPending}
           />
         )}
 
@@ -479,8 +496,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           <AllowVisualizationModal
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
-            caseId={id}
-            onSubmit={() => handleAllowVisualization()}
+            onSubmit={handleAllowVisualization}
+            isSubmitting={allowViewMutation.isPending}
           />
         )}
       </div>

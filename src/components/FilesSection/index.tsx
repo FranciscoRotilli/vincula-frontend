@@ -35,14 +35,15 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   const removeFileMutation = useRemoveFile(caseId);
 
   const handleRemove = () => {
-    if (fileToRemove) {
-      removeFileMutation.mutate(fileToRemove.id, {
-        onSuccess: () => {
-          setIsRemoveModalOpen(false);
-          setFileToRemove(null);
-        },
-      });
+    if (!fileToRemove || removeFileMutation.isPending) {
+      return;
     }
+    removeFileMutation.mutate(fileToRemove.id, {
+      onSuccess: () => {
+        setIsRemoveModalOpen(false);
+        setFileToRemove(null);
+      },
+    });
   };
 
   const rowActions = [
@@ -98,6 +99,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         onRemove={handleRemove}
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
+        isProcessing={removeFileMutation.isPending}
       />
     </>
   );
