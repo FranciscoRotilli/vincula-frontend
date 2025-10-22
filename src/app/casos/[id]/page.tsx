@@ -29,6 +29,7 @@ import {
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useUsers } from '@/hooks/useUsers';
 import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
