@@ -17,9 +17,9 @@ import RemoveModal from '../Modals/RemoveModal';
 import styles from './FilesSection.module.css';
 
 const columns: Column<FileResponse>[] = [
-  { key: 'name', label: 'NOME', align: 'left' },
-  { key: 'creation_date', label: 'DATA DE INCLUSÃO', align: 'left' },
-  { key: 'size', label: 'TAMANHO', align: 'left' },
+  { key: 'name', label: 'Nome', align: 'left' },
+  { key: 'creation_date', label: 'Data de Inclusão', align: 'left' },
+  { key: 'size', label: 'Tamanho', align: 'left' },
 ];
 
 type FilesSectionProps = {

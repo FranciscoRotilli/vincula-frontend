@@ -179,7 +179,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const envolvidosColumns: Column<EnvolvidoRow>[] = [
-    { key: 'name', label: 'NOME' },
+    { key: 'name', label: 'Nome' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
     { key: 'phone_number', label: 'Telefone' },
   ];
