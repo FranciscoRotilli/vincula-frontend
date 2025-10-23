@@ -34,7 +34,7 @@ function setup(
 }
 
 describe('MultiSelectDropdown (essencial)', () => {
-  it('renderiza placeholder e abre/fecha a lista', () => {
+  it('renders placeholder and opens/closes the list', () => {
     const { field } = setup();
 
     expect(screen.getByText('Selecionar')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
-  it('limita visualmente o menu a 3 itens (lista com scroll)', () => {
+  it('visually limits the menu to 3 items (scrollable list)', () => {
     const { field } = setup(MANY_OPTIONS);
 
     fireEvent.click(field);
@@ -58,7 +58,7 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(within(listbox).getAllByRole('option')).toHaveLength(MANY_OPTIONS.length);
   });
 
-  it('seleciona múltiplas opções e exibe as chips (onChange chamado)', () => {
+  it('selects multiple options and displays the chips (called onChange)', () => {
     const { field, onChange } = setup();
 
     fireEvent.click(field);
@@ -76,7 +76,7 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(last).toEqual(expect.arrayContaining(['a1', 'a2']));
   });
 
-  it('remove chip pelo “×” e atualiza a seleção', () => {
+  it('remove chip by “×” and update selection', () => {
     const { field, onChange } = setup(FEW_OPTIONS, { defaultSelected: ['a1', 'a2'] });
 
     expect(within(field).getByText('Opção A1')).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(last).not.toEqual(expect.arrayContaining(['a1']));
   });
 
-  it('não expande quando está desabilitado', () => {
+  it('does not expand when disabled', () => {
     const { field } = setup(FEW_OPTIONS, { disabled: true });
 
     fireEvent.click(field);
@@ -98,7 +98,7 @@ describe('MultiSelectDropdown (essencial)', () => {
 });
 
 describe('MultiSelectDropdown (estresse)', () => {
-  it('permanece estável com muitas seleções e mantém o menu funcional', () => {
+  it('remains stable with many selections and keeps the menu functional', () => {
     const { field, onChange } = setup(MANY_OPTIONS);
 
     fireEvent.click(field);
