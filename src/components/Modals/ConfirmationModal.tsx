@@ -3,6 +3,7 @@ import React from 'react';
 import Modal from '.';
 
 type ConfirmationModalProps = {
+  buttonsPosition?: 'left' | 'center' | 'right';
   isOpen: boolean;
   onClose: () => void;
   icon?: React.ReactNode;
@@ -17,6 +18,7 @@ type ConfirmationModalProps = {
 };
 
 export default function ConfirmationModal({
+	buttonsPosition,
   isOpen,
   onClose,
   icon,
@@ -32,7 +34,7 @@ export default function ConfirmationModal({
 
   return (
 		<Modal
-			buttonsPosition='center'
+			buttonsPosition={buttonsPosition || 'center'}
 			showCloseIcon={false}
 			onAction={onPrimary}
       isOpen={isOpen}
