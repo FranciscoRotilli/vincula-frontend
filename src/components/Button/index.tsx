@@ -41,7 +41,8 @@ const Button: React.FC<ButtonProps> = ({
   })();
   const effectiveLabel = loading ? loadingLabel ?? fallbackLoadingLabel : label;
   const hasLabel = !!effectiveLabel;
-  const effectiveIcon = loading ? loadingIcon ?? <span className={styles.spinner} aria-hidden /> : icon;
+  const effectiveIcon = loading ? loadingIcon ??
+   <span className={styles.spinner} aria-hidden /> : icon;
   const isDisabled = disabled || loading;
   const shouldHideLabel = size === 'icon' && loading;
 

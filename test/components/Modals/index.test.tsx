@@ -4,9 +4,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, vi } from 'vitest';
 
+import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import Modal from '@/components/Modals';
 import CreateCaseModal from '@/components/Modals/CreateCaseModal';
-import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
 
 vi.mock('next/image', () => ({
