@@ -6,12 +6,10 @@ import { vi } from 'vitest';
 
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import { getCurrentUser } from '@/services/auth';
-import { allowUserToViewCase } from '@/services/caseService';
 import { getUsers } from '@/services/userService';
 
 vi.mock('@/services/userService');
 vi.mock('@/services/auth');
-vi.mock('@/services/caseService');
 
 vi.mock('@/components/Select', () => ({
   CustomSelect: ({ options, value, onChange, placeholder }: any) => (
@@ -32,20 +30,14 @@ vi.mock('@/components/Select', () => ({
 
 const mockedGetUsers = vi.mocked(getUsers);
 const mockedGetCurrentUser = vi.mocked(getCurrentUser);
-const mockedAllowUserToViewCase = vi.mocked(allowUserToViewCase);
 
 const openModal = (
   overrides: Partial<React.ComponentProps<typeof AllowVisualizationModal>> = {}
 ) => {
   const props = {
     isOpen: true,
-    caseId: 'case-123',
     onClose: vi.fn(),
-    onPrimary: vi.fn(),
-    onSecondary: vi.fn(),
-    title: 'Permitir visualização',
-    primaryLabel: 'Salvar',
-    secondaryLabel: 'Cancelar',
+    onSubmit: vi.fn(),
     ...overrides,
   } as React.ComponentProps<typeof AllowVisualizationModal>;
   render(<AllowVisualizationModal {...props} />);
@@ -70,18 +62,7 @@ describe('AllowVisualizationModal', () => {
   });
 
   it('não renderiza quando isOpen = false', () => {
-    render(
-      <AllowVisualizationModal
-        isOpen={false}
-        caseId="case-123"
-        onClose={vi.fn()}
-        onPrimary={vi.fn()}
-        onSecondary={vi.fn()}
-        title="Permitir"
-        primaryLabel="Salvar"
-        secondaryLabel="Cancelar"
-      />
-    );
+    render(<AllowVisualizationModal isOpen={false} onClose={vi.fn()} onSubmit={vi.fn()} />);
     expect(screen.queryByText(/Permitir/i)).not.toBeInTheDocument();
   });
 
@@ -98,9 +79,13 @@ describe('AllowVisualizationModal', () => {
     await waitFor(() => expect(mockedGetUsers).toHaveBeenCalled());
   });
 
-  it('permite selecionar usuário e chamar allowUserToViewCase', async () => {
+  it('desabilita o botão salvar enquanto a submissão está em andamento', async () => {
+    openModal({ isSubmitting: true });
+    expect(await screen.findByRole('button', { name: /Salvando/i })).toBeDisabled();
+  });
+
+  it('permite selecionar usuário e chama onSubmit com o id selecionado', async () => {
     const onSubmit = vi.fn();
-    mockedAllowUserToViewCase.mockResolvedValue({});
 
     openModal({ onSubmit });
     await waitFor(() => expect(mockedGetUsers).toHaveBeenCalled());
@@ -111,17 +96,14 @@ describe('AllowVisualizationModal', () => {
     const saveButton = screen.getByRole('button', { name: /Salvar/i });
     fireEvent.click(saveButton);
 
-    await waitFor(() =>
-      expect(mockedAllowUserToViewCase).toHaveBeenCalledWith('case-123', 'user-2')
-    );
-    expect(onSubmit).toHaveBeenCalled();
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('user-2'));
   });
 
   it('mostra alerta em caso de erro na chamada do backend', async () => {
     const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    mockedAllowUserToViewCase.mockRejectedValue(new Error('erro'));
+    const onSubmit = vi.fn().mockRejectedValue(new Error('erro'));
 
-    openModal();
+    openModal({ onSubmit });
     await waitFor(() => expect(mockedGetUsers).toHaveBeenCalled());
 
     const select = await screen.findByTestId('mock-select');
@@ -137,7 +119,9 @@ describe('AllowVisualizationModal', () => {
   it('chama onClose ao clicar em Cancelar', async () => {
     const onClose = vi.fn();
     openModal({ onClose });
-    fireEvent.click(screen.getByRole('button', { name: /Cancelar/i }));
+    await waitFor(() => expect(mockedGetUsers).toHaveBeenCalled());
+    const cancelButton = await screen.findByRole('button', { name: /Cancelar/i });
+    fireEvent.click(cancelButton);
     expect(onClose).toHaveBeenCalled();
   });
 });

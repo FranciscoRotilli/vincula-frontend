@@ -5,23 +5,22 @@ import { FiUserPlus } from 'react-icons/fi';
 import Modal from '@/components/Modals';
 import { CustomSelect } from '@/components/Select';
 import { getCurrentUser } from '@/services/auth';
-import { allowUserToViewCase } from '@/services/caseService';
 import { getUsers } from '@/services/userService';
 import { t } from '@/texts';
 import { CurrentUser } from '@/types/User';
 
 type AllowVisualizationModalProps = {
   isOpen: boolean;
-  caseId: string;
   onClose: () => void;
-  onSubmit: () => Promise<void> | void;
+  onSubmit: (userId: string) => Promise<void> | void;
+  isSubmitting?: boolean;
 };
 
 export default function AllowVisualizationModal({
   isOpen,
-  caseId,
   onClose,
   onSubmit,
+  isSubmitting = false,
 }: AllowVisualizationModalProps) {
   const [, setUser] = useState<CurrentUser | null>(null);
   const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
@@ -48,10 +47,9 @@ export default function AllowVisualizationModal({
   }, [isOpen]);
 
   const handleSubmit = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || isSubmitting) return;
     try {
-      await allowUserToViewCase(caseId, selectedUser.id);
-      await onSubmit();
+      await onSubmit(selectedUser.id);
       onClose();
     } catch (err) {
       alert('Erro ao salvar usuário.');
@@ -65,10 +63,11 @@ export default function AllowVisualizationModal({
       title={t('cases.title.allowView')}
       onClose={onClose}
       onAction={handleSubmit}
-      actionButton={t('cases.title.save')}
+      actionButton={isSubmitting ? 'Salvando...' : t('cases.title.save')}
       cancelButton={t('cases.title.cancel')}
       description={t('cases.title.allowViewDesc')}
       icon={<FiUserPlus size={36} color="#FB8500" />}
+      actionDisabled={!selectedUser || isSubmitting}
     >
       <>
         <CustomSelect
