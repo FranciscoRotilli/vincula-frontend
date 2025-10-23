@@ -534,11 +534,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       onPrimary={handleUpdateOwner}
       secondaryLabel={t('cases.title.cancel')}
       onSecondary={() => setShowChangeResponsibleModal(false)}
+      primaryDisabled={updateOwnerMutation.isPending}
+      primaryLoading={updateOwnerMutation.isPending}
       >
             <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
               <ReactSelect
                 isClearable
-                isDisabled={isLoadingUsers}
+                isDisabled={isLoadingUsers || updateOwnerMutation.isPending}
                 options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
                 value={(users || [])
                   .map((u) => ({ value: u.id, label: u.name }))
