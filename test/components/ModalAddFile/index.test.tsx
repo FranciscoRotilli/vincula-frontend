@@ -39,7 +39,9 @@ describe('AddFileModal (basic)', () => {
   it('renders essential fields when open', () => {
     openModal();
     expect(screen.getByLabelText(/Origem/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Tipo/i)).toBeInTheDocument();
+    const typeSelect = screen.getByLabelText(/Tipo/i) as HTMLSelectElement;
+    expect(typeSelect).toBeInTheDocument();
+    expect(typeSelect).toBeDisabled();
     expect(
       screen.getByLabelText(/Arquivo/i, { selector: 'input[type="file"]' })
     ).toBeInTheDocument();
@@ -60,7 +62,7 @@ describe('AddFileModal (basic)', () => {
     const onClose = vi.fn();
     openModal({ onSubmit, onClose });
 
-    fireEvent.change(screen.getByLabelText(/Origem/i), { target: { value: 'SIMBA' } });
+    fireEvent.change(screen.getByLabelText(/Origem/i), { target: { value: 'SITTEL' } });
     fireEvent.change(screen.getByLabelText(/Tipo/i), {
       target: { value: 'CADASTRO_ASSINANTES' },
     });
@@ -72,5 +74,34 @@ describe('AddFileModal (basic)', () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     fireEvent.click(screen.getByRole('button', { name: /Adicionar/i }));
+  });
+
+  it('enables the type selector only after choosing an origin', () => {
+    openModal();
+    const originSelect = screen.getByLabelText(/Origem/i);
+    const typeSelect = screen.getByLabelText(/Tipo/i) as HTMLSelectElement;
+
+    expect(typeSelect).toBeDisabled();
+
+    fireEvent.change(originSelect, { target: { value: 'SIMBA' } });
+    expect(typeSelect).not.toBeDisabled();
+  });
+
+  it('shows only the types for the selected origin', () => {
+    openModal();
+    const originSelect = screen.getByLabelText(/Origem/i);
+    const typeSelect = screen.getByLabelText(/Tipo/i) as HTMLSelectElement;
+
+    fireEvent.change(originSelect, { target: { value: 'SIMBA' } });
+    expect(Array.from(typeSelect.options).map((opt) => opt.value)).toContain('EXTRATO_DETALHADO');
+    expect(Array.from(typeSelect.options).map((opt) => opt.value)).not.toContain(
+      'CADASTRO_ASSINANTES'
+    );
+
+    fireEvent.change(originSelect, { target: { value: 'SITTEL' } });
+    expect(Array.from(typeSelect.options).map((opt) => opt.value)).toContain('CADASTRO_ASSINANTES');
+    expect(Array.from(typeSelect.options).map((opt) => opt.value)).not.toContain(
+      'EXTRATO_DETALHADO'
+    );
   });
 });
