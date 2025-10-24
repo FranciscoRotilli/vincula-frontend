@@ -709,6 +709,7 @@ describe('GeneralInfoPage', () => {
       const mockMutate = vi.fn((_, { onSuccess }) => onSuccess());
       (useDeleteCase as Mock).mockReturnValue({
         mutate: mockMutate,
+        isPending: false,
       });
       (getCurrentUser as Mock).mockResolvedValue({ role: 'ADMIN', id: '1', name: 'Admin User' });
 
@@ -724,12 +725,9 @@ describe('GeneralInfoPage', () => {
         fireEvent.click(deleteOption);
       });
 
-      await waitFor(() => {
-        const deleteButtons = screen.getAllByText(t('cases.title.delete'));
-        // O último botão é o do modal (o primeiro é o título do modal, o segundo é o botão do menu)
-        const confirmButton = deleteButtons[deleteButtons.length - 1];
-        fireEvent.click(confirmButton);
-      });
+      // Wait for the modal title to appear
+      const confirmButton = await screen.findByText(t('cases.title.deleteAction'));
+      fireEvent.click(confirmButton);
 
       await waitFor(() => {
         expect(mockMutate).toHaveBeenCalledWith('123', expect.any(Object));
@@ -762,15 +760,19 @@ describe('GeneralInfoPage', () => {
     });
 
     it('deve submeter e recarregar a página no sucesso', async () => {
-      // Stub reload in JSDOM environment
-      const originalLocation = window.location;
-      Object.defineProperty(window, 'location', {
-        value: { ...window.location, reload: vi.fn() },
-        writable: true,
+      const mockMutateAsync = vi.fn().mockResolvedValue(undefined);
+      const mockRefetch = vi.fn();
+      (useAllowVisualization as Mock).mockReturnValue({ 
+        mutate: vi.fn(),
+        mutateAsync: mockMutateAsync,
+        isPending: false,
       });
-      const reloadSpy = vi.spyOn(window.location, 'reload');
-      const mockMutate = vi.fn((_, { onSuccess }) => onSuccess());
-      (useAllowVisualization as Mock).mockReturnValue({ mutate: mockMutate });
+      (useCaseById as Mock).mockReturnValue({
+        data: mockCaseData,
+        isLoading: false,
+        isError: false,
+        refetch: mockRefetch,
+      });
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
@@ -781,14 +783,12 @@ describe('GeneralInfoPage', () => {
       fireEvent.click(submit);
 
       await waitFor(() => {
-        expect(mockMutate).toHaveBeenCalled();
+        expect(mockMutateAsync).toHaveBeenCalled();
       });
 
       await waitFor(() => {
-        expect(reloadSpy).toHaveBeenCalled();
+        expect(mockRefetch).toHaveBeenCalled();
       });
-      // restore
-      Object.defineProperty(window, 'location', { value: originalLocation });
     });
   });
 
