@@ -47,13 +47,13 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
-  it('visually limits the menu to 3 items (scrollable list)', () => {
+  it('visually limits the menu to 4 items (scrollable list)', () => {
     const { field } = setup(MANY_OPTIONS);
 
     fireEvent.click(field);
     const listbox = screen.getByRole('listbox') as HTMLElement;
 
-    expect(listbox.style.maxHeight).toContain('calc(1.313rem * 3 + 8px)');
+    expect(listbox.style.maxHeight).toContain('calc(1.313rem * 6.5 + 8px)');
 
     expect(within(listbox).getAllByRole('option')).toHaveLength(MANY_OPTIONS.length);
   });
