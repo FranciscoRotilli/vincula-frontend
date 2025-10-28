@@ -35,7 +35,7 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
     {
       key: 'investigated',
       label: 'Investigado',
-      type: 'select',
+      type: 'multi-select',
       options: investigatedOptions,
       placeholder: 'Selecione',
     },
@@ -57,7 +57,7 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
       key: 'archive',
       label: 'Arquivo',
       options: archivesOptions,
-      type: 'select',
+      type: 'multi-select',
       placeholder: 'Selecione',
     },
   ];

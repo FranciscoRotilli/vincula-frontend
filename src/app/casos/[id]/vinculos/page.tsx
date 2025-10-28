@@ -191,11 +191,11 @@ import {
   }, [id]);
 
   const filterFields: FieldConfig[] = [
-    { key: 'investigado', label: 'Investigado (CPF/CNPJ)', type: 'select', options: investigado, placeholder: 'Selecione' },
+    { key: 'investigado', label: 'Investigado (CPF/CNPJ)', type: 'multi-select', options: investigado, placeholder: 'Selecione' },
     { key: 'nome', label: 'Nome', type: 'input', placeholder: 'Digite o nome' },
     { key: 'cpfCnpj', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
     { key: 'baseDados', label: 'Base de dados', type: 'select', options: baseOptions, placeholder: 'Selecione' },
-    { key: 'arquivo', label: 'Arquivo', type: 'input', placeholder: 'Nome do arquivo' },
+    { key: 'arquivo', label: 'Arquivo', type: 'multi-select', placeholder: 'Nome do arquivo' },
   ];
 
   const handleFilter = (newFilters: FilterValues) => {
