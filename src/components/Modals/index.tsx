@@ -17,6 +17,7 @@ type ModalProps = {
   cancelButton?: string;
   disableEscapeKeyDown?: boolean;
   onAction?: () => void;
+  actionDisabled?: boolean;
   isError?: boolean;
   actionButtonColor?: 'primary' | 'error';
 };
@@ -36,6 +37,7 @@ const Modal = ({
   onAction,
   actionButton,
   cancelButton,
+  actionDisabled = false,
   isError: _isError = false,
   actionButtonColor = 'primary',
 }: ModalProps) => {
@@ -117,12 +119,15 @@ const Modal = ({
 						>
 						{actionButton && (
 							<button
+                type="button"
 							className={
 								actionButtonColor === 'error'
 								? `${styles.button} ${styles.error}`
 								: `${styles.button} ${styles.primary}`
 							}
 							onClick={onAction}
+                disabled={actionDisabled}
+                aria-disabled={actionDisabled}
 							>
 							{actionButton}
 							</button>

@@ -17,9 +17,9 @@ import RemoveModal from '../Modals/RemoveModal';
 import styles from './FilesSection.module.css';
 
 const columns: Column<FileResponse>[] = [
-  { key: 'name', label: 'NOME', align: 'left' },
-  { key: 'creation_date', label: 'DATA DE INCLUSÃO', align: 'left' },
-  { key: 'size', label: 'TAMANHO', align: 'left' },
+  { key: 'name', label: 'Nome', align: 'left' },
+  { key: 'creation_date', label: 'Data de Inclusão', align: 'left' },
+  { key: 'size', label: 'Tamanho', align: 'left' },
 ];
 
 type FilesSectionProps = {
@@ -35,14 +35,15 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   const removeFileMutation = useRemoveFile(caseId);
 
   const handleRemove = () => {
-    if (fileToRemove) {
-      removeFileMutation.mutate(fileToRemove.id, {
-        onSuccess: () => {
-          setIsRemoveModalOpen(false);
-          setFileToRemove(null);
-        },
-      });
+    if (!fileToRemove || removeFileMutation.isPending) {
+      return;
     }
+    removeFileMutation.mutate(fileToRemove.id, {
+      onSuccess: () => {
+        setIsRemoveModalOpen(false);
+        setFileToRemove(null);
+      },
+    });
   };
 
   const rowActions = [
@@ -98,6 +99,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
         onRemove={handleRemove}
         title={t('removeFileModal.title')}
         description={t('removeFileModal.description')}
+        isProcessing={removeFileMutation.isPending}
       />
     </>
   );
