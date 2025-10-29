@@ -12,8 +12,6 @@ export default defineConfig({
     globals: true,
     fileParallelism: false,
   },
-  css: false,
-
   resolve: {
     alias: [
       { find: '@', replacement: path.resolve(__dirname, 'src') },
