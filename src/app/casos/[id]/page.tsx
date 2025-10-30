@@ -14,6 +14,7 @@ import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
   useCaseById,
@@ -428,22 +429,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showDeleteCaseModal && (
-          <ConfirmationModal
+          <RemoveModal
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
-            icon={<TbTrash size={36} color="#ff3636" />}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
             description={t('cases.title.deleteWarning', {
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.deleteAction', { defaultValue: 'Excluir' })}
-            onPrimary={handleDeleteCase}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowDeleteCaseModal(false)}
-            primaryDisabled={deleteCaseMutation.isPending}
-            primaryLoading={deleteCaseMutation.isPending}
-            primaryLoadingLabel={t('cases.title.deleting', { defaultValue: 'Excluindo...' })}
+            onRemove={handleDeleteCase}
+            isProcessing={deleteCaseMutation.isPending}
           />
         )}
 
@@ -465,21 +460,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showRemoveEnvolvidoModal.open && (
-          <ConfirmationModal
+          <RemoveModal
             isOpen={showRemoveEnvolvidoModal.open}
             onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-            icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
             description={t('cases.title.removeInvestigatedWarning', {
               defaultValue:
                 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
-            onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
-            primaryDisabled={deleteSuspectMutation.isPending}
-            primaryLoading={deleteSuspectMutation.isPending}
+            onRemove={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+            isProcessing={deleteSuspectMutation.isPending}
           />
         )}
 
