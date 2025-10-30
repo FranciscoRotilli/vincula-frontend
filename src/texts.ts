@@ -17,6 +17,8 @@ export const texts = {
   'cases.title.allowViewDesc': 'Selecione um usuário para compartilhar o acesso ao caso.',
   'cases.title.allowView.select.placeholder': 'Selecione um usuário',
   'cases.title.delete': 'Excluir caso',
+  'cases.title.deleteAction': 'Excluir',
+  'cases.title.deleting': 'Excluindo...',
   'cases.title.investigated': 'Investigados',
   'cases.title.investigatedDesc':
     'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
@@ -42,6 +44,7 @@ export const texts = {
   'cases.title.removeInvestigatedWarning':
     'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.remove': 'Remover',
+  'cases.title.addingInvestigated': 'Adicionando investigado...',
   'cases.title.addFile': 'Adicionar arquivo',
 
   'cases.createError': 'Erro ao criar caso. Tente novamente.',
@@ -74,6 +77,7 @@ export const texts = {
   'addFile.type': 'Tipo',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
+  'addFile.adding': 'Adicionando arquivo...',
   'addFile.simbaLabel': 'ExtratoDetalhado',
   'addFile.sittelLabel': 'Cadastros dos Assinantes',
   'addFile.rifLabel': 'RIF',

@@ -19,6 +19,10 @@ type ConfirmationModalProps = {
   primaryColor?: string;
   secondaryColor?: string;
   children?: React.ReactNode;
+  primaryDisabled?: boolean;
+  secondaryDisabled?: boolean;
+  primaryLoading?: boolean;
+  primaryLoadingLabel?: string;
 };
 
 export default function ConfirmationModal({
@@ -34,6 +38,10 @@ export default function ConfirmationModal({
   primaryColor,
   secondaryColor,
   children,
+  primaryDisabled = false,
+  secondaryDisabled = false,
+  primaryLoading = false,
+  primaryLoadingLabel,
 }: Readonly<ConfirmationModalProps>) {
   if (!isOpen) return null;
 
@@ -52,12 +60,16 @@ export default function ConfirmationModal({
             label={primaryLabel}
             variant="error"
             className={`${styles.btnPrimary}${primaryColor ? ' ' + styles.customPrimaryColor : ''}`}
+            disabled={primaryDisabled}
+            loading={primaryLoading}
+            loadingLabel={primaryLoadingLabel}
             onClick={onPrimary}
           />
           <Button
             label={secondaryLabel}
             variant="outlined"
             className={`${styles.btnSecondary}${secondaryColor ? ' ' + styles.customSecondaryColor : ''}`}
+            disabled={secondaryDisabled}
             onClick={onSecondary}
           />
         </div>

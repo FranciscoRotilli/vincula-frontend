@@ -14,7 +14,6 @@ import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
-import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
   useCaseById,
@@ -75,9 +74,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [arquivos, setArquivos] = useState<FileResponse[]>([]);
   const [novoNomeCaso, setNovoNomeCaso] = useState('');
   const [novaSituacao, setNovaSituacao] = useState('');
-  const [usuarioSelecionado] = useState('');
 
   const handleUpdateName = async () => {
+    if (updateNameMutation.isPending) return;
     updateNameMutation.mutate(
       { caseId, name: novoNomeCaso as CaseItem['name'] },
       {
@@ -92,6 +91,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleUpdateSituation = async () => {
+    if (updateSituationMutation.isPending) return;
     updateSituationMutation.mutate(
       { caseId, situation: novaSituacao as CaseItem['status'] },
       {
@@ -106,6 +106,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleDeleteCase = () => {
+    if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
@@ -118,6 +119,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAddEnvolvido = () => {
+    if (addSuspectMutation.isPending) return;
     const newSuspect: SuspectRequest = {
       name: novoNome,
       cpf_cnpj: novoCpf,
@@ -138,19 +140,20 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleAllowVisualization = () => {
-    allowViewMutation.mutate(
-      { caseId, userId: usuarioSelecionado },
-      {
-        onSuccess: () => {
-          setShowAllowVisualizationModal(false);
-          window.location.reload();
-        },
-      }
-    );
+  const handleAllowVisualization = async (userId: string) => {
+    if (allowViewMutation.isPending) return;
+    try {
+      await allowViewMutation.mutateAsync({ caseId, userId });
+      setShowAllowVisualizationModal(false);
+      refetch();
+    } catch (error) {
+      console.error('Erro ao permitir visualização:', error);
+      throw error;
+    }
   };
 
   const handleRemoveEnvolvido = (index: number) => {
+    if (deleteSuspectMutation.isPending) return;
     if (index === null || index === undefined) return;
     const suspect = envolvidos[index];
 
@@ -175,7 +178,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const envolvidosColumns: Column<EnvolvidoRow>[] = [
-    { key: 'name', label: 'NOME' },
+    { key: 'name', label: 'Nome' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
     { key: 'phone_number', label: 'Telefone' },
   ];
@@ -312,7 +315,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   //pattern="[0-9]*"
                   placeholder={t('cases.title.inputCpfCnpj')}
                   value={maskCpfCnpj(novoCpf)}
-                  onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, '').slice(0, 14))}
                   className={styles.input}
                   //maxLength={18}
                 />
@@ -333,8 +336,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   label=""
                   onClick={handleAddEnvolvido}
                   disabled={
-                    !novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)
+                    addSuspectMutation.isPending ||
+                    novoNome.trim().length === 0 ||
+                    !(novoCpf.length === 11 || novoCpf.length === 14)
                   }
+                  loading={addSuspectMutation.isPending}
+                  loadingLabel={t('cases.title.addingInvestigated', {
+                    defaultValue: 'Adicionando...',
+                  })}
                 />
               </div>
             </div>
@@ -366,6 +375,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
+            primaryDisabled={updateNameMutation.isPending}
+            primaryLoading={updateNameMutation.isPending}
           >
             <input
               type="text"
@@ -391,6 +402,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
+            primaryDisabled={updateSituationMutation.isPending}
+            primaryLoading={updateSituationMutation.isPending}
           >
             <select
               value={novaSituacao}
@@ -415,16 +428,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showDeleteCaseModal && (
-          <RemoveModal
+          <ConfirmationModal
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
+            icon={<TbTrash size={36} color="#ff3636" />}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
             description={t('cases.title.deleteWarning', {
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            onRemove={handleDeleteCase}
-            isLoading={deleteCaseMutation.isPending}
+            primaryLabel={t('cases.title.deleteAction', { defaultValue: 'Excluir' })}
+            onPrimary={handleDeleteCase}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowDeleteCaseModal(false)}
+            primaryDisabled={deleteCaseMutation.isPending}
+            primaryLoading={deleteCaseMutation.isPending}
+            primaryLoadingLabel={t('cases.title.deleting', { defaultValue: 'Excluindo...' })}
           />
         )}
 
@@ -446,16 +465,21 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showRemoveEnvolvidoModal.open && (
-          <RemoveModal
+          <ConfirmationModal
             isOpen={showRemoveEnvolvidoModal.open}
             onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
             description={t('cases.title.removeInvestigatedWarning', {
               defaultValue:
                 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            onRemove={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
-            isLoading={deleteSuspectMutation.isPending}
+            primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
+            onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            primaryDisabled={deleteSuspectMutation.isPending}
+            primaryLoading={deleteSuspectMutation.isPending}
           />
         )}
 
@@ -479,8 +503,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           <AllowVisualizationModal
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
-            caseId={id}
-            onSubmit={() => handleAllowVisualization()}
+            onSubmit={handleAllowVisualization}
+            isSubmitting={allowViewMutation.isPending}
           />
         )}
       </div>

@@ -1,10 +1,8 @@
 'use client';
 
-import { CircularProgress, Modal } from '@mui/material';
+import Modal from '@mui/material/Modal';
 import Image from 'next/image';
 import { MdClose } from 'react-icons/md';
-
-import { t } from '@/texts';
 
 import Button from '../Button';
 import styles from './RemoveModal.module.css';
@@ -15,7 +13,7 @@ interface RemoveModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRemove: () => void;
-  isLoading?: boolean;
+  isProcessing?: boolean;
 }
 
 export default function RemoveModal({
@@ -24,7 +22,7 @@ export default function RemoveModal({
   isOpen,
   onClose,
   onRemove,
-  isLoading = false,
+  isProcessing = false,
 }: RemoveModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -41,17 +39,11 @@ export default function RemoveModal({
 
         <div className={styles.buttons}>
           <Button
-            label={
-              isLoading ? (
-                <CircularProgress size={20} className={styles.loading} />
-              ) : (
-                t('cases.title.remove')
-              )
-            }
+            label={isProcessing ? 'Removendo...' : 'Remover'}
             variant="contained"
             className={styles.removeButton}
+            disabled={isProcessing}
             onClick={onRemove}
-            disabled={isLoading}
           />
           <Button label="Cancelar" variant="error" onClick={onClose} />
         </div>
