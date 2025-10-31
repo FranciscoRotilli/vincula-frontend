@@ -51,12 +51,76 @@ vi.mock('@/services/auth', () => ({
   getCurrentUser: vi.fn(),
 }));
 
+vi.mock('@/components/Button', () => ({
+  __esModule: true,
+  default: ({ label, onClick, disabled, loading, icon, size, variant, className, loadingLabel }: any) => (
+    <button
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={className}
+      data-variant={variant}
+      data-size={size}
+    >
+      {icon}
+      {loading ? loadingLabel || 'Loading...' : label}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/Input', () => ({
+  __esModule: true,
+  default: ({ value, onChange, placeholder, label, className, inputMode, ...props }: any) => (
+    <div className={className}>
+      {label && <label>{label}</label>}
+      <input
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        {...props}
+      />
+    </div>
+  ),
+}));
+
 vi.mock('@/components/CaseContainer', () => ({
   CaseContainer: ({ children, caseId }: { children: React.ReactNode; caseId: string }) => (
     <div data-testid="case-container" data-case-id={caseId}>
       {children}
     </div>
   ),
+}));
+
+vi.mock('@/components/ConfirmationModal/ConfirmationModal', () => ({
+  __esModule: true,
+  default: ({
+    isOpen,
+    onClose,
+    onPrimary,
+    onSecondary,
+    title,
+    description,
+    primaryLabel,
+    secondaryLabel,
+    children,
+    primaryDisabled,
+    primaryLoading,
+  }: any) => {
+    if (!isOpen) return null;
+    return (
+      <div data-testid="confirmation-modal">
+        <h2>{title}</h2>
+        <p>{description}</p>
+        {children}
+        <button onClick={onSecondary} disabled={primaryDisabled}>
+          {secondaryLabel}
+        </button>
+        <button onClick={onPrimary} disabled={primaryDisabled || primaryLoading}>
+          {primaryLabel}
+        </button>
+      </div>
+    );
+  },
 }));
 
 vi.mock('@/components/FilesSection', () => ({
