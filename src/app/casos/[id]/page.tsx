@@ -30,7 +30,7 @@ import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
 
-type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
+type SuspectRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
 export default function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -48,7 +48,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [showRemoveEnvolvidoModal, setShowRemoveEnvolvidoModal] = useState<{
+  const [showRemoveSuspectModal, setShowRemoveSuspectModal] = useState<{
     open: boolean;
     index: number | null;
   }>({
@@ -56,9 +56,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     index: null,
   });
 
-  const [novoNome, setNovoNome] = useState('');
-  const [novoTelefone, setNovoTelefone] = useState('');
-  const [novoCpf, setNovoCpf] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newCpf, setNewCpf] = useState('');
 
   const [validationErrors, setValidationErrors] = useState<{
     name?: string;
@@ -75,15 +75,15 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
 
-  const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
-  const [novoNomeCaso, setNovoNomeCaso] = useState('');
-  const [novaSituacao, setNovaSituacao] = useState('');
-  const [usuarioSelecionado] = useState('');
+  const [suspects, setSuspects] = useState<SuspectRow[]>([]);
+  const [files, setFiles] = useState<FileResponse[]>([]);
+  const [newCaseName, setNewCaseName] = useState('');
+  const [newSituation, setNewSituation] = useState('');
+  const [selectedUser] = useState('');
 
   const handleUpdateName = async () => {
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso as CaseItem['name'] },
+      { caseId, name: newCaseName as CaseItem['name'] },
       {
         onSuccess: () => {
           setShowNameModal(false);
@@ -97,7 +97,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const handleUpdateSituation = async () => {
     updateSituationMutation.mutate(
-      { caseId, situation: novaSituacao as CaseItem['status'] },
+      { caseId, situation: newSituation as CaseItem['status'] },
       {
         onSuccess: () => {
           setShowSituationModal(false);
@@ -121,13 +121,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     });
   };
 
-  const handleAddEnvolvido = () => {
-    let errors: typeof validationErrors = {};
+  const handleAddSuspect = () => {
+    const errors: typeof validationErrors = {};
     let isValid = true;
 
-    const rawCpfCnpj = novoCpf.replace(/\D/g, '');
+    const rawCpfCnpj = newCpf.replace(/\D/g, '');
 
-    if (!novoNome.trim()) {
+    if (!newName.trim()) {
       errors.name = 'O nome é obrigatório.';
       isValid = false;
     }
@@ -148,18 +148,18 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     setValidationErrors({});
 
     const newSuspect: SuspectRequest = {
-      name: novoNome,
+      name: newName,
       cpf_cnpj: rawCpfCnpj,
-      phone_number: novoTelefone,
+      phone_number: newPhone,
     };
 
     addSuspectMutation.mutate(
       { caseId, newSuspect },
       {
         onSuccess: () => {
-          setNovoNome('');
-          setNovoCpf('');
-          setNovoTelefone('');
+          setNewName('');
+          setNewCpf('');
+          setNewPhone('');
           refetch();
         },
         onError: (error) => {
@@ -170,7 +170,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleAllowVisualization = () => {
-    allowViewMutation.mutate({ caseId, userId: usuarioSelecionado }, {
+    allowViewMutation.mutate({ caseId, userId: selectedUser }, {
       onSuccess: () => {
         setShowAllowVisualizationModal(false);
         window.location.reload()
@@ -178,16 +178,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     });
   }
 
-  const handleRemoveEnvolvido = (index: number) => {
+  const handleRemoveSuspect = (index: number) => {
     if (index === null || index === undefined) return;
-    const suspect = envolvidos[index];
+    const suspect = suspects[index];
 
     deleteSuspectMutation.mutate(
       { caseId, suspectId: suspect.id.toString() },
       {
         onSuccess: () => {
-          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
-          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          setSuspects((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveSuspectModal({ open: false, index: null });
           refetch();
         },
         onError: (error) => {
@@ -197,32 +197,32 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleRemoveArquivo = (index: number) => {
-    setArquivos(arquivos.filter((_, i) => i !== index));
+  const handleRemoveFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
   };
 
-  const envolvidosColumns: Column<EnvolvidoRow>[] = [
+  const suspectsColumns: Column<SuspectRow>[] = [
     { key: 'name', label: 'NOME' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
     { key: 'phone_number', label: 'Telefone' },
   ];
 
-  const envolvidosRowActions = [
+  const suspectsRowActions = [
     {
       icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
       label: 'Remover',
-      onClick: (_row: EnvolvidoRow, _index?: number) => {
-        const idx = envolvidos.findIndex((e) => e.id === _row.id);
-        setShowRemoveEnvolvidoModal({ open: true, index: idx });
+      onClick: (_row: SuspectRow, _index?: number) => {
+        const idx = suspects.findIndex((e) => e.id === _row.id);
+        setShowRemoveSuspectModal({ open: true, index: idx });
       },
     },
   ];
 
   useEffect(() => {
     if (caseDetails) {
-      setEnvolvidos(caseDetails.suspects || []);
-      setArquivos(caseDetails.archives || []);
+      setSuspects(caseDetails.suspects || []);
+      setFiles(caseDetails.archives || []);
     }
   }, [caseDetails]);
 
@@ -318,7 +318,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             <div className={styles.sectionHeader}>
               <h1 className={styles.title3}>
                 {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
-                {envolvidos.length})
+                {suspects.length})
               </h1>
               <p className={styles.body5}>
                 {t('cases.title.investigatedDesc', {
@@ -331,8 +331,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 <Input
                   placeholder={t('cases.title.inputName')}
                   label='Nome'
-                  value={novoNome}
-                  onChange={(e) => setNovoNome(e.target.value)}
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
                   className={styles.input}
                   error={validationErrors.name}
                 />
@@ -340,8 +340,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   inputMode="numeric"
                   label='CPF / CNPJ'
                   placeholder={t('cases.title.inputCpfCnpj')}
-                  value={maskCpfCnpj(novoCpf)}
-                  onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
+                  value={maskCpfCnpj(newCpf)}
+                  onChange={(e) => setNewCpf(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                   error={validationErrors.cpf_cnpj}
                 />
@@ -349,8 +349,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   inputMode="numeric"
                   label='Telefone'
                   placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
-                  value={novoTelefone}
-                  onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                 />
                 <Button
@@ -358,16 +358,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   variant="contained"
                   size="icon"
                   label=""
-                  onClick={handleAddEnvolvido}
+                  onClick={handleAddSuspect}
                 />
               </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">
-              <GenericTable<EnvolvidoRow>
-                columns={envolvidosColumns}
-                data={envolvidos}
+              <GenericTable<SuspectRow>
+                columns={suspectsColumns}
+                data={suspects}
                 loading={isLoading}
-                rowActions={envolvidosRowActions}
+                rowActions={suspectsRowActions}
                 variant={'outlined'}
               />
             </div>
@@ -393,8 +393,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           >
             <input
               type="text"
-              value={novoNomeCaso}
-              onChange={(e) => setNovoNomeCaso(e.target.value as CaseItem['name'])}
+              value={newCaseName}
+              onChange={(e) => setNewCaseName(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
               placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
@@ -417,8 +417,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onSecondary={() => setShowSituationModal(false)}
           >
             <select
-              value={novaSituacao}
-              onChange={(e) => setNovaSituacao(e.target.value as CaseItem['status'])}
+              value={newSituation}
+              onChange={(e) => setNewSituation(e.target.value as CaseItem['status'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
             >
@@ -466,16 +466,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
             })}
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
-            onPrimary={() => handleRemoveArquivo(showRemoveFileModal.index!)}
+            onPrimary={() => handleRemoveFile(showRemoveFileModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
           />
         )}
 
-        {showRemoveEnvolvidoModal.open && (
+        {showRemoveSuspectModal.open && (
           <ConfirmationModal
-            isOpen={showRemoveEnvolvidoModal.open}
-            onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            isOpen={showRemoveSuspectModal.open}
+            onClose={() => setShowRemoveSuspectModal({ open: false, index: null })}
             icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
             description={t('cases.title.removeInvestigatedWarning', {
@@ -483,9 +483,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
             })}
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
-            onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+            onPrimary={() => handleRemoveSuspect(showRemoveSuspectModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            onSecondary={() => setShowRemoveSuspectModal({ open: false, index: null })}
           />
         )}
 
