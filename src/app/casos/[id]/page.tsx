@@ -60,7 +60,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     fetchCurrentUser();
   }, []);
   const isAdmin = currentUser?.role === 'ADMIN';
-  console.log(currentUser?.role)
 
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
