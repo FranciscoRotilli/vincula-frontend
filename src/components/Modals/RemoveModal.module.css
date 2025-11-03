@@ -49,6 +49,11 @@
 
 .removeButton {
   background-color: var(--button-error) !important;
+
+  > span {
+    display: flex !important;
+    align-items: center;
+  }
 }
 
 .removeButton:hover:not(.disabled) {
@@ -57,4 +62,8 @@
 
 .removeButton:active:not(.disabled) {
   background-color: var(--button-error-contained-active) !important;
+}
+
+.loading {
+  color: var(--white) !important;
 }
