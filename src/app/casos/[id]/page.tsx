@@ -205,7 +205,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const suspectsColumns: Column<SuspectRow>[] = [
     { key: 'name', label: 'NOME' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
-    { key: 'phone_number', label: 'Telefone' },
+    { key: 'phone_number', label: 'TELEFONE' },
   ];
 
   const suspectsRowActions = [
