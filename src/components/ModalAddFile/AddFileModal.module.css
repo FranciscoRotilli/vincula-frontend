@@ -136,6 +136,16 @@
   color: var(--surface);
 }
 
+.loadingContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loadingText {
+  font-weight: 700;
+}
+
 .invalid {
   border-color: var(--error) !important;
   box-shadow: 0 0 0 0.1875rem color-mix(in oklab, var(--error) 28%, transparent);

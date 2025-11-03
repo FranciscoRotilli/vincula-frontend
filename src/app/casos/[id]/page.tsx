@@ -14,6 +14,7 @@ import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
   useCaseById,
@@ -82,6 +83,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [selectedUser] = useState('');
 
   const handleUpdateName = async () => {
+    if (updateNameMutation.isPending) return;
     updateNameMutation.mutate(
       { caseId, name: newCaseName as CaseItem['name'] },
       {
@@ -90,12 +92,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         },
         onError: (error) => {
           console.error('Failed to update case name: ', error);
-        }
+        },
       }
     );
   };
 
   const handleUpdateSituation = async () => {
+    if (updateSituationMutation.isPending) return;
     updateSituationMutation.mutate(
       { caseId, situation: newSituation as CaseItem['status'] },
       {
@@ -110,6 +113,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const handleDeleteCase = () => {
+    if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
@@ -117,7 +121,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       },
       onError: (error) => {
         console.error('Failed to delete case:', error);
-      }
+      },
     });
   };
 
@@ -263,7 +267,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails} data-testid="case-details">
-            <h2 className={styles.h2} data-testid='case-name'>{caseDetails.name}</h2>
+            <h2 className={styles.h2} data-testid="case-name">
+              {caseDetails.name}
+            </h2>
             <div className={styles.detailsRow} data-testid="case-informations">
               <div>
                 <strong>{t('modal.owner')}</strong> {caseDetails.owner}
@@ -281,9 +287,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div className={styles.actionsBox} data-testid="case-action-buttons">
-            <h1 className={styles.title3}>
-              {t('cases.title.actions')}
-            </h1>
+            <h1 className={styles.title3}>{t('cases.title.actions')}</h1>
             <div className={styles.actionsRow}>
               <Button
                 size="medium"
@@ -390,6 +394,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
+            primaryDisabled={updateNameMutation.isPending}
+            primaryLoading={updateNameMutation.isPending}
           >
             <input
               type="text"
@@ -415,6 +421,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
+            primaryDisabled={updateSituationMutation.isPending}
+            primaryLoading={updateSituationMutation.isPending}
           >
             <select
               value={newSituation}
@@ -439,19 +447,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         )}
 
         {showDeleteCaseModal && (
-          <ConfirmationModal
+          <RemoveModal
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
-            icon={<TbTrash size={36} color="#ff3636" />}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
             description={t('cases.title.deleteWarning', {
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
-            onPrimary={handleDeleteCase}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowDeleteCaseModal(false)}
+            onRemove={handleDeleteCase}
+            isProcessing={deleteCaseMutation.isPending}
           />
         )}
 
@@ -509,8 +514,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           <AllowVisualizationModal
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
-            caseId={id}
-            onSubmit={() => handleAllowVisualization()}
+            onSubmit={handleAllowVisualization}
+            isSubmitting={allowViewMutation.isPending}
           />
         )}
       </div>

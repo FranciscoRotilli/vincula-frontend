@@ -13,6 +13,7 @@ interface RemoveModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRemove: () => void;
+  isProcessing?: boolean;
 }
 
 export default function RemoveModal({
@@ -21,6 +22,7 @@ export default function RemoveModal({
   isOpen,
   onClose,
   onRemove,
+  isProcessing = false,
 }: RemoveModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -37,9 +39,10 @@ export default function RemoveModal({
 
         <div className={styles.buttons}>
           <Button
-            label="Remover"
+            label={isProcessing ? 'Removendo...' : 'Remover'}
             variant="contained"
             className={styles.removeButton}
+            disabled={isProcessing}
             onClick={onRemove}
           />
           <Button label="Cancelar" variant="error" onClick={onClose} />

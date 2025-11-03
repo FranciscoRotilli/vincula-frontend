@@ -22,6 +22,7 @@ describe('FilesSection Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseRemoveFile.mockReturnValue({ mutate: vi.fn(), isPending: false });
   });
 
   it('renders loading state', () => {
@@ -84,7 +85,7 @@ describe('FilesSection Component', () => {
       },
       isLoading: false,
     });
-    mockUseRemoveFile.mockReturnValue({ mutate: mockMutate });
+    mockUseRemoveFile.mockReturnValue({ mutate: mockMutate, isPending: false });
 
     render(<FilesSection caseId="case-1" />);
 
