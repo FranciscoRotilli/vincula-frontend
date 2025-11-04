@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import Modal from '.';
@@ -12,13 +13,15 @@ type ConfirmationModalProps = {
   primaryLabel: string;
   onPrimary: () => void;
   secondaryLabel: string;
-  onSecondary: () => void;
+  onSecondary?: () => void;
   primaryColor?: string;
+  primaryLoading?: boolean;
+  primaryLoadingLabel?: string;
   children?: React.ReactNode;
 };
 
 export default function ConfirmationModal({
-	buttonsPosition,
+  buttonsPosition,
   isOpen,
   onClose,
   icon,
@@ -27,28 +30,33 @@ export default function ConfirmationModal({
   primaryLabel,
   onPrimary,
   secondaryLabel,
-	children,
-	primaryColor,
+  onSecondary,
+  primaryColor,
+  primaryLoading,
+  primaryLoadingLabel,
+  children,
 }: Readonly<ConfirmationModalProps>) {
   const primaryVariant = primaryColor === 'error' ? 'error' : 'primary';
-
+  const gerund = primaryLabel.replace(/r$/i, '') + 'ndo';
+  const actionLabel = primaryLoading ? (primaryLoadingLabel ?? gerund) : primaryLabel;
   return (
-		<Modal
-			buttonsPosition={buttonsPosition || 'center'}
-			showCloseIcon={false}
-			onAction={onPrimary}
+    <Modal
+      buttonsPosition={buttonsPosition ?? 'center'}
+      showCloseIcon={false}
+      onAction={onPrimary}
       isOpen={isOpen}
       onClose={onClose}
       icon={icon}
       title={title}
       description={description}
       size="medium"
-			closeOnOverlayClick={true}
-			actionButton={primaryLabel}
-			cancelButton={secondaryLabel}
-			actionButtonColor={primaryVariant}
-		>
-			{children}
+      closeOnOverlayClick={true}
+      actionButton={actionLabel}
+      cancelButton={secondaryLabel}
+      actionButtonColor={primaryVariant}
+      actionDisabled={!!primaryLoading}
+    >
+      {children}
     </Modal>
   );
 }
