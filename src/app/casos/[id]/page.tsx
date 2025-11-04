@@ -13,8 +13,8 @@ import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
-import RemoveModal from '@/components/Modals/RemoveModal';
 import ConfirmationModal from '@/components/Modals/ConfirmationModal';
+import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
   useCaseById,
@@ -394,7 +394,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
-            primaryDisabled={updateNameMutation.isPending}
+            // primaryDisabled={updateNameMutation.isPending}
             primaryLoading={updateNameMutation.isPending}
           >
             <input
@@ -421,7 +421,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
-            primaryDisabled={updateSituationMutation.isPending}
+            // primaryDisabled={updateSituationMutation.isPending}
             primaryLoading={updateSituationMutation.isPending}
           >
             <select
