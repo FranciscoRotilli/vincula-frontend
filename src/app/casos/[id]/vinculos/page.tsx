@@ -38,8 +38,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const [graphRels, setGraphRels] = useState<AppRelationship[]>([]);
   const [filters, setFilters] = useState<FilterValues>({});
   const [filterValues, setFilterValues] = useState<FilterValues>({});
-  const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
-  const [arquivo, setArquivo] = useState<{ value: string; label: string }[]>([]);
+  const [investigated, setInvestigated] = useState<{ value: string; label: string }[]>([]);
+  const [archive, setArchive] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
@@ -53,8 +53,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const graphFilters = useMemo(() => {
     let cpfCnpjValue: string | undefined = undefined;
 
-    if (filters.investigado) {
-      cpfCnpjValue = String(filters.investigado);
+    if (filters.investigated) {
+      cpfCnpjValue = String(filters.investigated);
     } else if (filters.cpfCnpj) {
       const cpfCnpjInput = String(filters.cpfCnpj);
       if (isValidCpfCnpjLength(cpfCnpjInput)) {
@@ -184,14 +184,14 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             label: `${suspect.name} - ${suspect.cpf_cnpj}`,
           })),
         ];
-        setInvestigado(options);
+        setInvestigated(options);
 
         const caseArchives = data.archives || [];
         const archiveOptions = caseArchives.map((a: { name: string, id: string }) => ({
           value: a.id,
           label: a.name,
         }));
-        setArquivo([{ value: '', label: 'Todos' }, ...archiveOptions]);
+        setArchive([{ value: '', label: 'Todos' }, ...archiveOptions]);
       } catch (error) {
         console.error(error);
       }
@@ -204,7 +204,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       key: 'investigado',
       label: 'Investigado (CPF/CNPJ)',
       type: 'multi-select',
-      options: investigado,
+      options: investigated,
       placeholder: 'Selecione',
     },
     { key: 'nome', label: 'Nome', type: 'input', placeholder: 'Digite o nome' },
@@ -220,7 +220,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       key: 'arquivo',
       label: 'Arquivo',
       type: 'multi-select',
-      options: arquivo,
+      options: archive,
       placeholder: 'Nome do arquivo',
     },
   ];
