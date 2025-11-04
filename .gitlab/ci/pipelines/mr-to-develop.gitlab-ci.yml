@@ -23,8 +23,6 @@ install:
 
 lint:
   stage: lint
-  needs:
-    - install
   tags:
     - docker-linux
   interruptible: true
@@ -42,8 +40,6 @@ lint:
 
 test:
   stage: test
-  needs:
-    - install
   tags:
     - docker-linux
   interruptible: true
@@ -61,10 +57,6 @@ test:
 
 build:
   stage: build
-  needs:
-    - install
-    - lint
-    - test
   tags:
     - docker-linux
   interruptible: true
