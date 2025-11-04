@@ -11,6 +11,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
+// import { jsPDF } from 'jspdf'; 
 import React, { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
