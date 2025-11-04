@@ -60,7 +60,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-
+  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -98,6 +98,26 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         },
         onError: (error) => {
           console.error('Failed to update case name: ', error);
+        },
+      }
+    );
+  };
+
+  const handleUpdateOwner = async () => {
+    if (!novoResponsavel) {
+      return;
+    }
+    
+    updateOwnerMutation.mutate(
+      { caseId, userId: novoResponsavel },
+      {
+        onSuccess: () => {
+          setShowChangeResponsibleModal(false);
+          setNovoResponsavel(''); 
+          refetch(); 
+        },
+        onError: (error) => {
+          console.error('Failed to update case owner:', error);
         },
       }
     );
