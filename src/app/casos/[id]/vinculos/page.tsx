@@ -39,7 +39,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const [filters, setFilters] = useState<FilterValues>({});
   const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [investigated, setInvestigated] = useState<{ value: string; label: string }[]>([]);
-  const [archive, setArchive] = useState<{ value: string; label: string }[]>([]);
+  const [file, setFile] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
@@ -66,7 +66,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       cpf_cnpj: cpfCnpjValue,
       investigated: filters.nome ? String(filters.nome) : undefined,
       origin: filters.baseDados ? String(filters.baseDados) : undefined,
-      archive: filters.arquivo ? String(filters.arquivo) : undefined,
+      file: filters.arquivo ? String(filters.arquivo) : undefined,
     };
   }, [filters]);
 
@@ -186,12 +186,12 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         ];
         setInvestigated(options);
 
-        const caseArchives = data.archives || [];
-        const archiveOptions = caseArchives.map((a: { name: string, id: string }) => ({
+        const caseFiles = data.files || [];
+        const fileOptions = caseFiles.map((a: { name: string, id: string }) => ({
           value: a.id,
           label: a.name,
         }));
-        setArchive([{ value: '', label: 'Todos' }, ...archiveOptions]);
+        setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
         console.error(error);
       }
@@ -220,7 +220,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       key: 'arquivo',
       label: 'Arquivo',
       type: 'multi-select',
-      options: archive,
+      options: file,
       placeholder: 'Nome do arquivo',
     },
   ];
