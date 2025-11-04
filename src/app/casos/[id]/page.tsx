@@ -394,7 +394,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowNameModal(false)}
-            // primaryDisabled={updateNameMutation.isPending}
             primaryLoading={updateNameMutation.isPending}
           >
             <input
@@ -421,7 +420,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowSituationModal(false)}
-            // primaryDisabled={updateSituationMutation.isPending}
             primaryLoading={updateSituationMutation.isPending}
           >
             <select
