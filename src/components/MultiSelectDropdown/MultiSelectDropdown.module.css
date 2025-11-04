@@ -1,0 +1,168 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  width: 100%;
+
+  --field-h: 40px;
+  --chip-h: 30px;
+  --caret-w: 10px;
+
+  --msd-border: #e6e8ec;
+  --msd-border-strong: #d8dbe1;
+  --msd-shadow-bottom: 0 2px 2px -1px rgba(0, 0, 0, .08);
+}
+
+.field {
+  width: 100%;
+  height: var(--field-h);
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  border-radius: 4px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  text-align: left;
+}
+.field:focus-visible {
+  outline: 2px solid var(--orange-primary);
+  outline-offset: 2px;
+}
+.isDisabled .field {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  gap: 6px;
+  height: 80%;
+  max-width: calc(100% - var(--caret-w));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.chips::-webkit-scrollbar { width: 6px; height: 6px; }
+.chips::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--msd-border) 60%, transparent);
+  border-radius: 999px;
+}
+
+.placeholder {
+  color: var(--text-color-placeholder, var(--gray));
+  font-size: 1rem;
+  line-height: var(--chip-h);
+  height: var(--chip-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: var(--chip-h);
+  max-width: 100%;
+  padding: 0 10px 0 12px;
+  gap: 6px;
+
+  background: color-mix(in oklab, var(--orange-primary) 50%, var(--white));
+  border: 1px solid var(--orange-primary);
+  border-radius: 999px;
+}
+.chipText {
+  max-width: 9.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--black);
+  text-align: left;
+}
+.chipClose {
+  border: none;
+  background: transparent;
+  color: var(--black);
+  cursor: pointer;
+  line-height: 1;
+  font-size: 0.9rem;
+  padding: 0 2px;
+}
+
+.icon,
+.iconRotated {
+  flex: none;
+  color: var(--text-color-placeholder, var(--gray));
+  transition: transform 0.2s ease;
+}
+.iconRotated { transform: rotate(180deg); }
+.icon :global(svg),
+.iconRotated :global(svg) {
+  color: inherit;
+  fill: currentColor;
+}
+
+.menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 0;
+  border: 1px solid var(--msd-border);
+  border-radius: 4px;
+  background: var(--white);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, .08),
+    0 2px 0 rgba(0, 0, 0, .04);
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.list { list-style: none; padding: 0; margin: 0; }
+
+.checkboxIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+}
+.checked svg { color: var(--orange-primary); }
+
+.optionRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 1.313rem;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--orange-primary);
+}
+.optionRow:hover {
+  background: color-mix(in oklab, var(--orange-primary) 35%, transparent);
+}
+
+.optionText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--black);
+}

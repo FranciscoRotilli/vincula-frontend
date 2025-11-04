@@ -2,38 +2,64 @@ import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import VinculosPage from '../../../../../src/app/casos/[id]/vinculos/page';
+import VinculosPage from '@/app/casos/[id]/vinculos/page';
+import Providers from '@/app/providers';
 
 vi.mock('@/components/CaseContainer', () => ({
   CaseContainer: ({ children, ...props }) => (
-    <div data-testid="aba-container" {...props}>{children}</div>
+    <div data-testid="aba-container" {...props}>
+      {children}
+    </div>
   ),
+}));
+
+vi.mock('@/hooks/useCase', () => ({
+  useCaseGraph: () => ({ data: null, isLoading: false, error: null }),
+}));
+
+vi.mock('@/components/Graph', () => ({
+  __esModule: true,
+  default: React.forwardRef<HTMLDivElement, any>(() => <div data-testid="graph-mock" />),
 }));
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
-    use: (p: Promise<any>) => {
-      let result: any;
-      p.then(r => { result = r });
-      return result || { id: 'mock-id' };
-    }
+    use: (thenable: any) => {
+      if (thenable && typeof thenable.then === 'function') {
+        return { id: '123' };
+      }
+      return thenable;
+    },
   };
 });
 
+beforeEach(() => {
+  vi.resetAllMocks();
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ suspects: [] }),
+    })
+  );
+});
+
 describe('VinculosPage', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-  });
-
   it('render page components correctly', async () => {
-    const params = Promise.resolve({ id: '123' });
-    render(<VinculosPage params={params} />);
+    const params = Promise.resolve({ id: 'qualquer-coisa' });
 
-    expect(await screen.findByTestId('aba-vinculos')).toBeInTheDocument();
-    expect(await screen.findByTestId('filter-component')).toBeInTheDocument();
+    render(
+      <Providers>
+        <VinculosPage params={params} />
+      </Providers>
+    );
+
     expect(await screen.findByTestId('graph-container')).toBeInTheDocument();
+    expect(await screen.findByTestId('graph-controls')).toBeInTheDocument();
+    expect(await screen.findByTestId('aba-container')).toBeInTheDocument();
+    expect(await screen.findByTestId('graph-mock')).toBeInTheDocument();
   });
 
   it('wraps content with CaseContainer', async () => {
