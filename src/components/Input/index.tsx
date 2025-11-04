@@ -66,7 +66,7 @@ const Input = forwardRef<HTMLDivElement, InputProps>(({
     }, [value])
 
     return (
-        <FormControl error={hasError} fullWidth>
+        <FormControl error={hasError} fullWidth sx={{ position: 'relative' }}>
             {outsideLabel && (
                 <label htmlFor={rest.id} className={`${styles.label} ${required ? styles.requiredLabel : ''}`}>
                     {labelText}
@@ -125,7 +125,14 @@ const Input = forwardRef<HTMLDivElement, InputProps>(({
                 }}
             />
             {hasError && error && error.trim() &&
-                <FormHelperText sx={{ marginLeft: '0.2em' }}>
+                <FormHelperText 
+                    sx={{
+                        position: 'absolute',
+                        bottom: '-20px',
+                        left: '0.2em',
+                        margin: 0,
+                        zIndex: 1
+                        }}>
                     {error}
                 </FormHelperText>
             }

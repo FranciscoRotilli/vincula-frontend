@@ -39,10 +39,11 @@ const Button: React.FC<ButtonProps> = ({
     if (normalized === 'remover') return 'Removendo...';
     return `${label}...`;
   })();
-  const effectiveLabel = loading ? loadingLabel ?? fallbackLoadingLabel : label;
+  const effectiveLabel = loading ? (loadingLabel ?? fallbackLoadingLabel) : label;
   const hasLabel = !!effectiveLabel;
-  const effectiveIcon = loading ? loadingIcon ??
-   <span className={styles.spinner} aria-hidden /> : icon;
+  const effectiveIcon = loading
+    ? (loadingIcon ?? <span className={styles.spinner} aria-hidden />)
+    : icon;
   const isDisabled = disabled || loading;
   const shouldHideLabel = size === 'icon' && loading;
 
@@ -54,7 +55,7 @@ const Button: React.FC<ButtonProps> = ({
         styles[variant],
         styles[size],
         isDisabled ? styles.disabled : '',
-        className
+        className,
       ].join(' ')}
       onClick={isDisabled ? undefined : onClick}
       disabled={isDisabled}
