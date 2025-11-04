@@ -11,6 +11,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
+// import { jsPDF } from 'jspdf'; 
 import React, { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -29,7 +30,7 @@ import {
   baseOptions,
   generateRelationshipName,
   getRelationshipSourceDatabase,
-  transformApiData,
+  transformApiData
 } from './utils';
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
@@ -54,8 +55,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const graphFilters = useMemo(() => {
     let cpfCnpjValue: string | undefined = undefined;
 
-    if (filters.investigated) {
-      cpfCnpjValue = String(filters.investigated);
+    if (filters.investigado) {
+      cpfCnpjValue = String(filters.investigado);
     } else if (filters.cpfCnpj) {
       const cpfCnpjInput = String(filters.cpfCnpj);
       if (isValidCpfCnpjLength(cpfCnpjInput)) {
@@ -78,7 +79,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const {
     data: graphData,
     isLoading: isLoadingGraph,
-    error: graphError,
+    error: graphError
   } = useCaseGraph(id, graphFilters);
 
   useEffect(() => {
@@ -133,6 +134,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       const wasFullscreen = isFullscreen;
       setIsFullscreen(isCurrentlyFullscreen);
 
+
       if (isCurrentlyFullscreen !== wasFullscreen && nvlRef.current) {
         setTimeout(() => {
           fitNodes();
@@ -151,6 +153,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       const timer = setTimeout(() => {
         fitNodes();
       }, 100);
+
 
       return () => clearTimeout(timer);
     }
@@ -195,6 +198,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           throw new Error('Failed to fetch case data');
         }
         const data = await response.json();
+
 
         const suspects = data.suspects || [];
         const options = [
@@ -283,6 +287,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         />
       )}
 
+
       <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
         <div
           className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}
@@ -308,17 +313,26 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
 
           <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
-              <button onClick={zoomIn} className={styles.controlButton}>
+              <button
+                onClick={zoomIn}
+                className={styles.controlButton}
+              >
                 <ZoomInIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.zoomOut')} placement="right">
-              <button onClick={zoomOut} className={styles.controlButton}>
+              <button
+                onClick={zoomOut}
+                className={styles.controlButton}
+              >
                 <ZoomOutIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.fitToScreen')} placement="right">
-              <button onClick={fitNodes} className={styles.controlButton}>
+              <button
+                onClick={fitNodes}
+                className={styles.controlButton}
+              >
                 <FitScreenIcon />
               </button>
             </Tooltip>
@@ -349,7 +363,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
             </Tooltip>
 
           </div>
-
           <Graph
             ref={nvlRef}
             nodes={graphNodes}
