@@ -14,6 +14,7 @@ interface RemoveModalProps {
   onClose: () => void;
   onRemove: () => void;
   isProcessing?: boolean;
+  'data-testid'?: string;
 }
 
 export default function RemoveModal({
@@ -23,10 +24,11 @@ export default function RemoveModal({
   onClose,
   onRemove,
   isProcessing = false,
+  'data-testid': dataTestId,
 }: RemoveModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <div className={styles.modalContainer}>
+      <div className={styles.modalContainer} data-testid={dataTestId}>
         <div className={styles.closeButtonContainer}>
           <MdClose size={22} onClick={onClose} className={styles.closeButton} />
         </div>

@@ -484,6 +484,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                     size="icon"
                     label=""
                     onClick={() => setShowAddSuspectsBatchModal(true)}
+                    disabled={!newName.trim() || !newCpf.trim()}
                   />
                   <Button
                     data-testid='add-suspect'
@@ -574,6 +575,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showDeleteCaseModal && (
           <RemoveModal
+            data-testid="delete-case-modal"
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}

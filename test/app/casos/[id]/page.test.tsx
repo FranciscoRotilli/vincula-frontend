@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable i18next/no-literal-string */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -95,7 +96,6 @@ vi.mock('@/components/ConfirmationModal/ConfirmationModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
-    onClose,
     onPrimary,
     onSecondary,
     title,
@@ -140,7 +140,7 @@ vi.mock('@/components/Modals/AllowVisualizationModal', () => ({
   }: {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit?: () => void;
+    onSubmit?: (userId: string) => void;
   }) => {
     if (!isOpen) return null;
     const modalTitle = 'Allow Visualization Modal';
@@ -149,7 +149,7 @@ vi.mock('@/components/Modals/AllowVisualizationModal', () => ({
         <h2>{modalTitle}</h2>
         <button onClick={onClose}>Close</button>
         {onSubmit && (
-          <button onClick={onSubmit}>Submit</button>
+          <button onClick={() => onSubmit('mock-user-id')}>Submit</button>
         )}
       </div>
     );
@@ -789,9 +789,13 @@ describe('GeneralInfoPage', () => {
         fireEvent.click(deleteOption);
       });
 
-      // Wait for the modal title to appear
-      const confirmButton = await screen.findByText(t('cases.title.deleteAction'));
-      fireEvent.click(confirmButton);
+      // Wait for the modal to appear
+      const modal = await screen.findByTestId('delete-case-modal');
+      
+      // Click the remove button inside the modal
+      const removeButton = modal.querySelector('button[class*="removeButton"]') as HTMLButtonElement;
+      expect(removeButton).toBeTruthy();
+      fireEvent.click(removeButton);
 
       await waitFor(() => {
         expect(mockMutate).toHaveBeenCalledWith('123', expect.any(Object));
@@ -824,11 +828,16 @@ describe('GeneralInfoPage', () => {
     });
 
     it('deve submeter e recarregar a página no sucesso', async () => {
-      const mockMutateAsync = vi.fn().mockResolvedValue(undefined);
+      const mockMutate = vi.fn((_, { onSuccess }) => {
+        onSuccess();
+      });
       const mockRefetch = vi.fn();
+      const mockReload = vi.fn();
+      delete (window as any).location;
+      (window as any).location = { reload: mockReload };
+      
       (useAllowVisualization as Mock).mockReturnValue({ 
-        mutate: vi.fn(),
-        mutateAsync: mockMutateAsync,
+        mutate: mockMutate,
         isPending: false,
       });
       (useCaseById as Mock).mockReturnValue({
@@ -847,11 +856,11 @@ describe('GeneralInfoPage', () => {
       fireEvent.click(submit);
 
       await waitFor(() => {
-        expect(mockMutateAsync).toHaveBeenCalled();
+        expect(mockMutate).toHaveBeenCalled();
       });
 
       await waitFor(() => {
-        expect(mockRefetch).toHaveBeenCalled();
+        expect(mockReload).toHaveBeenCalled();
       });
     });
   });
