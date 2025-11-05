@@ -818,7 +818,7 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        expect(mockRefetch).toHaveBeenCalled();
+        expect(mockReload).toHaveBeenCalled();
       });
     });
   });
