@@ -21,15 +21,16 @@ import { useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
 
 import styles from './page.module.css';
-import { 
-  AppNode, 
-  AppRelationship, 
-  baseOptions, 
+import {
+  AppNode,
+  AppRelationship,
+  baseOptions,
   generateRelationshipName,
   getRelationshipSourceDatabase,
-  transformApiData} from './utils';
+  transformApiData,
+} from './utils';
 
-  export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
+export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
 
@@ -37,7 +38,8 @@ import {
   const [graphRels, setGraphRels] = useState<AppRelationship[]>([]);
   const [filters, setFilters] = useState<FilterValues>({});
   const [filterValues, setFilterValues] = useState<FilterValues>({});
-  const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
+  const [investigated, setInvestigated] = useState<{ value: string; label: string }[]>([]);
+  const [file, setFile] = useState<{ value: string; label: string }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
@@ -50,9 +52,9 @@ import {
 
   const graphFilters = useMemo(() => {
     let cpfCnpjValue: string | undefined = undefined;
-    
-    if (filters.investigado) {
-      cpfCnpjValue = String(filters.investigado);
+
+    if (filters.investigated) {
+      cpfCnpjValue = String(filters.investigated);
     } else if (filters.cpfCnpj) {
       const cpfCnpjInput = String(filters.cpfCnpj);
       if (isValidCpfCnpjLength(cpfCnpjInput)) {
@@ -64,18 +66,18 @@ import {
       cpf_cnpj: cpfCnpjValue,
       investigated: filters.nome ? String(filters.nome) : undefined,
       origin: filters.baseDados ? String(filters.baseDados) : undefined,
-      archive: filters.arquivo ? String(filters.arquivo) : undefined,
+      file: filters.arquivo ? String(filters.arquivo) : undefined,
     };
   }, [filters]);
 
   const hasActiveFilters = useMemo(() => {
-    return Object.values(graphFilters).some(value => value !== undefined && value !== '');
+    return Object.values(graphFilters).some((value) => value !== undefined && value !== '');
   }, [graphFilters]);
 
-  const { 
-    data: graphData, 
-    isLoading: isLoadingGraph, 
-    error: graphError 
+  const {
+    data: graphData,
+    isLoading: isLoadingGraph,
+    error: graphError,
   } = useCaseGraph(id, graphFilters);
 
   useEffect(() => {
@@ -129,7 +131,7 @@ import {
       const isCurrentlyFullscreen = !!document.fullscreenElement;
       const wasFullscreen = isFullscreen;
       setIsFullscreen(isCurrentlyFullscreen);
-      
+
       if (isCurrentlyFullscreen !== wasFullscreen && nvlRef.current) {
         setTimeout(() => {
           fitNodes();
@@ -148,22 +150,22 @@ import {
       const timer = setTimeout(() => {
         fitNodes();
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [graphNodes, fitNodes]);
 
   const handleNodeClick = (node: Node) => {
     setSelectedElement(node as AppNode);
-  }
+  };
 
   const handleRelationshipClick = (rel: Relationship) => {
     setSelectedElement(rel as AppRelationship);
-  }
+  };
 
   const handleCanvasClick = () => {
     setSelectedElement(null);
-  }
+  };
 
   useEffect(() => {
     async function fetchCaseData() {
@@ -173,16 +175,23 @@ import {
           throw new Error('Failed to fetch case data');
         }
         const data = await response.json();
-        
+
         const suspects = data.suspects || [];
         const options = [
           { value: '', label: 'Todos' },
           ...suspects.map((suspect: { name: string; cpf_cnpj: string }) => ({
             value: suspect.cpf_cnpj,
             label: `${suspect.name} - ${suspect.cpf_cnpj}`,
-          }))
+          })),
         ];
-        setInvestigado(options);
+        setInvestigated(options);
+
+        const caseFiles = data.files || [];
+        const fileOptions = caseFiles.map((a: { name: string, id: string }) => ({
+          value: a.id,
+          label: a.name,
+        }));
+        setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
         console.error(error);
       }
@@ -191,11 +200,29 @@ import {
   }, [id]);
 
   const filterFields: FieldConfig[] = [
-    { key: 'investigado', label: 'Investigado (CPF/CNPJ)', type: 'select', options: investigado, placeholder: 'Selecione' },
+    {
+      key: 'investigado',
+      label: 'Investigado (CPF/CNPJ)',
+      type: 'multi-select',
+      options: investigated,
+      placeholder: 'Selecione',
+    },
     { key: 'nome', label: 'Nome', type: 'input', placeholder: 'Digite o nome' },
     { key: 'cpfCnpj', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
-    { key: 'baseDados', label: 'Base de dados', type: 'select', options: baseOptions, placeholder: 'Selecione' },
-    { key: 'arquivo', label: 'Arquivo', type: 'input', placeholder: 'Nome do arquivo' },
+    {
+      key: 'baseDados',
+      label: 'Base de dados',
+      type: 'select',
+      options: baseOptions,
+      placeholder: 'Selecione',
+    },
+    {
+      key: 'arquivo',
+      label: 'Arquivo',
+      type: 'multi-select',
+      options: file,
+      placeholder: 'Nome do arquivo',
+    },
   ];
 
   const handleFilter = (newFilters: FilterValues) => {
@@ -233,9 +260,11 @@ import {
           }}
         />
       )}
-      
+
       <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
-        <div className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}>
+        <div
+          className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}
+        >
           {isFullscreen && showFilters && (
             <div className={styles.fullscreenFilters}>
               <Filter
@@ -253,45 +282,36 @@ import {
               />
             </div>
           )}
-          
+
           <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
-              <button 
-                onClick={zoomIn}
-                className={styles.controlButton}
-              >
+              <button onClick={zoomIn} className={styles.controlButton}>
                 <ZoomInIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.zoomOut')} placement="right">
-              <button 
-                onClick={zoomOut}
-                className={styles.controlButton}
-              >
+              <button onClick={zoomOut} className={styles.controlButton}>
                 <ZoomOutIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.fitToScreen')} placement="right">
-              <button 
-                onClick={fitNodes}
-                className={styles.controlButton}
-              >
+              <button onClick={fitNodes} className={styles.controlButton}>
                 <FitScreenIcon />
               </button>
             </Tooltip>
-            <Tooltip title={showFilters ? t('graph.hideFilters') : t('graph.showFilters')} placement="right">
-              <button 
-                onClick={() => setShowFilters(!showFilters)}
-                className={styles.controlButton}
-              >
+            <Tooltip
+              title={showFilters ? t('graph.hideFilters') : t('graph.showFilters')}
+              placement="right"
+            >
+              <button onClick={() => setShowFilters(!showFilters)} className={styles.controlButton}>
                 {showFilters ? <FilterListOffIcon /> : <FilterListIcon />}
               </button>
             </Tooltip>
-            <Tooltip title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')} placement="right">
-              <button 
-                onClick={toggleFullscreen}
-                className={styles.controlButton}
-              >
+            <Tooltip
+              title={isFullscreen ? t('graph.exitFullscreen') : t('graph.fullscreen')}
+              placement="right"
+            >
+              <button onClick={toggleFullscreen} className={styles.controlButton}>
                 {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
               </button>
             </Tooltip>
@@ -314,52 +334,64 @@ import {
             hasNodes={graphNodes.length > 0}
             caseId={id}
           />
-        
+
           {selectedElement && (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }} data-testid="graph-details-modal">
+            <div
+              style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}
+              data-testid="graph-details-modal"
+            >
               <NodeModal
                 isOpen={true}
                 onClose={() => setSelectedElement(null)}
-                name={selectedElement ? 
-                  ('from' in selectedElement ? 
-                    generateRelationshipName(selectedElement, graphNodes) :
-                    (selectedElement.properties?.name as string || selectedElement.caption || 'Nó')
-                  ) : ''
+                name={
+                  selectedElement
+                    ? 'from' in selectedElement
+                      ? generateRelationshipName(selectedElement, graphNodes)
+                      : (selectedElement.properties?.name as string) ||
+                        selectedElement.caption ||
+                        'Nó'
+                    : ''
                 }
-                quantity={selectedElement && 'from' in selectedElement ? 
-                  (selectedElement?.properties?.quantity as number) : 
-                  undefined
+                quantity={
+                  selectedElement && 'from' in selectedElement
+                    ? (selectedElement?.properties?.quantity as number)
+                    : undefined
                 }
-                cpfCnpj={selectedElement?.properties?.identity as string || ''}
+                cpfCnpj={(selectedElement?.properties?.identity as string) || ''}
                 phone={selectedElement?.properties?.phone_number as string}
                 isRelationship={'from' in selectedElement}
-                sourceDatabase={selectedElement && 'from' in selectedElement ? 
-                  getRelationshipSourceDatabase(selectedElement, graphNodes) : undefined
+                sourceDatabase={
+                  selectedElement && 'from' in selectedElement
+                    ? getRelationshipSourceDatabase(selectedElement, graphNodes)
+                    : undefined
                 }
-                caseNumber={selectedElement ? 
-                  (selectedElement.properties?.case_number as string) : undefined
+                caseNumber={
+                  selectedElement ? (selectedElement.properties?.case_number as string) : undefined
                 }
-                files={selectedElement && 'from' in selectedElement ? 
-                  (() => {
-                    const fileNames = selectedElement.properties?.file_name;
-                    if (Array.isArray(fileNames)) {
-                      return fileNames;
-                    } else if (typeof fileNames === 'string') {
-                      return [fileNames];
-                    }
-                    return undefined;
-                  })() : 
-                  (selectedElement && !('from' in selectedElement) && selectedElement.properties?.type !== 'Person' ?
-                    (() => {
-                      const fileNames = selectedElement.properties?.file_name;
-                      if (Array.isArray(fileNames)) {
-                        return fileNames;
-                      } else if (typeof fileNames === 'string') {
-                        return [fileNames];
-                      }
-                      return undefined;
-                    })() : undefined
-                  )
+                files={
+                  selectedElement && 'from' in selectedElement
+                    ? (() => {
+                        const fileNames = selectedElement.properties?.file_name;
+                        if (Array.isArray(fileNames)) {
+                          return fileNames;
+                        } else if (typeof fileNames === 'string') {
+                          return [fileNames];
+                        }
+                        return undefined;
+                      })()
+                    : selectedElement &&
+                        !('from' in selectedElement) &&
+                        selectedElement.properties?.type !== 'Person'
+                      ? (() => {
+                          const fileNames = selectedElement.properties?.file_name;
+                          if (Array.isArray(fileNames)) {
+                            return fileNames;
+                          } else if (typeof fileNames === 'string') {
+                            return [fileNames];
+                          }
+                          return undefined;
+                        })()
+                      : undefined
                 }
               />
             </div>
