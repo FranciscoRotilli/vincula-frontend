@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 import {
   addCase,
@@ -11,6 +12,7 @@ import {
   GraphFilters,
   updateCaseCanView,
   updateCaseName,
+  updateCaseOwner,
   updateCaseSituation,
 } from '@/services/caseService';
 import {
@@ -76,6 +78,19 @@ export function useDeleteCase() {
   });
 }
 
+export function useUpdateCaseOwner() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
+      updateCaseOwner(caseId, userId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
+  });
+}
+
 export function useCases(
   pagination: PaginationParams,
   filters: FilterParams,
@@ -87,6 +102,12 @@ export function useCases(
   });
 }
 
+type ApiError = { status?: number; message?: string };
+
+function isApiError(err: unknown): err is ApiError {
+  return typeof err === 'object' && err !== null && ('status' in err || 'message' in err);
+}
+
 export function useCaseById(caseId: string) {
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
@@ -95,6 +116,7 @@ export function useCaseById(caseId: string) {
   });
 
   return queryResult;
+
 }
 
 export function useAllowVisualization() {

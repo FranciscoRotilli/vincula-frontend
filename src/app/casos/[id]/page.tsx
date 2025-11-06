@@ -6,6 +6,7 @@ import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
+import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
@@ -20,9 +21,11 @@ import {
   useCaseById,
   useDeleteCase,
   useUpdateCaseName,
+  useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useUsers } from '@/hooks/useUsers';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
 import { FileResponse } from '@/types/Files';
@@ -42,6 +45,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
+  const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -56,7 +60,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-
+  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -70,8 +74,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const updateSituationMutation = useUpdateCaseSituation();
   const deleteCaseMutation = useDeleteCase();
   const allowViewMutation = useAllowVisualization();
+  const updateOwnerMutation = useUpdateCaseOwner();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+  const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
@@ -92,6 +98,26 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         },
         onError: (error) => {
           console.error('Failed to update case name: ', error);
+        },
+      }
+    );
+  };
+
+  const handleUpdateOwner = async () => {
+    if (!novoResponsavel) {
+      return;
+    }
+    
+    updateOwnerMutation.mutate(
+      { caseId, userId: novoResponsavel },
+      {
+        onSuccess: () => {
+          setShowChangeResponsibleModal(false);
+          setNovoResponsavel(''); 
+          refetch(); 
+        },
+        onError: (error) => {
+          console.error('Failed to update case owner:', error);
         },
       }
     );
@@ -242,7 +268,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
-          <span>{t('cases.errorMessage')}</span>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -250,12 +275,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
-            />
-            <Button
-              size="medium"
-              label={t('cases.reload')}
-              className={styles.reloadButton}
-              onClick={() => refetch()}
             />
           </div>
         </div>
@@ -308,6 +327,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 onClick={() => {
                   setShowAllowVisualizationModal(true);
                 }}
+              />
+               <Button
+                size="small"
+                label={t('cases.title.changeResponsible')}
+                variant="contained"
+                data-testid="btn-change-responsible"
+                onClick={() => setShowChangeResponsibleModal(true)}
               />
               <Button
                 size="medium"
@@ -386,13 +412,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeName', { defaultValue: 'Alterar nome do caso' })}
-            description={t('cases.title.changeNameDesc', {
-              defaultValue: 'Altere o nome do caso abaixo.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeName')}
+            description={t('cases.title.changeNameDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateName}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowNameModal(false)}
             primaryDisabled={updateNameMutation.isPending}
             primaryLoading={updateNameMutation.isPending}
@@ -403,7 +427,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               onChange={(e) => setNewCaseName(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
-              placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
+              placeholder={t('cases.title.inputName')}
             />
           </ConfirmationModal>
         )}
@@ -413,13 +437,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
-            description={t('cases.title.changeSituationDesc', {
-              defaultValue: 'Selecione a nova situação do caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeSituation')}
+            description={t('cases.title.changeSituationDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateSituation}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowSituationModal(false)}
             primaryDisabled={updateSituationMutation.isPending}
             primaryLoading={updateSituationMutation.isPending}
@@ -431,16 +453,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
             >
               <option value="">
-                {t('cases.title.selectSituation', { defaultValue: 'Selecione a situação' })}
+                {t('cases.title.selectSituation')}
               </option>
               <option value="Em andamento">
-                {t('cases.title.situationOngoing', { defaultValue: 'Em andamento' })}
+                {t('cases.title.situationOngoing')}
               </option>
               <option value="Suspenso">
-                {t('cases.title.situationSuspended', { defaultValue: 'Suspenso' })}
+                {t('cases.title.situationSuspended')}
               </option>
               <option value="Encerrado">
-                {t('cases.title.situationClosed', { defaultValue: 'Encerrado' })}
+                {t('cases.title.situationClosed')}
               </option>
             </select>
           </ConfirmationModal>
@@ -499,13 +521,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showUploadModal}
             onClose={() => setShowUploadModal(false)}
             icon={<FiUpload size={36} color="#ff3636" />}
-            title={t('cases.title.addFile', { defaultValue: 'Adicionar arquivo' })}
-            description={t('cases.title.addFileDesc', {
-              defaultValue: 'Selecione um arquivo para anexar ao caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.addFile')}
+            description={t('cases.title.addFileDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={() => setShowUploadModal(false)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
         )}
@@ -519,6 +539,47 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           />
         )}
       </div>
+
+    {showChangeResponsibleModal && (
+      <ConfirmationModal
+      isOpen={showChangeResponsibleModal}
+      onClose={() => setShowChangeResponsibleModal(false)}
+      data-testid="modal-change-responsible"
+      icon={<FiEdit2 size={36} color="#ff3636" />}
+      title={t('cases.title.changeResponsible')}
+      description={t('cases.title.changeResponsibleDesc')}
+      primaryLabel={t('cases.title.save')}
+      onPrimary={handleUpdateOwner}
+      secondaryLabel={t('cases.title.cancel')}
+      onSecondary={() => setShowChangeResponsibleModal(false)}
+      primaryDisabled={updateOwnerMutation.isPending}
+      primaryLoading={updateOwnerMutation.isPending}
+      >
+            <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
+              <ReactSelect
+                isClearable
+                isDisabled={isLoadingUsers || updateOwnerMutation.isPending}
+                options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
+                value={(users || [])
+                  .map((u) => ({ value: u.id, label: u.name }))
+                  .find((opt) => opt.value === novoResponsavel) || null}
+                onChange={(newValue, _actionMeta) => {
+                  const opt = newValue as SingleValue<{ value: string; label: string }>;
+                  setNovoResponsavel(opt?.value ?? '');
+                }}
+                placeholder={
+                  isLoadingUsers
+                    ? t('cases.title.loadingUsers')
+                    : t('cases.title.selectResponsible')
+                }
+                styles={{
+                  control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
+                } as StylesConfig}
+                menuPlacement="auto"
+              />
+            </div>
+          </ConfirmationModal>
+        )}
     </CaseContainer>
   );
 }

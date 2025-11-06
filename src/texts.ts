@@ -26,6 +26,8 @@ export const texts = {
   'cases.title.inputCpfCnpj': 'Insira o CPF / CNPJ',
   'cases.title.inputPhone': 'Insira o telefone',
   'cases.title.files': 'Arquivos',
+  'cases.title.loadingUsers': 'Carregando usuários...',
+  'cases.title.selectResponsible': 'Selecione o novo responsável',
   'cases.title.filesDesc':
     'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
   'cases.title.upload': 'Upload',
@@ -35,6 +37,9 @@ export const texts = {
   'cases.title.situationClosed': 'Encerrado',
   'cases.title.save': 'Salvar',
   'cases.title.cancel': 'Cancelar',
+  'cases.title.changeResponsible': 'Alterar responsável',
+  'cases.title.changeResponsibleDesc': 'Digite o nome do novo responsável pelo caso.',
+  'cases.title.inputResponsible': 'Nome do responsável',
   'cases.title.deleteWarning':
     'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.removeFile': 'Remover arquivo?',
