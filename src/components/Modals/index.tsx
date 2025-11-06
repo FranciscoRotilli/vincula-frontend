@@ -3,6 +3,8 @@ import React, { ReactNode, useEffect } from 'react';
 import styles from './Modal.module.css';
 
 type ModalProps = {
+	buttonsPosition?: 'left' | 'center' | 'right';
+	showCloseIcon?: boolean;
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -21,6 +23,8 @@ type ModalProps = {
 };
 
 const Modal = ({
+	showCloseIcon = true,
+	buttonsPosition = 'right',
   isOpen,
   onClose,
   children,
@@ -91,37 +95,49 @@ const Modal = ({
                 {description}
               </div>
             )}
-          </div>
+					</div>
+					{showCloseIcon && (
           <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
             &times;
-          </button>
+						</button>
+					)}
         </header>
         <div className={styles.body}>
           <main className={styles.content}>{children}</main>
         </div>
         {(cancelButton || actionButton) && (
-          <footer className={styles.footer}>
-            {actionButton && (
-              <button
+						<footer
+						className={styles.footer}
+						style={{
+							justifyContent:
+							buttonsPosition === 'left'
+								? 'flex-start'
+								: buttonsPosition === 'center'
+								? 'center'
+								: 'flex-end',
+						}}
+						>
+						{actionButton && (
+							<button
                 type="button"
-                className={
-                  actionButtonColor === 'error'
-                    ? `${styles.button} ${styles.error}`
-                    : `${styles.button} ${styles.primary}`
-                }
-                onClick={onAction}
+							className={
+								actionButtonColor === 'error'
+								? `${styles.button} ${styles.error}`
+								: `${styles.button} ${styles.primary}`
+							}
+							onClick={onAction}
                 disabled={actionDisabled}
                 aria-disabled={actionDisabled}
-              >
-                {actionButton}
-              </button>
-            )}
-            {cancelButton && (
-              <button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
-                {cancelButton}
-              </button>
-            )}
-          </footer>
+							>
+							{actionButton}
+							</button>
+						)}
+						{cancelButton && (
+							<button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
+							{cancelButton}
+							</button>
+						)}
+						</footer>
         )}
       </div>
     </div>

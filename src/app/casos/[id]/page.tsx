@@ -10,11 +10,11 @@ import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
-import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import ConfirmationModal from '@/components/Modals/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
@@ -418,7 +418,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowNameModal(false)}
-            primaryDisabled={updateNameMutation.isPending}
             primaryLoading={updateNameMutation.isPending}
           >
             <input
@@ -443,7 +442,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowSituationModal(false)}
-            primaryDisabled={updateSituationMutation.isPending}
             primaryLoading={updateSituationMutation.isPending}
           >
             <select
