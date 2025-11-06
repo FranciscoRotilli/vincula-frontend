@@ -11,6 +11,7 @@ import {
   useCaseById,
   useDeleteCase,
   useUpdateCaseName,
+  useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
@@ -41,6 +42,7 @@ vi.mock('@/hooks/useCase', () => ({
   useUpdateCaseSituation: vi.fn(),
   useDeleteCase: vi.fn(),
   useAllowVisualization: vi.fn(),
+  useUpdateCaseOwner: vi.fn(),
 }));
 
 vi.mock('@/hooks/useSuspect', () => ({
