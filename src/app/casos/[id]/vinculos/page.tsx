@@ -350,11 +350,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
               </button>
             </Tooltip>
 
-            <Tooltip title="Download graph image" placement="right">
-              <button
-                onClick={handleExportImage}
-                className={styles.controlButton}
-              >
+            <Tooltip title={t('graph.download')} placement="right">
+              <button onClick={handleExportImage} className={styles.controlButton}>
                 <DownloadIcon />
               </button>
             </Tooltip>
