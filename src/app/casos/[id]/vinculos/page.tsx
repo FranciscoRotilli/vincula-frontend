@@ -11,6 +11,7 @@ import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
 import React, { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -29,7 +30,6 @@ import {
   getRelationshipSourceDatabase,
   transformApiData,
 } from './utils';
-
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
@@ -193,7 +193,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         }));
         setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
-        toast.error('Erro ao carregar dados do caso.')
+        toast.error(t('toastError.caseData'))
         console.error(error);
       }
     }

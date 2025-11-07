@@ -113,9 +113,9 @@ export default function Casos() {
       await caseMutation.mutateAsync(apiPayload);
       setIsModalOpen(false);
       refetch();
-        toast.success('Caso criado com sucesso.')
+      toast.success(t('toastSuccess.handleCreateCase'))
     } catch (error) {
-        toast.error('Não foi possível criar o caso.')
+      toast.error(t('toastError.handleCreateCase'))
       console.error('Erro ao criar caso:', error);
       throw error;
     }

@@ -10,6 +10,7 @@ import { t } from '@/texts';
 import { FileRequest } from '@/types/Files';
 
 import styles from './AddFileModal.module.css';
+import { toast } from 'react-toastify';
 
 type AddFileModalProps = {
   isOpen: boolean;
@@ -189,8 +190,10 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
             setIsSavingFile(false);
             onClose();
           }, 6000);
+          toast.success(t('toastSuccess.addFile'))
         },
         onError: () => {
+          toast.success(t('toastError.addFile'))
           setIsSavingFile(false);
         },
       }
