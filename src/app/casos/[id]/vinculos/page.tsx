@@ -158,21 +158,19 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
     }
   }, [graphNodes, fitNodes]);
 
-  const handleExportImage = () => { // Pode remover o 'async', pois o método é síncrono
+  const handleExportImage = () => {
     if (!nvlRef.current) {
       console.error("Referência do NVL não encontrada para exportar.");
       return;
     }
 
     try {
-      // Basta chamar o método. Ele cuida de tudo, incluindo o download.
       nvlRef.current.saveFullGraphToLargeFile({
         filename: 'grafo-vinculos.png',
-        backgroundColor: '#ffffff' // É bom definir um fundo, ex: branco
+        backgroundColor: '#f1f1f1'
       });
-      
+
     } catch (error) {
-      // O seu log de erro antigo mencionava PDF, atualizei.
       console.error("Erro ao exportar a imagem:", error);
     }
   };
@@ -352,7 +350,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
               </button>
             </Tooltip>
 
-            <Tooltip title="Baixar Imagem do Grafo" placement="right">
+            <Tooltip title="Download graph image" placement="right">
               <button
                 onClick={handleExportImage}
                 className={styles.controlButton}
@@ -393,8 +391,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                     ? 'from' in selectedElement
                       ? generateRelationshipName(selectedElement, graphNodes)
                       : (selectedElement.properties?.name as string) ||
-                        selectedElement.caption ||
-                        'Nó'
+                      selectedElement.caption ||
+                      'Nó'
                     : ''
                 }
                 quantity={
@@ -416,6 +414,18 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 files={
                   selectedElement && 'from' in selectedElement
                     ? (() => {
+                      const fileNames = selectedElement.properties?.file_name;
+                      if (Array.isArray(fileNames)) {
+                        return fileNames;
+                      } else if (typeof fileNames === 'string') {
+                        return [fileNames];
+                      }
+                      return undefined;
+                    })()
+                    : selectedElement &&
+                      !('from' in selectedElement) &&
+                      selectedElement.properties?.type !== 'Person'
+                      ? (() => {
                         const fileNames = selectedElement.properties?.file_name;
                         if (Array.isArray(fileNames)) {
                           return fileNames;
@@ -424,18 +434,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                         }
                         return undefined;
                       })()
-                    : selectedElement &&
-                        !('from' in selectedElement) &&
-                        selectedElement.properties?.type !== 'Person'
-                      ? (() => {
-                          const fileNames = selectedElement.properties?.file_name;
-                          if (Array.isArray(fileNames)) {
-                            return fileNames;
-                          } else if (typeof fileNames === 'string') {
-                            return [fileNames];
-                          }
-                          return undefined;
-                        })()
                       : undefined
                 }
               />
