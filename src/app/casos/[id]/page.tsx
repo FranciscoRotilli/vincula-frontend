@@ -84,7 +84,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState<{
+    open: boolean;
+    userId: string | null;
+  }>({
+    open: false,
+    userId: null,
+  });
+  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -273,6 +280,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
+  const handleRemoveUser = (userId: string) => {
+    if (!userId) return;
+
+    removeUserMutation.mutate(
+      { caseId, userId },
+      {
+        onSuccess: () => {
+          setShowRemoveUserModal({ open: false, userId: null });
+        },
+        onError: (error) => {
+          console.error('Erro ao remover usuário:', error);
+        },
+      }
+    );
+  };
+
   const handleRemoveFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
@@ -436,7 +459,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             caseId={caseId}
             users={usersWithAccess}
             onRemoveUser={(userId) => {
-              removeUserMutation.mutate({ caseId, userId: userId.toString() });
+              setShowRemoveUserModal({ open: true, userId: userId.toString() });
             }}
           />
 
@@ -655,6 +678,21 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onClose={() => setShowAddSuspectsBatchModal(false)}
             onSubmit={handleAddSuspectsBatch}
             isSubmitting={addSuspectsBatchMutation.isPending}
+          />
+        )}
+
+        {showRemoveUserModal.open && (
+          <ConfirmationModal
+            isOpen={showRemoveUserModal.open}
+            onClose={() => setShowRemoveUserModal({ open: false, userId: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
+            title={t('listPeople.removeUserTitle')}
+            description={t('listPeople.removeUserWarning')}
+            primaryLabel={t('cases.title.remove')}
+            onPrimary={() => handleRemoveUser(showRemoveUserModal.userId!)}
+            secondaryLabel={t('cases.title.cancel')}
+            onSecondary={() => setShowRemoveUserModal({ open: false, userId: null })}
+            primaryLoading={removeUserMutation.isPending}
           />
         )}
       </div>
