@@ -26,7 +26,6 @@ export default function ChangeOwnerModal({
   useEffect(() => {
     async function fetchUsers() {
       try {
-
         const allUsers = await getUsers();
         setUsers(allUsers);
       } catch (err) {

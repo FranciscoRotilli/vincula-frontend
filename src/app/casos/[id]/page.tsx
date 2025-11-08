@@ -109,7 +109,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [files, setFiles] = useState<FileResponse[]>([]);
   const [newCaseName, setNewCaseName] = useState('');
   const [newSituation, setNewSituation] = useState('');
-  const [selectedUser] = useState('');
 
   const handleUpdateName = async () => {
     if (updateNameMutation.isPending) return;
@@ -128,17 +127,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleUpdateOwner = async () => {
-    if (!novoResponsavel) {
-      return;
-    }
-    
+  const handleUpdateOwner = async (userId: string) => {
     updateOwnerMutation.mutate(
-      { caseId, userId: novoResponsavel },
+      { caseId, userId },
       {
         onSuccess: () => {
           setShowChangeResponsibleModal(false);
-          setNovoResponsavel(''); 
           refetch(); 
         },
         onError: (error) => {
@@ -249,15 +243,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     allowViewMutation.mutate({ caseId, userId: selectedUser }, {
       onSuccess: () => {
         setShowAllowVisualizationModal(false);
-        toast.success(t('toastSuccess.handleAllowVisualization'))
-        window.location.reload()
-      },
-      onError: () => {
-      setShowAllowVisualizationModal(false);
-      toast.error('Erro ao alterar permissão de visualização de caso.')
-      toast.error(t('toastError.handleAllowVisualization'))
-      window.location.reload();
-    }});
+        refetch();
+      }
+    });
   }
 
   const handleRemoveSuspect = (index: number) => {
