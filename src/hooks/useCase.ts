@@ -8,7 +8,9 @@ import {
   getCaseById,
   getCaseGraph,
   getCases,
+  getUsersWithAccess,
   GraphFilters,
+  removeUserAccess,
   updateCaseCanView,
   updateCaseName,
   updateCaseOwner,
@@ -22,6 +24,7 @@ import {
   FilterParams,
   PaginationParams,
 } from '@/types/Cases';
+import { UserIdName } from '@/types/User';
 
 type AddCaseInput = {
   name: string;
@@ -132,5 +135,27 @@ export function useCaseGraph(caseId: string, filters?: GraphFilters) {
     queryFn: () => getCaseGraph(caseId, filters),
     refetchOnWindowFocus: false,
     enabled: !!caseId,
+  });
+}
+
+export function useUsersWithAccess(caseId: string) {
+  return useQuery<UserIdName[], Error>({
+    queryKey: ['caseUsers', caseId],
+    queryFn: () => getUsersWithAccess(caseId),
+    refetchOnWindowFocus: false,
+    enabled: !!caseId,
+  });
+}
+
+export function useRemoveUserAccess() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
+      removeUserAccess(caseId, userId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['caseUsers', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+    },
   });
 }

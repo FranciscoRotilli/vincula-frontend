@@ -10,8 +10,10 @@ import {
   useAllowVisualization,
   useCaseById,
   useDeleteCase,
+  useRemoveUserAccess,
   useUpdateCaseName,
   useUpdateCaseSituation,
+  useUsersWithAccess,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch,useDeleteSuspect } from '@/hooks/useSuspect';
 import { getCurrentUser } from '@/services/auth';
@@ -40,6 +42,8 @@ vi.mock('@/hooks/useCase', () => ({
   useDeleteCase: vi.fn(),
   useAllowVisualization: vi.fn(),
   useUpdateCaseOwner: vi.fn(),
+  useUsersWithAccess: vi.fn(),
+  useRemoveUserAccess: vi.fn(),
 }));
 
 vi.mock('@/hooks/useSuspect', () => ({
@@ -251,6 +255,20 @@ describe('GeneralInfoPage', () => {
       mutate: vi.fn(),
     });
 
+    (useUpdateCaseOwner as Mock).mockReturnValue({
+      mutate: vi.fn(),
+    });
+
+    (useUsersWithAccess as Mock).mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    });
+
+    (useRemoveUserAccess as Mock).mockReturnValue({
+      mutate: vi.fn(),
+    });
+
     (useAddSuspect as Mock).mockReturnValue({
       mutate: vi.fn(),
     });
@@ -299,18 +317,6 @@ describe('GeneralInfoPage', () => {
       expect(await screen.findByText(/2024001/)).toBeInTheDocument();
       expect(await screen.findByText('Em andamento')).toBeInTheDocument();
       expect(await screen.findByText('01/01/2024')).toBeInTheDocument();
-    });
-
-    it('deve renderizar a seção de ações', async () => {
-      render(renderWithClient(
-        <SuspenseWrapper>
-          <GeneralInfoPage params={mockParams} />
-        </SuspenseWrapper>
-      ));
-
-      await waitFor(() => {
-        expect(screen.getByTestId('case-action-buttons')).toBeInTheDocument();
-      });
     });
 
     it('deve renderizar a seção de investigados', async () => {

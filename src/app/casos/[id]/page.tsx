@@ -15,6 +15,7 @@ import { CaseContainer } from '@/components/CaseContainer';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import ListPeople from '@/components/ListPeople';
 import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import ChangeOwnerModal from '@/components/Modals/ChangeOwnerModal';
@@ -24,9 +25,11 @@ import {
   useAllowVisualization,
   useCaseById,
   useDeleteCase,
+  useRemoveUserAccess,
   useUpdateCaseName,
   useUpdateCaseOwner,
   useUpdateCaseSituation,
+  useUsersWithAccess,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
 import { useUsers } from '@/hooks/useUsers';
@@ -96,8 +99,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const deleteCaseMutation = useDeleteCase();
   const allowViewMutation = useAllowVisualization();
   const updateOwnerMutation = useUpdateCaseOwner();
+  const removeUserMutation = useRemoveUserAccess();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+  const { data: users, isLoading: isLoadingUsers } = useUsers();
+  const { data: usersWithAccess = [] } = useUsersWithAccess(caseId);
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
@@ -318,6 +324,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
+          <p>{t('cases.errorMessage')}</p>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -325,6 +332,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
+            />
+            <Button
+              size="medium"
+              label={t('cases.reload')}
+              variant="contained"
+              onClick={() => refetch()}
             />
           </div>
         </div>
@@ -419,9 +432,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          <div className={styles.actionsBox} data-testid="case-action-buttons">
-            
-          </div>
+          <ListPeople
+            caseId={caseId}
+            users={usersWithAccess}
+            onRemoveUser={(userId) => {
+              removeUserMutation.mutate({ caseId, userId: userId.toString() });
+            }}
+          />
 
           <div className={styles.investigatedSection} data-testid="investigated-section">
             <div className={styles.sectionHeader}>
