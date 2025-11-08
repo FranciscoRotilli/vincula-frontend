@@ -178,7 +178,7 @@ export const texts = {
   'listPeople.loading': 'Carregando...',
   'listPeople.removeAccess': 'Remover acesso',
   'listPeople.removeUserTitle': 'Remover acesso do usuário?',
-  'listPeople.removeUserWarning': 'O usuário não terá mais acesso a este caso.',
+  'listPeople.removeUserWarning': 'O usuário não terá mais acesso a este caso.'
 } as const;
 
 export type TextKey = keyof typeof texts;
