@@ -11,7 +11,6 @@ import {
   useCaseById,
   useDeleteCase,
   useUpdateCaseName,
-  useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
@@ -383,11 +382,11 @@ describe('GeneralInfoPage', () => {
       ));
 
       await waitFor(() => {
-        expect(screen.getByText(t('cases.errorMessage'))).toBeInTheDocument();
+        expect(screen.getByText(t('cases.returnToCases'))).toBeInTheDocument();
       });
     });
 
-    it('deve exibir botões de retornar e recarregar no estado de erro', async () => {
+    it('deve exibir botão de retornar no estado de erro', async () => {
       const mockRefetch = vi.fn();
       (useCaseById as Mock).mockReturnValue({
         data: null,
@@ -404,7 +403,6 @@ describe('GeneralInfoPage', () => {
 
       await waitFor(() => {
         expect(screen.getByText(t('cases.returnToCases'))).toBeInTheDocument();
-        expect(screen.getByText(t('cases.reload'))).toBeInTheDocument();
       });
     });
 
@@ -428,29 +426,6 @@ describe('GeneralInfoPage', () => {
       });
 
       expect(mockRouter.push).toHaveBeenCalledWith('/casos');
-    });
-
-    it('deve chamar refetch quando clicar em recarregar', async () => {
-      const mockRefetch = vi.fn();
-      (useCaseById as Mock).mockReturnValue({
-        data: null,
-        isLoading: false,
-        isError: true,
-        refetch: mockRefetch,
-      });
-
-      render(renderWithClient(
-        <SuspenseWrapper>
-          <GeneralInfoPage params={mockParams} />
-        </SuspenseWrapper>
-      ));
-
-      await waitFor(() => {
-        const reloadButton = screen.getByText(t('cases.reload'));
-        fireEvent.click(reloadButton);
-      });
-
-      expect(mockRefetch).toHaveBeenCalled();
     });
   });
 
@@ -834,9 +809,6 @@ describe('GeneralInfoPage', () => {
         onSuccess();
       });
       const mockRefetch = vi.fn();
-      const mockReload = vi.fn();
-      delete (window as any).location;
-      (window as any).location = { reload: mockReload };
       
       (useAllowVisualization as Mock).mockReturnValue({ 
         mutate: mockMutate,
@@ -862,7 +834,7 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        expect(mockReload).toHaveBeenCalled();
+        expect(mockRefetch).toHaveBeenCalled();
       });
     });
   });
