@@ -116,9 +116,14 @@ export function useCaseById(caseId: string) {
 }
 
 export function useAllowVisualization() {
+    const queryClient = useQueryClient();
+    
     return useMutation({
         mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
             allowUserToViewCase(caseId, userId),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['caseUsers', variables.caseId] });
+        },
     });
 }
 

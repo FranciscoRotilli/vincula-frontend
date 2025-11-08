@@ -189,7 +189,7 @@ export async function updateCaseOwner(caseId: string, userId: string): Promise<v
 }
 
 export async function getUsersWithAccess(caseId: string): Promise<UserIdName[]> {
-  const resp = await fetch(`/api/cases/${caseId}/users`, {
+  const resp = await fetch(`/api/case/${caseId}/viewers`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     cache: 'no-store',
@@ -199,7 +199,7 @@ export async function getUsersWithAccess(caseId: string): Promise<UserIdName[]> 
 }
 
 export async function removeUserAccess(caseId: string, userId: string): Promise<void> {
-  const resp = await fetch(`/api/cases/${caseId}/users/${userId}`, {
+  const resp = await fetch(`/api/case/${caseId}/viewers/${userId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });
