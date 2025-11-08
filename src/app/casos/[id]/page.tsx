@@ -18,6 +18,7 @@ import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
 import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import ChangeOwnerModal from '@/components/Modals/ChangeOwnerModal';
 import ConfirmationModal from '@/components/Modals/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
 import {
@@ -99,7 +100,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const updateOwnerMutation = useUpdateCaseOwner();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
-  const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
@@ -373,12 +373,47 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                     }
                   }}
                 >
-                  <MenuItem data-testid="menu-change-name" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowNameModal(true); }}>{t('cases.title.changeName')}</MenuItem>
-                  <MenuItem data-testid="menu-change-situation" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowSituationModal(true); }}>{t('cases.title.changeSituation')}</MenuItem>
-                  <MenuItem data-testid="menu-allow-view" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowAllowVisualizationModal(true); }}>{t('cases.title.allowView')}</MenuItem>
-                  {isAdmin && (
-                    <MenuItem data-testid="menu-delete-case" sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }} onClick={() => { handleCloseMenu(); setShowDeleteCaseModal(true); }}>{t('cases.title.delete')}</MenuItem>
-                  )}
+                  <MenuItem 
+                    data-testid="menu-change-name"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowNameModal(true); }}
+                  >
+                    {t('cases.title.changeName')}
+                  </MenuItem>
+                  <MenuItem
+                    data-testid="menu-change-situation"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowSituationModal(true); }}
+                  >
+                    {t('cases.title.changeSituation')}
+                    </MenuItem>
+                  <MenuItem
+                    data-testid="menu-allow-view"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowAllowVisualizationModal(true); }}
+                  >
+                    {t('cases.title.allowView')}
+                  </MenuItem>
+                  
+                  {isAdmin && [
+                      <MenuItem
+                        key="change-owner"
+                        data-testid="menu-change-case-owner"
+                        sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                        onClick={() => { handleCloseMenu(); setShowChangeResponsibleModal(true); }}
+                      >
+                        {t('cases.title.changeResponsible')}
+                      </MenuItem>,
+                      <MenuItem
+                        key="delete-case"
+                        data-testid="menu-delete-case"
+                        sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                        onClick={() => { handleCloseMenu(); setShowDeleteCaseModal(true); }}
+                      >
+                        {t('cases.title.delete')}
+                      </MenuItem>
+
+                    ]}
                 </Menu>
               </div>
             </div>
@@ -657,44 +692,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       </div>
 
     {showChangeResponsibleModal && (
-      <ConfirmationModal
-      isOpen={showChangeResponsibleModal}
-      onClose={() => setShowChangeResponsibleModal(false)}
-      data-testid="modal-change-responsible"
-      icon={<FiEdit2 size={36} color="#ff3636" />}
-      title={t('cases.title.changeResponsible')}
-      description={t('cases.title.changeResponsibleDesc')}
-      primaryLabel={t('cases.title.save')}
-      onPrimary={handleUpdateOwner}
-      secondaryLabel={t('cases.title.cancel')}
-      onSecondary={() => setShowChangeResponsibleModal(false)}
-      primaryLoading={updateOwnerMutation.isPending}
-      >
-            <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
-              <ReactSelect
-                isClearable
-                isDisabled={isLoadingUsers || updateOwnerMutation.isPending}
-                options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
-                value={(users || [])
-                  .map((u) => ({ value: u.id, label: u.name }))
-                  .find((opt) => opt.value === novoResponsavel) || null}
-                onChange={(newValue, _actionMeta) => {
-                  const opt = newValue as SingleValue<{ value: string; label: string }>;
-                  setNovoResponsavel(opt?.value ?? '');
-                }}
-                placeholder={
-                  isLoadingUsers
-                    ? t('cases.title.loadingUsers')
-                    : t('cases.title.selectResponsible')
-                }
-                styles={{
-                  control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
-                } as StylesConfig}
-                menuPlacement="auto"
-              />
-            </div>
-          </ConfirmationModal>
-        )}
+      <ChangeOwnerModal
+        data-testid="modal-change-responsible"
+        isOpen={showChangeResponsibleModal}
+        onClose={() => setShowChangeResponsibleModal(false)}
+        onSubmit={handleUpdateOwner}
+        isSubmitting={updateOwnerMutation.isPending}
+      />
+      )}
     </CaseContainer>
   );
 }
