@@ -10,6 +10,9 @@ import Button from '../Button';
 import Input from '../Input';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
+import { Save } from '@mui/icons-material';
+import { usePathname } from 'next/navigation';
+import SaveFilterModal from '../Modals/SaveFilterModal';
 
 export type FilterValues = {
   caseNumber?: string;
@@ -38,6 +41,7 @@ export type FilterProps = {
   defaultValues?: FilterValues;
   values?: FilterValues;
   onValuesChange?: (values: FilterValues) => void;
+  graphFilter?: boolean;
   disabled?: boolean;
   autoFilter?: boolean;
   debounceMs?: number;
@@ -50,6 +54,12 @@ export type FilterProps = {
   };
 };
 
+type SavedFilter = {
+  name: string;
+  values: FilterValues;
+  createdAt?: string;
+};
+
 const _isCaseStatus = (value: string): value is CaseStatus => {
   return ['Aberto', 'Em andamento', 'Concluído'].includes(value);
 };
@@ -58,10 +68,10 @@ const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,
   onClear,
-  // onSaveFilter,
   defaultValues = {},
   values: controlledValues,
   onValuesChange,
+  graphFilter = true,
   disabled = false,
   autoFilter = false,
   debounceMs = 2000,
@@ -72,7 +82,9 @@ const Filter: React.FC<FilterProps> = ({
   const [internalFilters, setInternalFilters] = useState<FilterValues>({ ...defaultValues });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
+  const [selectedSavedFilter, setSelectedSavedFilter] = useState<string>('');
+  const [isSaveFilterModalOpen, setIsSaveFilterModalOpen] = useState<boolean>(false);
   const filters = isControlled ? controlledValues : internalFilters;
 
   const updateFilters = (updater: FilterValues | ((prev: FilterValues) => FilterValues)) => {
@@ -109,6 +121,8 @@ const Filter: React.FC<FilterProps> = ({
     const value = e.target.value;
     updateFilters((prev) => ({ ...prev, [key]: value }));
     
+    if (selectedSavedFilter !== '') setSelectedSavedFilter('');
+
     if (errors[key]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -125,11 +139,74 @@ const Filter: React.FC<FilterProps> = ({
     };
     updateFilters(newFilters);
     
+    if (selectedSavedFilter !== '') setSelectedSavedFilter('');
+
     if (autoFilter) {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
       onFilter(newFilters);
+    }
+  };
+
+  const safeParse = <T,>(json: string | null): T | null => {
+    try {
+      return json ? (JSON.parse(json) as T) : null;
+    } catch {
+      return null;
+    }
+  };
+  const pathname = usePathname();
+  const STORAGE_KEY = `graphFilters_${pathname}`;
+
+  const getSavedFilters = () => {
+    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(STORAGE_KEY));
+    if (Array.isArray(parsed)) setSavedFilters(parsed);
+  };
+
+  const addSavedFilters = (filter: SavedFilter) => {
+    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(STORAGE_KEY)) ?? [];
+    parsed.push(filter);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    setSavedFilters(parsed);
+  };
+
+  useEffect(() => {
+    getSavedFilters();
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) getSavedFilters();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  const applySavedFilter = (sf: SavedFilter) => {
+    const allowedKeys = new Set(fields.map(f => f.key));
+    const next: FilterValues = {};
+
+    Object.entries(sf.values).forEach(([k, v]) => {
+      if (!allowedKeys.has(k)) return;
+      if (typeof v === 'string' && _isCaseStatus(v)) {
+        next[k] = v as CaseStatus;
+      } else {
+        next[k] = v as any;
+      }
+    });
+
+    updateFilters(next);
+
+    if (autoFilter) {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      onFilter(next);
+    }
+  };
+
+  const handleSaveFilter = (name: string) => {
+    
+    if (name && name.trim()) {
+      addSavedFilters({ name: name.trim(), values: filters, createdAt: new Date().toISOString() });
+      setSelectedSavedFilter(name.trim());
     }
   };
 
@@ -163,9 +240,6 @@ const Filter: React.FC<FilterProps> = ({
     onClear?.();
   };
 
-  // const handleSave = () => {
-  //   if (onSaveFilter) onSaveFilter(filters);
-  // };
 
   return (
     <div
@@ -203,9 +277,36 @@ const Filter: React.FC<FilterProps> = ({
             </div>
           )
         )}
-      </div>
+        {graphFilter && (
+          <div className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}>
+            <label className={styles.label}>Filtro</label>
+            <CustomSelect
+              options={savedFilters.map(f => ({ value: f.name, label: f.name }))}
+              value={selectedSavedFilter}
+              onChange={(name) => {
+                const chosen = savedFilters.find(f => f.name === name);
+                setSelectedSavedFilter(name || '');
+                if (chosen) applySavedFilter(chosen);
+              }}
+              placeholder='Filtro'
+              style={{ height: '2.5rem', width: '11.25rem' }}
+              isControlled
+            />
+          </div>
 
-      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
+        )}
+      </div>
+        <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
+          <Button
+            data-testid="save-filter-button"
+            icon={<Save />}
+            variant="contained"
+            size="icon"
+            label=""
+            onClick={() => {setIsSaveFilterModalOpen(true)}}
+            className={styles.iconButton}
+            disabled={disabled}
+          />
         {onClear && (
           <Button
             data-testid="clear-button"
@@ -244,6 +345,12 @@ const Filter: React.FC<FilterProps> = ({
           )} */}
         </div>
       </div>
+      <SaveFilterModal
+        isOpen={isSaveFilterModalOpen}
+        onClose={() => setIsSaveFilterModalOpen(false)}
+        onSubmit={(payload) => {handleSaveFilter(payload.filterName)}}
+        // onSubmit={(payload) => handleSave(payload.filterName)}
+      />
     </div>
   );
 };

@@ -70,6 +70,7 @@ export const texts = {
   'addFile.required': '*',
   'addFile.select': 'Selecionar',
   'addFile.type': 'Tipo',
+  'modal.filterName': 'Nome do filtro:',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
   'addFile.simbaLabel': 'ExtratoDetalhado',
