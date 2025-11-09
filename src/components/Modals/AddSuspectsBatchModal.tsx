@@ -91,6 +91,7 @@ export default function AddSuspectsBatchModal({
         tabIndex={0}
         onClick={() => fileInputRef.current?.click()}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInputRef.current?.click()}
+        data-testid="dropzone"
       >
         <input
           ref={fileInputRef}
@@ -98,6 +99,7 @@ export default function AddSuspectsBatchModal({
           className={styles.inputFile}
           onChange={handleFileInput}
           accept=".csv,text/csv"
+          data-testid="file-input"
         />
         <div className={styles.dropzoneContent}>
           <FileUploadIcon fontSize="large" />

@@ -436,8 +436,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                 />
-                <div className={styles.investigatedButtons}>
+                <div className={styles.investigatedButtons} data-testid="add-investigated-buttons">
                   <Button
+                    data-testid='add-suspects-batch'
                     icon={<NoteAddOutlinedIcon />}
                     variant="contained"
                     size="icon"
@@ -445,6 +446,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                     onClick={() => setShowAddSuspectsBatchModal(true)}
                   />
                   <Button
+                    data-testid='add-suspect'
                     icon={<AddIcon />}
                     variant="contained"
                     size="icon"
