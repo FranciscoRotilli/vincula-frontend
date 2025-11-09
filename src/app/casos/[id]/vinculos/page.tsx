@@ -1,5 +1,6 @@
 'use client';
 
+import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
