@@ -17,3 +17,9 @@
   color: #666666;
   margin-bottom: 16px;
 }
+
+.tableWrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
