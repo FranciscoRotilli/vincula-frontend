@@ -7,8 +7,6 @@ import GenericTable from '@/components/GenericTable';
 import { t } from '@/texts';
 import { Column } from '@/types/Table';
 
-import styles from './ListPeople.module.css';
-
 export interface UserWithAccess {
   id: string | number;
   name: string;
@@ -22,10 +20,10 @@ interface ListPeopleProps {
   isLoading?: boolean;
 }
 
-export default function ListPeople({ 
-  users, 
+export default function ListPeople({
+  users,
   onRemoveUser,
-  isLoading = false 
+  isLoading = false
 }: ListPeopleProps) {
   const columns: Column<UserWithAccess>[] = [
     { key: 'name', label: 'Nome' },
@@ -41,28 +39,13 @@ export default function ListPeople({
     },
   ] : undefined;
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <h1 className={styles.title}>{t('listPeople.title')}</h1>
-        <p className={styles.description}>{t('listPeople.loading')}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>{t('listPeople.title')}</h1>
-      
-      <div className={styles.tableWrapper}>
-        <GenericTable<UserWithAccess>
-          columns={columns}
-          data={users}
-          rowActions={rowActions}
-          loading={isLoading}
-          variant="outlined"
-        />
-      </div>
-    </div>
-  );
+    <GenericTable<UserWithAccess>
+      columns={columns}
+      data={users}
+      rowActions={rowActions}
+      loading={isLoading}
+      variant="outlined"
+    />
+  )
 }

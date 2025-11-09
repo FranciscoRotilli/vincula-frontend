@@ -454,14 +454,20 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           </div>
-
-          <ListPeople
-            caseId={caseId}
-            users={usersWithAccess}
-            onRemoveUser={(userId) => {
-              setShowRemoveUserModal({ open: true, userId: userId.toString() });
-            }}
-          />
+          <div className={styles.allowedSection}>
+            <div className={styles.sectionHeader}>
+              <h1 className={styles.title3}>{t('listPeople.title')}</h1>
+            </div>
+            <div className={` ${styles.allowedTable}`}>
+              <ListPeople
+                caseId={caseId}
+                users={usersWithAccess}
+                onRemoveUser={(userId) => {
+                  setShowRemoveUserModal({ open: true, userId: userId.toString() });
+                }}
+              />
+            </div>
+          </div>
 
           <div className={styles.investigatedSection} data-testid="investigated-section">
             <div className={styles.sectionHeader}>
