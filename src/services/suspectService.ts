@@ -33,3 +33,26 @@ export async function deleteSuspect(caseId: string, suspectId: string) {
     throw new Error(`Falha ao remover suspeito: ${response.statusText}`);
   }
 }
+
+export async function addSuspectsBatch(caseId: string, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`/api/case/${caseId}/suspect/batch`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha ao adicionar suspeitos em lote: ${response.statusText}`);
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return { ok: true };
+  }
+}
