@@ -1,7 +1,7 @@
 'use client';
 import AddIcon from '@mui/icons-material/Add';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
-import { CircularProgress, Tooltip } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
@@ -402,8 +402,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                 />
-                <div className={styles.investigatedButtons}></div>
-                <Tooltip title="Adicionar CSV de investigados">
+                <div className={styles.investigatedButtons}>
                   <Button
                     icon={<NoteAddOutlinedIcon />}
                     variant="contained"
@@ -411,8 +410,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                     label=""
                     onClick={() => setShowAddSuspectsBatchModal(true)}
                   />
-                </Tooltip>
-                <Tooltip title="Adicionar suspeito">
                   <Button
                     icon={<AddIcon />}
                     variant="contained"
@@ -420,8 +417,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                     label=""
                     onClick={handleAddSuspect}
                   />
-                </Tooltip>
-                
+                </div>
               </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">

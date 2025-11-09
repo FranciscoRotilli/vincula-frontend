@@ -126,6 +126,12 @@
   box-shadow: 0 0.125rem 0.5rem #0001; /* 0 2px 8px */
 }
 
+.investigatedButtons {
+  display: flex;
+  flex-direction: row;
+  row-gap: 1rem;
+}
+
 .sectionHeader {
   display: flex;
   flex-direction: column;
