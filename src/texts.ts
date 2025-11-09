@@ -151,6 +151,25 @@ export const texts = {
   'graph.goToGeneralInfo': 'Ir para Informações Gerais',
   'graph.showFilters': 'Mostrar Filtros',
   'graph.hideFilters': 'Ocultar Filtros',
+  'toastSuccess.handleCreateCase': 'Caso criado com sucesso.',
+  'toastError.handleCreateCase': 'Não foi possível criar o caso.',
+  'toastSuccess.handleUpdateName': 'Nome do caso atualizado com sucesso.',
+  'toastError.handleUpdateName': 'Não foi possível alterar o nome do caso.',
+  'toastSuccess.handleUpdateSituation': 'Situação do caso atualizada com sucesso.',
+  'toastError.handleUpdateSituation': 'Não foi possível alterar a situação do caso.',
+  'toastSuccess.handleDeleteCase': 'Caso deletado com sucesso.',
+  'toastError.handleDeleteCase': 'Não foi possível deletar o caso.',
+  'toastSuccess.handleAddEnvolvido': 'Investigado adicionado com sucesso.', 
+  'toastError.handleAddEnvolvido': 'Não foi possível adicionar investigado ao caso.', 
+  'toastSuccess.handleAllowVisualization': 'Permissão de visualização de caso atualizada.',
+  'toastError.handleAllowVisualization': 'Não foi possível alterar permissão de visualização de caso.',
+  'toastSuccess.handleRemoveEnvolvido': 'Investigado removido com sucesso.',
+  'toastError.handleRemoveEnvolvido': 'Não foi possível remover investigado no caso.',
+  'toastSuccess.handleRemoveArquivo': 'Arquivo removido com sucesso.',
+  'toastError.caseData': 'Erro ao carregar os dados do caso.',
+  'toastSuccess.addFile': 'Arquivo adicionado com sucesso.',
+  'toastError.addFile': 'Não foi possível adicionar o arquivo.'
+
 } as const;
 
 export type TextKey = keyof typeof texts;

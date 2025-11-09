@@ -8,6 +8,7 @@ import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
 import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
+import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
@@ -99,9 +100,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowNameModal(false);
+          toast.success(t('toastSuccess.handleUpdateName'))
         },
         onError: (error) => {
-          console.error('Failed to update case name: ', error);
+          toast.error(t('toastError.handleUpdateName'))
+          console.error('Failed to update case situation:', error);
         },
       }
     );
@@ -134,24 +137,44 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowSituationModal(false);
+          toast.success(t('toastSuccess.handleUpdateSituation'))
         },
         onError: (error) => {
+          toast.error(t('toastError.handleUpdateSituation'))
           console.error('Failed to update case situation:', error);
         },
       }
     );
   };
 
+  // const handleToggleCanView = () => {
+  //   updateCanViewMutation.mutate(
+  //     { caseId, canView: !visualizacaoPermitida },
+  //     {
+  //       onSuccess: () => {
+  //         setVisualizacaoPermitida((v) => !v);
+  //         toast.success('Usuários com permissão para acessar o caso alterados com sucesso.')
+  //       },
+  //       onError: (error) => {
+  //         toast.error('Não foi possível alterar usuários com permissão para acessar o caso.')
+  //         console.error('Failed to update users with permission to see case:', error);
+  //       }
+  //     }
+  //   );
+  // };
+
   const handleDeleteCase = () => {
     if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
+        toast.success(t('toastSuccess.handleDeleteCase'))
         router.push('/casos');
       },
-      onError: (error) => {
-        console.error('Failed to delete case:', error);
-      },
+       onError: (error) => {
+          toast.error(t('toastError.handleDeleteCase'))
+          console.error('Failed to delete case: ', error);
+        }
     });
   };
 
@@ -194,9 +217,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           setNewName('');
           setNewCpf('');
           setNewPhone('');
+          toast.success(t('toastSuccess.handleAddEnvolvido'))
           refetch();
         },
         onError: (error) => {
+          toast.error(t('toastError.handleAddEnvolvido'))
           console.error('Falha na API ao adicionar investigado:', error);
         }
       }
@@ -222,9 +247,15 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     allowViewMutation.mutate({ caseId, userId: selectedUser }, {
       onSuccess: () => {
         setShowAllowVisualizationModal(false);
+        toast.success(t('toastSuccess.handleAllowVisualization'))
         window.location.reload()
-      }
-    });
+      },
+      onError: () => {
+      setShowAllowVisualizationModal(false);
+      toast.error('Erro ao alterar permissão de visualização de caso.')
+      toast.error(t('toastError.handleAllowVisualization'))
+      window.location.reload();
+    }});
   }
 
   const handleRemoveSuspect = (index: number) => {
@@ -237,9 +268,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onSuccess: () => {
           setSuspects((prev) => prev.filter((_, i) => i !== index));
           setShowRemoveSuspectModal({ open: false, index: null });
+          toast.success(t('toastSuccess.handleRemoveEnvolvido'));
           refetch();
         },
         onError: (error) => {
+          toast.error(t('toastError.handleRemoveEnvolvido'));
           console.error('Erro ao remover investigado:', error);
         },
       }
@@ -249,6 +282,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const handleRemoveFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
+    toast.success(t('toastSuccess.handleRemoveArquivo'))
   };
 
   const suspectsColumns: Column<SuspectRow>[] = [
