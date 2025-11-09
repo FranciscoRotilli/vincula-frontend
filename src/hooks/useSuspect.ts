@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { addSuspect, deleteSuspect } from '@/services/suspectService';
+import { addSuspect, addSuspectsBatch, deleteSuspect } from '@/services/suspectService';
 import { SuspectRequest } from '@/types/Cases';
 
 export function useAddSuspect() {
@@ -15,4 +15,11 @@ export function useDeleteSuspect() {
     mutationFn: ({ caseId, suspectId }: { caseId: string; suspectId: string }) =>
       deleteSuspect(caseId, suspectId),
   });
+}
+
+export function useAddSuspectsBatch() {
+  return useMutation({
+    mutationFn: ({ caseId, file }: { caseId: string; file: File }) =>
+      addSuspectsBatch(caseId, file),
+  })
 }

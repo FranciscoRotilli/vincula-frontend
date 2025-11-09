@@ -1,6 +1,7 @@
 'use client';
 import AddIcon from '@mui/icons-material/Add';
-import { CircularProgress } from '@mui/material';
+import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
+import { CircularProgress, Tooltip } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
@@ -13,6 +14,7 @@ import { CaseContainer } from '@/components/CaseContainer';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import ConfirmationModal from '@/components/Modals/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
@@ -24,7 +26,7 @@ import {
   useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
 import { useUsers } from '@/hooks/useUsers';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
@@ -60,6 +62,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
+  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
   const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -81,6 +84,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
+  const addSuspectsBatchMutation = useAddSuspectsBatch();
 
   const [suspects, setSuspects] = useState<SuspectRow[]>([]);
   const [files, setFiles] = useState<FileResponse[]>([]);
@@ -195,6 +199,21 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onError: (error) => {
           console.error('Falha na API ao adicionar investigado:', error);
         }
+      }
+    );
+  };
+
+  const handleAddSuspectsBatch = (file: File) => {
+    addSuspectsBatchMutation.mutate(
+      { caseId, file },
+      {
+        onSuccess: () => {
+          setShowAddSuspectsBatchModal(false);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Falha na API ao adicionar investigados por lote: ', error);
+        },
       }
     );
   };
@@ -328,7 +347,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   setShowAllowVisualizationModal(true);
                 }}
               />
-               <Button
+              <Button
                 size="small"
                 label={t('cases.title.changeResponsible')}
                 variant="contained"
@@ -383,13 +402,26 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                 />
-                <Button
-                  icon={<AddIcon />}
-                  variant="contained"
-                  size="icon"
-                  label=""
-                  onClick={handleAddSuspect}
-                />
+                <div className={styles.investigatedButtons}></div>
+                <Tooltip title="Adicionar CSV de investigados">
+                  <Button
+                    icon={<NoteAddOutlinedIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={() => setShowAddSuspectsBatchModal(true)}
+                  />
+                </Tooltip>
+                <Tooltip title="Adicionar suspeito">
+                  <Button
+                    icon={<AddIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={handleAddSuspect}
+                  />
+                </Tooltip>
+                
               </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">
@@ -536,6 +568,15 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isSubmitting={allowViewMutation.isPending}
           />
         )}
+
+        {showAddSuspectsBatchModal && (
+          <AddSuspectsBatchModal
+            isOpen={showAddSuspectsBatchModal}
+            onClose={() => setShowAddSuspectsBatchModal(false)}
+            onSubmit={handleAddSuspectsBatch}
+            isSubmitting={addSuspectsBatchMutation.isPending}
+          />
+        )}
       </div>
 
     {showChangeResponsibleModal && (
@@ -550,7 +591,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       onPrimary={handleUpdateOwner}
       secondaryLabel={t('cases.title.cancel')}
       onSecondary={() => setShowChangeResponsibleModal(false)}
-      primaryDisabled={updateOwnerMutation.isPending}
       primaryLoading={updateOwnerMutation.isPending}
       >
             <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
