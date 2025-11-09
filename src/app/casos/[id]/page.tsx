@@ -70,6 +70,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
+  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
