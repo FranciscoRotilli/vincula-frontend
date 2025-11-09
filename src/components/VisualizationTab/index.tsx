@@ -34,9 +34,10 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   const [loadingFileId, setLoadingFileId] = useState<string | null>(null);
 
   const [filters, setFilters] = useState<FilterValues>({
-    investigado: '',
+    investigado: [] as string[],
     cpfCnpj: '',
     destino: '',
+    arquivo: [] as string[],
   });
 
   const [investigado, setInvestigado] = useState<{ value: string; label: string }[]>([]);
@@ -44,7 +45,7 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   useEffect(() => {
     async function fetchSuspects() {
       try {
-        const response = await fetch(`/api/cases/${caseId}`);
+        const response = await fetch(`/api/case/${caseId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch suspects');
         }
@@ -74,33 +75,48 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
     if (!data) return;
     let filtered = data.rows;
 
-    const { investigado, cpfCnpj, destino } = appliedFilters;
+    const { investigado: invFilter, cpfCnpj, destino, arquivo } = appliedFilters;
 
-    if (investigado?.trim()) {
+    if (Array.isArray(arquivo) && arquivo.length > 0) {
+      if (!selectedFile || !arquivo.includes(selectedFile.name)) {
+        setFilteredData({ ...data, rows: [] });
+        return;
+      }
+    }
+
+    if (Array.isArray(invFilter) && invFilter.length > 0) {
+      filtered = filtered.filter((row) =>
+        invFilter.some((sel) =>
+          String(row['NOME DO TITULAR'] || '')
+            .toLowerCase()
+            .includes(String(sel).toLowerCase())
+        )
+      );
+    } else if (typeof invFilter === 'string' && invFilter.trim()) {
       filtered = filtered.filter((row) =>
         String(row['NOME DO TITULAR'] || '')
           .toLowerCase()
-          .includes(investigado.toLowerCase())
+          .includes(invFilter.toLowerCase())
       );
     }
 
-    if (cpfCnpj?.trim()) {
+    if (cpfCnpj && String(cpfCnpj).trim()) {
       filtered = filtered.filter(
         (row) =>
           String(row['CPF/CNPJ ORIGEM'] || '')
             .toLowerCase()
-            .includes(cpfCnpj.toLowerCase()) ||
+            .includes(String(cpfCnpj).toLowerCase()) ||
           String(row['CPF/CNPJ DESTINO'] || '')
             .toLowerCase()
-            .includes(cpfCnpj.toLowerCase())
+            .includes(String(cpfCnpj).toLowerCase())
       );
     }
 
-    if (destino?.trim()) {
+    if (destino && String(destino).trim()) {
       filtered = filtered.filter((row) =>
         String(row['NOME DESTINO'] || '')
           .toLowerCase()
-          .includes(destino.toLowerCase())
+          .includes(String(destino).toLowerCase())
       );
     }
 
@@ -113,7 +129,7 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   };
 
   const handleClear = () => {
-    setFilters({});
+    setFilters({ investigado: [], cpfCnpj: '', destino: '', arquivo: [] });
     if (data) setFilteredData(data);
   };
 
@@ -161,8 +177,8 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
         })}
       </div>
     );
-  };
-
+	};
+	
   // 🔁 Mapeia colunas (strings) para o formato do GenericTable
   const gtColumns = useMemo(() => {
     const source = filteredData ?? data;
@@ -172,8 +188,8 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
       label: col,
       align: 'left' as const,
     }));
-  }, [filteredData, data]);
-
+	}, [filteredData, data]);
+	
   // 🔁 Converte rows para incluir `id` obrigatório
   const gtRows = useMemo<RowRecord[]>(() => {
     const source = filteredData ?? data;
@@ -185,16 +201,18 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
   }, [filteredData, data, selectedFile?.id]);
 
   const hasFiltersApplied =
-    (filters.investigado?.trim() ||
-      filters.cpfCnpj?.trim() ||
-      filters.destino?.trim()) ??
+    ((Array.isArray(filters.investigado) && filters.investigado.length > 0) ||
+      (typeof filters.investigado === 'string' && filters.investigado.trim()) ||
+      (filters.cpfCnpj && String(filters.cpfCnpj).trim()) ||
+      (filters.destino && String(filters.destino).trim()) ||
+      (Array.isArray(filters.arquivo) && filters.arquivo.length > 0)) ??
     false;
 
   const filterFields: FieldConfig[] = [
     {
       key: 'investigado',
       label: t('filter.label1'),
-      type: 'select',
+      type: 'multi-select',
       options: investigado,
       placeholder: t('filter.placeholder1'),
     },
@@ -209,6 +227,13 @@ export const VisualizationTab = ({ caseId }: VisualizationTabProps) => {
       label: t('filter.label3'),
       type: 'input',
       placeholder: t('filter.placeholder3'),
+    },
+    {
+      key: 'arquivo',
+      label: t('visualization.availableFiles', { count: files.length }),
+      type: 'multi-select',
+      options: files.map((f) => ({ value: f.name, label: f.name })),
+      placeholder: 'Selecione',
     },
   ];
 

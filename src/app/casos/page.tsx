@@ -3,6 +3,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from "next/navigation";
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -103,20 +104,21 @@ export default function Casos() {
     setPagination({ page: newPage + 1, limit: newLimit });
   };
 
-  const handleCreateCase = (payload: { caseName: string }) => {
+  const handleCreateCase = async (payload: { caseName: string }) => {
     const apiPayload: { name: string } = {
       name: payload.caseName,
     };
 
-    caseMutation.mutate(apiPayload, {
-      onSuccess: (_data) => {
-        setIsModalOpen(false);
-        refetch();
-      },
-      onError: (error) => {
-        console.error('Erro ao criar caso:', error);
-      },
-    });
+    try {
+      await caseMutation.mutateAsync(apiPayload);
+      setIsModalOpen(false);
+      refetch();
+      toast.success(t('toastSuccess.handleCreateCase'))
+    } catch (error) {
+      toast.error(t('toastError.handleCreateCase'))
+      console.error('Erro ao criar caso:', error);
+      throw error;
+    }
   };
 
   return (
@@ -138,6 +140,7 @@ export default function Casos() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleCreateCase}
+          isSubmitting={caseMutation.isPending}
         />
         <div className={styles.tableContainer}>
           <Filter

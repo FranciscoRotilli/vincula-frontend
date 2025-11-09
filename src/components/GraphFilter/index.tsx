@@ -18,10 +18,10 @@ const baseOptions = [
 
 export default function GraphFilter({ archives, investigated }: Readonly<GraphFilterProps>) {
   const [_filters, setFilters] = useState<FilterValues>({});
-  const [archivesOptions, setArchivesOptions] = useState<{ value: string; label: string }[]>([]);
-  const [investigatedOptions, setInvestigatedOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
+  const [archivesOptions, setArchivesOptions] =
+    useState<{ value: string; label: string }[]>([]);
+  const [investigatedOptions, setInvestigatedOptions] =
+    useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     setInvestigatedOptions(investigated.map(item => ({ value: item, label: item })));
@@ -35,7 +35,7 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
     {
       key: 'investigated',
       label: 'Investigado',
-      type: 'select',
+      type: 'multi-select',
       options: investigatedOptions,
       placeholder: 'Selecione',
     },
@@ -57,7 +57,7 @@ export default function GraphFilter({ archives, investigated }: Readonly<GraphFi
       key: 'archive',
       label: 'Arquivo',
       options: archivesOptions,
-      type: 'select',
+      type: 'multi-select',
       placeholder: 'Selecione',
     },
   ];

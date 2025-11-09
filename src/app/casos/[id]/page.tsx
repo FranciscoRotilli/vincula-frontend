@@ -1,26 +1,34 @@
 'use client';
 import AddIcon from '@mui/icons-material/Add';
+import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
 import { CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
+import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
+import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
-import ConfirmationModal from '@/components/ConfirmationModal/ConfirmationModal';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
+import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import ConfirmationModal from '@/components/Modals/ConfirmationModal';
+import RemoveModal from '@/components/Modals/RemoveModal';
 import {
+  useAllowVisualization,
   useCaseById,
   useDeleteCase,
-  useUpdateCaseCanView,
   useUpdateCaseName,
+  useUpdateCaseOwner,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useUsers } from '@/hooks/useUsers';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
 import { FileResponse } from '@/types/Files';
@@ -29,7 +37,7 @@ import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
 
-type EnvolvidoRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
+type SuspectRow = { id: string | number; name: string; cpf_cnpj: string; phone_number?: string };
 
 export default function GeneralInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -39,6 +47,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
+  const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -46,147 +56,256 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [showRemoveEnvolvidoModal, setShowRemoveEnvolvidoModal] = useState<{
+  const [showRemoveSuspectModal, setShowRemoveSuspectModal] = useState<{
     open: boolean;
     index: number | null;
   }>({
     open: false,
     index: null,
   });
-  const [visualizacaoPermitida, setVisualizacaoPermitida] = useState(true);
+  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
+  const [novoResponsavel, setNovoResponsavel] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newCpf, setNewCpf] = useState('');
 
-  const [novoNome, setNovoNome] = useState('');
-  const [novoTelefone, setNovoTelefone] = useState('');
-  const [novoCpf, setNovoCpf] = useState('');
+  const [validationErrors, setValidationErrors] = useState<{
+    name?: string;
+    cpf_cnpj?: string;
+  }>({});
 
   const updateNameMutation = useUpdateCaseName();
   const updateSituationMutation = useUpdateCaseSituation();
-  const updateCanViewMutation = useUpdateCaseCanView();
   const deleteCaseMutation = useDeleteCase();
+  const allowViewMutation = useAllowVisualization();
+  const updateOwnerMutation = useUpdateCaseOwner();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+  const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
+  const addSuspectsBatchMutation = useAddSuspectsBatch();
 
-  const [envolvidos, setEnvolvidos] = useState<EnvolvidoRow[]>([]);
-  const [arquivos, setArquivos] = useState<FileResponse[]>([]);
-  const [novoNomeCaso, setNovoNomeCaso] = useState('');
-  const [novaSituacao, setNovaSituacao] = useState('');
+  const [suspects, setSuspects] = useState<SuspectRow[]>([]);
+  const [files, setFiles] = useState<FileResponse[]>([]);
+  const [newCaseName, setNewCaseName] = useState('');
+  const [newSituation, setNewSituation] = useState('');
+  const [selectedUser] = useState('');
 
   const handleUpdateName = async () => {
+    if (updateNameMutation.isPending) return;
     updateNameMutation.mutate(
-      { caseId, name: novoNomeCaso as CaseItem['name']},
+      { caseId, name: newCaseName as CaseItem['name'] },
       {
         onSuccess: () => {
           setShowNameModal(false);
+          toast.success(t('toastSuccess.handleUpdateName'))
         },
         onError: (error) => {
-          console.error('Failed to update case name: ', error);
-        }
-      }
-    );
-  };
-
-  const handleUpdateSituation = async () => {
-    updateSituationMutation.mutate(
-      { caseId, situation: novaSituacao as CaseItem['status'] },
-      {
-        onSuccess: () => {
-          setShowSituationModal(false);
-        },
-        onError: (error) => {
+          toast.error(t('toastError.handleUpdateName'))
           console.error('Failed to update case situation:', error);
         },
       }
     );
   };
 
-  const handleToggleCanView = () => {
-    updateCanViewMutation.mutate(
-      { caseId, canView: !visualizacaoPermitida },
+  const handleUpdateOwner = async () => {
+    if (!novoResponsavel) {
+      return;
+    }
+    
+    updateOwnerMutation.mutate(
+      { caseId, userId: novoResponsavel },
       {
         onSuccess: () => {
-          setVisualizacaoPermitida((v) => !v);
+          setShowChangeResponsibleModal(false);
+          setNovoResponsavel(''); 
+          refetch(); 
+        },
+        onError: (error) => {
+          console.error('Failed to update case owner:', error);
         },
       }
     );
   };
 
+  const handleUpdateSituation = async () => {
+    if (updateSituationMutation.isPending) return;
+    updateSituationMutation.mutate(
+      { caseId, situation: newSituation as CaseItem['status'] },
+      {
+        onSuccess: () => {
+          setShowSituationModal(false);
+          toast.success(t('toastSuccess.handleUpdateSituation'))
+        },
+        onError: (error) => {
+          toast.error(t('toastError.handleUpdateSituation'))
+          console.error('Failed to update case situation:', error);
+        },
+      }
+    );
+  };
+
+  // const handleToggleCanView = () => {
+  //   updateCanViewMutation.mutate(
+  //     { caseId, canView: !visualizacaoPermitida },
+  //     {
+  //       onSuccess: () => {
+  //         setVisualizacaoPermitida((v) => !v);
+  //         toast.success('Usuários com permissão para acessar o caso alterados com sucesso.')
+  //       },
+  //       onError: (error) => {
+  //         toast.error('Não foi possível alterar usuários com permissão para acessar o caso.')
+  //         console.error('Failed to update users with permission to see case:', error);
+  //       }
+  //     }
+  //   );
+  // };
+
   const handleDeleteCase = () => {
+    if (deleteCaseMutation.isPending) return;
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
+        toast.success(t('toastSuccess.handleDeleteCase'))
+        router.push('/casos');
       },
+       onError: (error) => {
+          toast.error(t('toastError.handleDeleteCase'))
+          console.error('Failed to delete case: ', error);
+        }
     });
   };
 
-  const handleAddEnvolvido = () => {
+  const handleAddSuspect = () => {
+    const errors: typeof validationErrors = {};
+    let isValid = true;
+
+    const rawCpfCnpj = newCpf.replace(/\D/g, '');
+
+    if (!newName.trim()) {
+      errors.name = 'O nome é obrigatório.';
+      isValid = false;
+    }
+    if (!rawCpfCnpj) {
+      errors.cpf_cnpj = 'CPF/CNPJ é obrigatório.';
+      isValid = false;
+    } else if (rawCpfCnpj.length !== 11 && rawCpfCnpj.length !== 14) {
+      errors.cpf_cnpj = 'CPF/CNPJ inválido.';
+      isValid = false;
+    }
+
+    setValidationErrors(errors);
+
+    if (!isValid) {
+      return;
+    }
+
+    setValidationErrors({});
+
     const newSuspect: SuspectRequest = {
-      name: novoNome,
-      cpf_cnpj: novoCpf,
-      phone_number: novoTelefone,
+      name: newName,
+      cpf_cnpj: rawCpfCnpj,
+      phone_number: newPhone,
     };
 
     addSuspectMutation.mutate(
       { caseId, newSuspect },
       {
         onSuccess: () => {
-          setNovoNome('');
-          setNovoCpf('');
-          setNovoTelefone('');
-
+          setNewName('');
+          setNewCpf('');
+          setNewPhone('');
+          toast.success(t('toastSuccess.handleAddEnvolvido'))
           refetch();
+        },
+        onError: (error) => {
+          toast.error(t('toastError.handleAddEnvolvido'))
+          console.error('Falha na API ao adicionar investigado:', error);
+        }
+      }
+    );
+  };
+
+  const handleAddSuspectsBatch = (file: File) => {
+    addSuspectsBatchMutation.mutate(
+      { caseId, file },
+      {
+        onSuccess: () => {
+          setShowAddSuspectsBatchModal(false);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Falha na API ao adicionar investigados por lote: ', error);
         },
       }
     );
   };
 
-  const handleRemoveEnvolvido = (index: number) => {
+  const handleAllowVisualization = () => {
+    allowViewMutation.mutate({ caseId, userId: selectedUser }, {
+      onSuccess: () => {
+        setShowAllowVisualizationModal(false);
+        toast.success(t('toastSuccess.handleAllowVisualization'))
+        window.location.reload()
+      },
+      onError: () => {
+      setShowAllowVisualizationModal(false);
+      toast.error('Erro ao alterar permissão de visualização de caso.')
+      toast.error(t('toastError.handleAllowVisualization'))
+      window.location.reload();
+    }});
+  }
+
+  const handleRemoveSuspect = (index: number) => {
     if (index === null || index === undefined) return;
-    const suspect = envolvidos[index];
+    const suspect = suspects[index];
 
     deleteSuspectMutation.mutate(
       { caseId, suspectId: suspect.id.toString() },
       {
         onSuccess: () => {
-          setEnvolvidos((prev) => prev.filter((_, i) => i !== index));
-          setShowRemoveEnvolvidoModal({ open: false, index: null });
+          setSuspects((prev) => prev.filter((_, i) => i !== index));
+          setShowRemoveSuspectModal({ open: false, index: null });
+          toast.success(t('toastSuccess.handleRemoveEnvolvido'));
           refetch();
         },
         onError: (error) => {
+          toast.error(t('toastError.handleRemoveEnvolvido'));
           console.error('Erro ao remover investigado:', error);
         },
       }
     );
   };
 
-  const handleRemoveArquivo = (index: number) => {
-    setArquivos(arquivos.filter((_, i) => i !== index));
+  const handleRemoveFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
+    toast.success(t('toastSuccess.handleRemoveArquivo'))
   };
 
-  const envolvidosColumns: Column<EnvolvidoRow>[] = [
+  const suspectsColumns: Column<SuspectRow>[] = [
     { key: 'name', label: 'NOME' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
-    { key: 'phone_number', label: 'Telefone' },
+    { key: 'phone_number', label: 'TELEFONE' },
   ];
 
-  const envolvidosRowActions = [
+  const suspectsRowActions = [
     {
       icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
       label: 'Remover',
-      onClick: (_row: EnvolvidoRow, _index?: number) => {
-        const idx = envolvidos.findIndex((e) => e.id === _row.id);
-        setShowRemoveEnvolvidoModal({ open: true, index: idx });
+      onClick: (_row: SuspectRow, _index?: number) => {
+        const idx = suspects.findIndex((e) => e.id === _row.id);
+        setShowRemoveSuspectModal({ open: true, index: idx });
       },
     },
   ];
 
   useEffect(() => {
     if (caseDetails) {
-      setEnvolvidos(caseDetails.suspects || []);
-      setArquivos(caseDetails.archives || []);
+      setSuspects(caseDetails.suspects || []);
+      setFiles(caseDetails.archives || []);
     }
   }, [caseDetails]);
 
@@ -202,7 +321,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
-          <span>{t('cases.errorMessage')}</span>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -210,12 +328,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
-            />
-            <Button
-              size="medium"
-              label={t('cases.reload')}
-              className={styles.reloadButton}
-              onClick={() => refetch()}
             />
           </div>
         </div>
@@ -227,7 +339,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails} data-testid="case-details">
-            <h2 className={styles.h2} data-testid='case-name'>{caseDetails.name}</h2>
+            <h2 className={styles.h2} data-testid="case-name">
+              {caseDetails.name}
+            </h2>
             <div className={styles.detailsRow} data-testid="case-informations">
               <div>
                 <strong>{t('modal.owner')}</strong> {caseDetails.owner}
@@ -245,9 +359,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div className={styles.actionsBox} data-testid="case-action-buttons">
-            <h1 className={styles.title3}>
-              {t('cases.title.actions')}
-            </h1>
+            <h1 className={styles.title3}>{t('cases.title.actions')}</h1>
             <div className={styles.actionsRow}>
               <Button
                 size="medium"
@@ -265,7 +377,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 size="medium"
                 label={t('cases.title.allowView')}
                 variant="contained"
-                onClick={handleToggleCanView}
+                onClick={() => {
+                  setShowAllowVisualizationModal(true);
+                }}
+              />
+              <Button
+                size="small"
+                label={t('cases.title.changeResponsible')}
+                variant="contained"
+                data-testid="btn-change-responsible"
+                onClick={() => setShowChangeResponsibleModal(true)}
               />
               <Button
                 size="medium"
@@ -280,60 +401,65 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             <div className={styles.sectionHeader}>
               <h1 className={styles.title3}>
                 {t('cases.title.investigated', { defaultValue: 'Investigados' })} (
-                {envolvidos.length})
+                {suspects.length})
               </h1>
               <p className={styles.body5}>
-              {t('cases.title.investigatedDesc', {
-                defaultValue:
-                  'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
-              })}
+                {t('cases.title.investigatedDesc', {
+                  defaultValue:
+                    'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
+                })}
               </p>
-            <div className={styles.addInvestigated} data-testid="add-investigated">
-              <Input
-                placeholder={t('cases.title.inputName')}
-                label='Nome'
-                value={novoNome}
-                onChange={(e) => setNovoNome(e.target.value)}
-                className={styles.input}
-              />
-              <Input
-                inputMode="numeric"
-                label='CPF / CNPJ'
-                //pattern="[0-9]*"
-                placeholder={t('cases.title.inputCpfCnpj')}
-                value={maskCpfCnpj(novoCpf)}
-                onChange={(e) => setNovoCpf(e.target.value.replace(/\D/g, ''))}
-                className={styles.input}
-                //maxLength={18}
-              />
-              <Input
-                inputMode="numeric"
-                label='Telefone'
-                //pattern="[0-9]*"
-                placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
-                value={novoTelefone}
-                onChange={(e) => setNovoTelefone(e.target.value.replace(/\D/g, ''))}
-                className={styles.input}
-                //maxLength={15}
-              />
-              <Button
-                icon={<AddIcon />}
-                variant="contained"
-                size="icon"
-                label=""
-                onClick={handleAddEnvolvido}
-                disabled={
-                  !novoNome || !novoCpf || !(novoCpf.length === 11 || novoCpf.length === 14)
-                }
-              />
-            </div>
+
+              <div className={styles.addInvestigated} data-testid="add-investigated">
+                <Input
+                  placeholder={t('cases.title.inputName')}
+                  label='Nome'
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className={styles.input}
+                  error={validationErrors.name}
+                />
+                <Input
+                  inputMode="numeric"
+                  label='CPF / CNPJ'
+                  placeholder={t('cases.title.inputCpfCnpj')}
+                  value={maskCpfCnpj(newCpf)}
+                  onChange={(e) => setNewCpf(e.target.value.replace(/\D/g, ''))}
+                  className={styles.input}
+                  error={validationErrors.cpf_cnpj}
+                />
+                <Input
+                  inputMode="numeric"
+                  label='Telefone'
+                  placeholder={t('cases.title.inputPhone', { defaultValue: 'Insira o telefone' })}
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
+                  className={styles.input}
+                />
+                <div className={styles.investigatedButtons}>
+                  <Button
+                    icon={<NoteAddOutlinedIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={() => setShowAddSuspectsBatchModal(true)}
+                  />
+                  <Button
+                    icon={<AddIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={handleAddSuspect}
+                  />
+                </div>
+              </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">
-              <GenericTable<EnvolvidoRow>
-                columns={envolvidosColumns}
-                data={envolvidos}
+              <GenericTable<SuspectRow>
+                columns={suspectsColumns}
+                data={suspects}
                 loading={isLoading}
-                rowActions={envolvidosRowActions}
+                rowActions={suspectsRowActions}
                 variant={'outlined'}
               />
             </div>
@@ -348,22 +474,21 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeName', { defaultValue: 'Alterar nome do caso' })}
-            description={t('cases.title.changeNameDesc', {
-              defaultValue: 'Altere o nome do caso abaixo.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeName')}
+            description={t('cases.title.changeNameDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateName}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowNameModal(false)}
+            primaryLoading={updateNameMutation.isPending}
           >
             <input
               type="text"
-              value={novoNomeCaso}
-              onChange={(e) => setNovoNomeCaso(e.target.value as CaseItem['name'])}
+              value={newCaseName}
+              onChange={(e) => setNewCaseName(e.target.value as CaseItem['name'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
-              placeholder={t('cases.title.inputName', { defaultValue: 'Novo nome do caso' })}
+              placeholder={t('cases.title.inputName')}
             />
           </ConfirmationModal>
         )}
@@ -373,51 +498,47 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
-            title={t('cases.title.changeSituation', { defaultValue: 'Alterar situação' })}
-            description={t('cases.title.changeSituationDesc', {
-              defaultValue: 'Selecione a nova situação do caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.changeSituation')}
+            description={t('cases.title.changeSituationDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateSituation}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowSituationModal(false)}
+            primaryLoading={updateSituationMutation.isPending}
           >
             <select
-              value={novaSituacao}
-              onChange={(e) => setNovaSituacao(e.target.value as CaseItem['status'])}
+              value={newSituation}
+              onChange={(e) => setNewSituation(e.target.value as CaseItem['status'])}
               className={styles.input}
               style={{ marginBottom: 16, marginTop: 8, width: '100%' }}
             >
               <option value="">
-                {t('cases.title.selectSituation', { defaultValue: 'Selecione a situação' })}
+                {t('cases.title.selectSituation')}
               </option>
               <option value="Em andamento">
-                {t('cases.title.situationOngoing', { defaultValue: 'Em andamento' })}
+                {t('cases.title.situationOngoing')}
               </option>
               <option value="Suspenso">
-                {t('cases.title.situationSuspended', { defaultValue: 'Suspenso' })}
+                {t('cases.title.situationSuspended')}
               </option>
               <option value="Encerrado">
-                {t('cases.title.situationClosed', { defaultValue: 'Encerrado' })}
+                {t('cases.title.situationClosed')}
               </option>
             </select>
           </ConfirmationModal>
         )}
 
         {showDeleteCaseModal && (
-          <ConfirmationModal
+          <RemoveModal
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
-            icon={<TbTrash size={36} color="#ff3636" />}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
             description={t('cases.title.deleteWarning', {
               defaultValue:
                 'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
             })}
-            primaryLabel={t('cases.title.delete', { defaultValue: 'Excluir' })}
-            onPrimary={handleDeleteCase}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowDeleteCaseModal(false)}
+            onRemove={handleDeleteCase}
+            isProcessing={deleteCaseMutation.isPending}
           />
         )}
 
@@ -432,16 +553,16 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 'Ao excluir este arquivo, todos os vínculos relacionados poderão ser perdidos.',
             })}
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
-            onPrimary={() => handleRemoveArquivo(showRemoveFileModal.index!)}
+            onPrimary={() => handleRemoveFile(showRemoveFileModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
             onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
           />
         )}
 
-        {showRemoveEnvolvidoModal.open && (
+        {showRemoveSuspectModal.open && (
           <ConfirmationModal
-            isOpen={showRemoveEnvolvidoModal.open}
-            onClose={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            isOpen={showRemoveSuspectModal.open}
+            onClose={() => setShowRemoveSuspectModal({ open: false, index: null })}
             icon={<FiAlertCircle size={36} color="#ff3636" />}
             title={t('cases.title.removeInvestigated', { defaultValue: 'Remover investigado?' })}
             description={t('cases.title.removeInvestigatedWarning', {
@@ -449,9 +570,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                 'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
             })}
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
-            onPrimary={() => handleRemoveEnvolvido(showRemoveEnvolvidoModal.index!)}
+            onPrimary={() => handleRemoveSuspect(showRemoveSuspectModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveEnvolvidoModal({ open: false, index: null })}
+            onSecondary={() => setShowRemoveSuspectModal({ open: false, index: null })}
           />
         )}
 
@@ -460,17 +581,73 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             isOpen={showUploadModal}
             onClose={() => setShowUploadModal(false)}
             icon={<FiUpload size={36} color="#ff3636" />}
-            title={t('cases.title.addFile', { defaultValue: 'Adicionar arquivo' })}
-            description={t('cases.title.addFileDesc', {
-              defaultValue: 'Selecione um arquivo para anexar ao caso.',
-            })}
-            primaryLabel={t('cases.title.save', { defaultValue: 'Salvar' })}
+            title={t('cases.title.addFile')}
+            description={t('cases.title.addFileDesc')}
+            primaryLabel={t('cases.title.save')}
             onPrimary={() => setShowUploadModal(false)}
-            secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
+            secondaryLabel={t('cases.title.cancel')}
             onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
         )}
+
+        {showAllowVisualizationModal && (
+          <AllowVisualizationModal
+            isOpen={showAllowVisualizationModal}
+            onClose={() => setShowAllowVisualizationModal(false)}
+            onSubmit={handleAllowVisualization}
+            isSubmitting={allowViewMutation.isPending}
+          />
+        )}
+
+        {showAddSuspectsBatchModal && (
+          <AddSuspectsBatchModal
+            isOpen={showAddSuspectsBatchModal}
+            onClose={() => setShowAddSuspectsBatchModal(false)}
+            onSubmit={handleAddSuspectsBatch}
+            isSubmitting={addSuspectsBatchMutation.isPending}
+          />
+        )}
       </div>
+
+    {showChangeResponsibleModal && (
+      <ConfirmationModal
+      isOpen={showChangeResponsibleModal}
+      onClose={() => setShowChangeResponsibleModal(false)}
+      data-testid="modal-change-responsible"
+      icon={<FiEdit2 size={36} color="#ff3636" />}
+      title={t('cases.title.changeResponsible')}
+      description={t('cases.title.changeResponsibleDesc')}
+      primaryLabel={t('cases.title.save')}
+      onPrimary={handleUpdateOwner}
+      secondaryLabel={t('cases.title.cancel')}
+      onSecondary={() => setShowChangeResponsibleModal(false)}
+      primaryLoading={updateOwnerMutation.isPending}
+      >
+            <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
+              <ReactSelect
+                isClearable
+                isDisabled={isLoadingUsers || updateOwnerMutation.isPending}
+                options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
+                value={(users || [])
+                  .map((u) => ({ value: u.id, label: u.name }))
+                  .find((opt) => opt.value === novoResponsavel) || null}
+                onChange={(newValue, _actionMeta) => {
+                  const opt = newValue as SingleValue<{ value: string; label: string }>;
+                  setNovoResponsavel(opt?.value ?? '');
+                }}
+                placeholder={
+                  isLoadingUsers
+                    ? t('cases.title.loadingUsers')
+                    : t('cases.title.selectResponsible')
+                }
+                styles={{
+                  control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
+                } as StylesConfig}
+                menuPlacement="auto"
+              />
+            </div>
+          </ConfirmationModal>
+        )}
     </CaseContainer>
   );
 }

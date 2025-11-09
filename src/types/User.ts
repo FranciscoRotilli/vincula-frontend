@@ -9,3 +9,9 @@ export type CurrentUser = {
   username: string;
   role: string;
 };
+
+export type UserResponse = {
+    id: string;
+    name: string;
+};
+

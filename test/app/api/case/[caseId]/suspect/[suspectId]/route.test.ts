@@ -10,7 +10,7 @@ vi.mock('@/lib/backend', () => ({
   apiFetch: vi.fn(),
 }));
 
-describe('DELETE /api/cases/[caseId]/suspect/[suspectId]', () => {
+describe('DELETE /api/case/[caseId]/suspect/[suspectId]', () => {
   const mockApiFetch = vi.mocked(apiFetch);
   const mockRequest = {} as NextRequest;
   const params = { params: Promise.resolve({ caseId: 'case-123', suspectId: 'suspect-456' }) };

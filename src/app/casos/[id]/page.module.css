@@ -90,7 +90,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
-  gap-row: 1rem;
+  row-gap: 1rem;
 }
 
 .actionsBox {
@@ -124,6 +124,12 @@
   background: var(--white);
   border-radius: 0.3125rem; /* 5px */
   box-shadow: 0 0.125rem 0.5rem #0001; /* 0 2px 8px */
+}
+
+.investigatedButtons {
+  display: flex;
+  flex-direction: row;
+  row-gap: 1rem;
 }
 
 .sectionHeader {

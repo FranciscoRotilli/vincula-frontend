@@ -5,9 +5,9 @@ import { MdOutlineClear } from 'react-icons/md';
 
 import { CaseStatus } from '@/types/Cases';
 
-// import { maskCpfCnpj, onlyNumbers } from '@/utils/functions';
 import Button from '../Button';
 import Input from '../Input';
+import MultiSelectDropdown from '../MultiSelectDropdown';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
 import { Save } from '@mui/icons-material';
@@ -19,18 +19,18 @@ export type FilterValues = {
   caseName?: string;
   responsible?: string;
   situation?: CaseStatus;
-	search?: string;
-  [key: string]: string | CaseStatus | undefined;
+  search?: string;
+  [key: string]: string | string[] | CaseStatus | undefined;
 };
 
 export type FieldConfig = {
-	key: string;
-	label: string;
-	placeholder?: string;
-	type: 'input' | 'select';
-	options?: { value: string; label: string }[];
-	testId?: string;
-	isCpfCnpjField?: boolean;
+  key: string;
+  label: string;
+  placeholder?: string;
+  type: 'input' | 'select' | 'multi-select';
+  options?: { value: string; label: string }[];
+  testId?: string;
+  isCpfCnpjField?: boolean;
 };
 
 export type FilterProps = {
@@ -71,7 +71,7 @@ const Filter: React.FC<FilterProps> = ({
   defaultValues = {},
   values: controlledValues,
   onValuesChange,
-  graphFilter = true,
+  graphFilter = false,
   disabled = false,
   autoFilter = false,
   debounceMs = 2000,
@@ -132,10 +132,10 @@ const Filter: React.FC<FilterProps> = ({
     }
   };
 
-  const handleSelectChange = (key: string) => (value: string | null) => {
+  const handleSelectChange = (key: string, multi = false) => (value: string | null | string[]) => {
     const newFilters = {
       ...filters,
-      [key]: value && value !== '' ? value : undefined,
+      [key]: multi ? (value as string[]) : (value && value !== '' ? (value as string) : undefined),
     };
     updateFilters(newFilters);
     
@@ -240,26 +240,52 @@ const Filter: React.FC<FilterProps> = ({
     onClear?.();
   };
 
-
   return (
     <div
       className={`${styles.filterContainer} ${customStyles?.container || ''}`}
       data-testid="filter-component"
     >
       <div className={`${styles.fieldsRow} ${customStyles?.fieldsRow || ''}`}>
-        {fields.map((field) =>
-          field.type === 'input' ? (
-            <Input
-              key={field.key}
-              placeholder={field.placeholder ?? ''}
-              label={field.label}
-              value={(filters[field.key] as string | undefined) ?? ''}
-              onChange={handleInputChange(field.key)}
-              disabled={disabled}
-              error={errors[field.key]}
-              data-testid={field.testId || `${field.key}-input`}
-            />
-          ) : (
+        {fields.map((field) => {
+          const multiSelected = Array.isArray(filters[field.key])
+            ? (filters[field.key] as string[])
+            : [];
+
+          if (field.type === 'input') {
+            return (
+              <Input
+                key={field.key}
+                placeholder={field.placeholder ?? ''}
+                label={field.label}
+                value={(filters[field.key] as string | undefined) ?? ''}
+                onChange={handleInputChange(field.key)}
+                disabled={disabled}
+                error={errors[field.key]}
+                data-testid={field.testId || `${field.key}-input`}
+              />
+            );
+          }
+
+          if (field.type === 'multi-select') {
+            return (
+              <div
+                key={field.key}
+                className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
+                data-testid={field.testId || `${field.key}-multiselect`}
+              >
+                <label className={styles.label}>{field.label}</label>
+                <MultiSelectDropdown
+                  options={field.options || []}
+                  defaultSelected={multiSelected}
+                  onChange={handleSelectChange(field.key, true)}
+                  placeholder={field.placeholder ?? ''}
+                  id={field.key}
+                />
+              </div>
+            );
+          }
+
+          return (
             <div
               key={field.key}
               className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
@@ -275,9 +301,9 @@ const Filter: React.FC<FilterProps> = ({
                 isControlled
               />
             </div>
-          )
+          );
+        }
         )}
-        {graphFilter && (
           <div className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}>
             <label className={styles.label}>Filtro</label>
             <CustomSelect
@@ -293,10 +319,11 @@ const Filter: React.FC<FilterProps> = ({
               isControlled
             />
           </div>
-
-        )}
+        
       </div>
-        <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
+
+      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>    
+        {graphFilter && (
           <Button
             data-testid="save-filter-button"
             icon={<Save />}
@@ -307,6 +334,7 @@ const Filter: React.FC<FilterProps> = ({
             className={styles.iconButton}
             disabled={disabled}
           />
+        )}
         {onClear && (
           <Button
             data-testid="clear-button"
@@ -349,10 +377,10 @@ const Filter: React.FC<FilterProps> = ({
         isOpen={isSaveFilterModalOpen}
         onClose={() => setIsSaveFilterModalOpen(false)}
         onSubmit={(payload) => {handleSaveFilter(payload.filterName)}}
-        // onSubmit={(payload) => handleSave(payload.filterName)}
       />
     </div>
   );
 };
+
 
 export default Filter;

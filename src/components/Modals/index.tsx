@@ -3,6 +3,8 @@ import React, { ReactNode, useEffect } from 'react';
 import styles from './Modal.module.css';
 
 type ModalProps = {
+	buttonsPosition?: 'left' | 'center' | 'right';
+	showCloseIcon?: boolean;
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -15,11 +17,14 @@ type ModalProps = {
   cancelButton?: string;
   disableEscapeKeyDown?: boolean;
   onAction?: () => void;
+  actionDisabled?: boolean;
   isError?: boolean;
   actionButtonColor?: 'primary' | 'error';
 };
 
 const Modal = ({
+	showCloseIcon = true,
+	buttonsPosition = 'right',
   isOpen,
   onClose,
   children,
@@ -32,6 +37,7 @@ const Modal = ({
   onAction,
   actionButton,
   cancelButton,
+  actionDisabled = false,
   isError: _isError = false,
   actionButtonColor = 'primary',
 }: ModalProps) => {
@@ -84,39 +90,54 @@ const Modal = ({
             )}
             {description && (
               <div
-                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginBottom: 8 }}
+                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginTop: 8, marginBottom: 8 }}
               >
                 {description}
               </div>
             )}
-          </div>
+					</div>
+					{showCloseIcon && (
           <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
             &times;
-          </button>
+						</button>
+					)}
         </header>
         <div className={styles.body}>
           <main className={styles.content}>{children}</main>
         </div>
         {(cancelButton || actionButton) && (
-          <footer className={styles.footer}>
-            {actionButton && (
-              <button
-                className={
-                  actionButtonColor === 'error'
-                    ? `${styles.button} ${styles.error}`
-                    : `${styles.button} ${styles.primary}`
-                }
-                onClick={onAction}
-              >
-                {actionButton}
-              </button>
-            )}
-            {cancelButton && (
-              <button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
-                {cancelButton}
-              </button>
-            )}
-          </footer>
+						<footer
+						className={styles.footer}
+						style={{
+							justifyContent:
+							buttonsPosition === 'left'
+								? 'flex-start'
+								: buttonsPosition === 'center'
+								? 'center'
+								: 'flex-end',
+						}}
+						>
+						{actionButton && (
+							<button
+                type="button"
+							className={
+								actionButtonColor === 'error'
+								? `${styles.button} ${styles.error}`
+								: `${styles.button} ${styles.primary}`
+							}
+							onClick={onAction}
+                disabled={actionDisabled}
+                aria-disabled={actionDisabled}
+							>
+							{actionButton}
+							</button>
+						)}
+						{cancelButton && (
+							<button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
+							{cancelButton}
+							</button>
+						)}
+						</footer>
         )}
       </div>
     </div>

@@ -1,0 +1,37 @@
+.dropzone {
+  border: .125rem dashed color-mix(in oklab, var(--text) 30%, var(--surface));
+  border-radius: .313rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--surface);
+  margin-top: 1rem;
+}
+
+.dropzone:hover {
+  border-color: var(--text);
+  background: color-mix(in oklab, var(--text) 6%, var(--surface));
+}
+
+.dropzone.dragActive {
+  border-color: var(--text);
+  box-shadow: 0 0 0 .25rem color-mix(in oklab, var(--text) 18%, transparent);
+}
+
+.inputFile {
+  display: none;
+}
+
+.dropzoneContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .625rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.dropzoneText {
+  user-select: none;
+}

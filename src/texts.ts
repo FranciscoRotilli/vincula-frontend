@@ -14,7 +14,11 @@ export const texts = {
   'cases.title.changeName': 'Alterar nome',
   'cases.title.changeSituation': 'Alterar situação',
   'cases.title.allowView': 'Permitir visualização',
+  'cases.title.allowViewDesc': 'Selecione um usuário para compartilhar o acesso ao caso.',
+  'cases.title.allowView.select.placeholder': 'Selecione um usuário',
   'cases.title.delete': 'Excluir caso',
+  'cases.title.deleteAction': 'Excluir',
+  'cases.title.deleting': 'Excluindo...',
   'cases.title.investigated': 'Investigados',
   'cases.title.investigatedDesc':
     'Informe os investigados envolvidos para possibilitar o vínculo com os arquivos anexados.',
@@ -22,6 +26,8 @@ export const texts = {
   'cases.title.inputCpfCnpj': 'Insira o CPF / CNPJ',
   'cases.title.inputPhone': 'Insira o telefone',
   'cases.title.files': 'Arquivos',
+  'cases.title.loadingUsers': 'Carregando usuários...',
+  'cases.title.selectResponsible': 'Selecione o novo responsável',
   'cases.title.filesDesc':
     'Os arquivos em anexo serão usados para a geração de vínculos com os investigados.',
   'cases.title.upload': 'Upload',
@@ -31,6 +37,9 @@ export const texts = {
   'cases.title.situationClosed': 'Encerrado',
   'cases.title.save': 'Salvar',
   'cases.title.cancel': 'Cancelar',
+  'cases.title.changeResponsible': 'Alterar responsável',
+  'cases.title.changeResponsibleDesc': 'Digite o nome do novo responsável pelo caso.',
+  'cases.title.inputResponsible': 'Nome do responsável',
   'cases.title.deleteWarning':
     'Ao excluir este caso, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.removeFile': 'Remover arquivo?',
@@ -40,6 +49,7 @@ export const texts = {
   'cases.title.removeInvestigatedWarning':
     'Ao excluir este investigado, todos os vínculos relacionados poderão ser perdidos.',
   'cases.title.remove': 'Remover',
+  'cases.title.addingInvestigated': 'Adicionando investigado...',
   'cases.title.addFile': 'Adicionar arquivo',
 
   'cases.createError': 'Erro ao criar caso. Tente novamente.',
@@ -73,6 +83,7 @@ export const texts = {
   'modal.filterName': 'Nome do filtro:',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
+  'addFile.adding': 'Adicionando arquivo...',
   'addFile.simbaLabel': 'ExtratoDetalhado',
   'addFile.sittelLabel': 'Cadastros dos Assinantes',
   'addFile.rifLabel': 'RIF',
@@ -141,6 +152,25 @@ export const texts = {
   'graph.goToGeneralInfo': 'Ir para Informações Gerais',
   'graph.showFilters': 'Mostrar Filtros',
   'graph.hideFilters': 'Ocultar Filtros',
+  'toastSuccess.handleCreateCase': 'Caso criado com sucesso.',
+  'toastError.handleCreateCase': 'Não foi possível criar o caso.',
+  'toastSuccess.handleUpdateName': 'Nome do caso atualizado com sucesso.',
+  'toastError.handleUpdateName': 'Não foi possível alterar o nome do caso.',
+  'toastSuccess.handleUpdateSituation': 'Situação do caso atualizada com sucesso.',
+  'toastError.handleUpdateSituation': 'Não foi possível alterar a situação do caso.',
+  'toastSuccess.handleDeleteCase': 'Caso deletado com sucesso.',
+  'toastError.handleDeleteCase': 'Não foi possível deletar o caso.',
+  'toastSuccess.handleAddEnvolvido': 'Investigado adicionado com sucesso.', 
+  'toastError.handleAddEnvolvido': 'Não foi possível adicionar investigado ao caso.', 
+  'toastSuccess.handleAllowVisualization': 'Permissão de visualização de caso atualizada.',
+  'toastError.handleAllowVisualization': 'Não foi possível alterar permissão de visualização de caso.',
+  'toastSuccess.handleRemoveEnvolvido': 'Investigado removido com sucesso.',
+  'toastError.handleRemoveEnvolvido': 'Não foi possível remover investigado no caso.',
+  'toastSuccess.handleRemoveArquivo': 'Arquivo removido com sucesso.',
+  'toastError.caseData': 'Erro ao carregar os dados do caso.',
+  'toastSuccess.addFile': 'Arquivo adicionado com sucesso.',
+  'toastError.addFile': 'Não foi possível adicionar o arquivo.'
+
 } as const;
 
 export type TextKey = keyof typeof texts;

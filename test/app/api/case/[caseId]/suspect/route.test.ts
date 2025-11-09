@@ -8,7 +8,7 @@ vi.mock('@/lib/backend', () => ({
   apiFetch: vi.fn(),
 }));
 
-describe('POST /api/cases/[caseId]/suspect', () => {
+describe('POST /api/case/[caseId]/suspect', () => {
   const mockApiFetch = vi.mocked(apiFetch);
   const params = { params: Promise.resolve({ caseId: 'case-123' }) };
   const suspectPayload = { name: 'John Doe', cpf: '123.456.789-00' };
@@ -19,7 +19,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
 
   it('should return a successful JSON response when apiFetch succeeds', async () => {
     const mockSuccessResponse = { id: 'suspect-789', ...suspectPayload };
-    const mockRequest = new NextRequest('http://localhost/api/cases/case-123/suspect', {
+    const mockRequest = new NextRequest('http://localhost/api/case/case-123/suspect', {
       method: 'POST',
       body: JSON.stringify(suspectPayload),
     });
@@ -44,7 +44,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
   });
 
   it('should forward a non-JSON success response correctly', async () => {
-    const mockRequest = new NextRequest('http://localhost/api/cases/case-123/suspect', {
+    const mockRequest = new NextRequest('http://localhost/api/case/case-123/suspect', {
       method: 'POST',
       body: JSON.stringify(suspectPayload),
     });
@@ -65,7 +65,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
   });
 
   it('should return a 500 error if the request payload is invalid', async () => {
-    const mockRequest = new NextRequest('http://localhost/api/cases/case-123/suspect', {
+    const mockRequest = new NextRequest('http://localhost/api/case/case-123/suspect', {
       method: 'POST',
       body: 'invalid-json',
     });
@@ -79,7 +79,7 @@ describe('POST /api/cases/[caseId]/suspect', () => {
   });
 
   it('should return a 500 error if apiFetch throws an exception', async () => {
-    const mockRequest = new NextRequest('http://localhost/api/cases/case-123/suspect', {
+    const mockRequest = new NextRequest('http://localhost/api/case/case-123/suspect', {
       method: 'POST',
       body: JSON.stringify(suspectPayload),
     });

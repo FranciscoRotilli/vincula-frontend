@@ -10,6 +10,7 @@ import { t } from '@/texts';
 import { FileRequest } from '@/types/Files';
 
 import styles from './AddFileModal.module.css';
+import { toast } from 'react-toastify';
 
 type AddFileModalProps = {
   isOpen: boolean;
@@ -24,16 +25,18 @@ const ORIGIN_OPTIONS = [
   { value: 'RIF', label: 'RIF' },
 ];
 
-const TYPE_OPTIONS = [
-  { value: 'CADASTRO_ASSINANTES', label: t('addFile.sittelLabel') },
-  { value: 'EXTRATO_DETALHADO', label: t('addFile.simbaLabel') },
-  { value: 'RIF', label: t('addFile.rifLabel') },
-];
+const TYPE_OPTIONS_BY_ORIGIN: Record<string, { value: string; label: string }[]> = {
+  SIMBA: [{ value: 'EXTRATO_DETALHADO', label: t('addFile.simbaLabel') }],
+  SITTEL: [{ value: 'CADASTRO_ASSINANTES', label: t('addFile.sittelLabel') }],
+  RIF: [{ value: 'RIF', label: t('addFile.rifLabel') }],
+};
 
 const MAX_SIZE_MB = 50;
 
 const ACCEPT_BY_TYPE: Record<string, string> = {
-  csv: '.csv,text/csv',
+  CADASTRO_ASSINANTES: '.csv,text/csv',
+  EXTRATO_DETALHADO: '.csv,text/csv',
+  RIF: '.csv,text/csv',
 };
 
 export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddFileModalProps) {
@@ -104,12 +107,28 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
     }
   };
 
-  const accept = type ? ACCEPT_BY_TYPE[type] : Object.values(ACCEPT_BY_TYPE).join(',');
+  const availableTypeOptions = origin ? TYPE_OPTIONS_BY_ORIGIN[origin] ?? [] : [];
+  const accept =
+    type && ACCEPT_BY_TYPE[type] ? ACCEPT_BY_TYPE[type] : Object.values(ACCEPT_BY_TYPE).join(',');
 
   const onChangeOrigin: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     const v = e.target.value;
+    const options = TYPE_OPTIONS_BY_ORIGIN[v] ?? [];
+    const nextType = options.some((option) => option.value === type) ? type : '';
+
     setOrigin(v);
-    if (submitAttempted) setErrors((prev) => ({ ...prev, origin: validateOrigin(v) }));
+    if (nextType !== type) {
+      setType(nextType);
+    }
+
+    if (submitAttempted) {
+      setErrors((prev) => ({
+        ...prev,
+        origin: validateOrigin(v),
+        type: validateType(nextType),
+        file: file ? validateFile(file, nextType) : prev.file,
+      }));
+    }
   };
 
   const onChangeType: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
@@ -145,6 +164,7 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
   };
 
   const handleSubmit = async () => {
+    if (isSavingFile) return;
     if (!submitAttempted) setSubmitAttempted(true);
     const errs = validateAll();
     const hasError = Object.values(errs).some(Boolean);
@@ -170,6 +190,11 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
             setIsSavingFile(false);
             onClose();
           }, 6000);
+          toast.success(t('toastSuccess.addFile'))
+        },
+        onError: () => {
+          toast.success(t('toastError.addFile'))
+          setIsSavingFile(false);
         },
       }
     );
@@ -238,12 +263,13 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
                     showTypeError ? styles.invalid : ''
                   }`}
                   value={type}
+                  disabled={!origin}
                   onChange={onChangeType}
                   aria-invalid={showTypeError}
                   aria-describedby={showTypeError ? `${titleId}-type-error` : undefined}
                 >
                   <option value="">{t('addFile.select')}</option>
-                  {TYPE_OPTIONS.map((t) => (
+                  {availableTypeOptions.map((t) => (
                     <option key={t.value} value={t.value}>
                       {t.label}
                     </option>
@@ -325,8 +351,23 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
         </div>
 
         <div className={styles.actions}>
-          <button type="button" className={styles.primaryButton} onClick={handleSubmit}>
-            {isSavingFile ? <CircularProgress size={20} /> : t('addFile.add')}
+          <button
+            type="button"
+            className={styles.primaryButton}
+            onClick={handleSubmit}
+            disabled={isSavingFile}
+            aria-busy={isSavingFile}
+          >
+            {isSavingFile ? (
+              <span className={styles.loadingContent}>
+                <CircularProgress size={20} />
+                <span className={styles.loadingText}>
+                  {t('addFile.adding', { defaultValue: 'Adicionando...' })}
+                </span>
+              </span>
+            ) : (
+              t('addFile.add')
+            )}
           </button>
         </div>
       </Modal>

@@ -1,10 +1,21 @@
 import '@testing-library/jest-dom';
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, vi } from 'vitest';
 
 import Modal from '@/components/Modals';
+import ConfirmationModal from '@/components/Modals/ConfirmationModal';
+import CreateCaseModal from '@/components/Modals/CreateCaseModal';
+import RemoveModal from '@/components/Modals/RemoveModal';
+
+vi.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return <img {...props} />;
+  },
+}));
 
 vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
   default: {
@@ -18,6 +29,46 @@ vi.mock('@/components/modalGenerico/Modal.module.css', () => ({
     small: 'small',
     medium: 'medium',
     large: 'large',
+  },
+}));
+
+vi.mock('@/components/ConfirmationModal/ConfirmationModal.module.css', () => ({
+  default: {
+    overlay: 'overlay',
+    modal: 'modal',
+    close: 'close',
+    icon: 'icon',
+    title: 'title',
+    desc: 'desc',
+    actions: 'actions',
+    btnPrimary: 'btnPrimary',
+    btnSecondary: 'btnSecondary',
+    customPrimaryColor: 'customPrimaryColor',
+    customSecondaryColor: 'customSecondaryColor',
+  },
+}));
+
+vi.mock('@/components/Input', () => ({
+  __esModule: true,
+  default: ({ value = '', onChange, ...rest }: any) => (
+    <input
+      data-testid="mock-input"
+      value={value}
+      onChange={(event) => onChange?.(event)}
+      {...rest}
+    />
+  ),
+}));
+
+vi.mock('@/components/Modals/RemoveModal.module.css', () => ({
+  default: {
+    modalContainer: 'modalContainer',
+    closeButtonContainer: 'closeButtonContainer',
+    closeButton: 'closeButton',
+    title: 'title',
+    description: 'description',
+    buttons: 'buttons',
+    removeButton: 'removeButton',
   },
 }));
 
@@ -77,5 +128,136 @@ describe('Componente Modal', () => {
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(1);
     expect(buttons[0]).toHaveAttribute('aria-label', 'Fechar');
+  });
+
+  it('should disable the action button when actionDisabled is true', () => {
+    const handleAction = vi.fn();
+
+    render(
+      <Modal
+        isOpen={true}
+        onClose={() => {}}
+        onAction={handleAction}
+        actionButton="Salvar"
+        actionDisabled
+      >
+        <p>Conteúdo</p>
+      </Modal>
+    );
+
+    const actionButton = screen.getByRole('button', { name: /Salvar/i });
+    expect(actionButton).toBeDisabled();
+  });
+
+});
+
+describe('RemoveModal', () => {
+  it('disables the remove button while processing', () => {
+    render(
+      <RemoveModal
+        title="Remover arquivo"
+        description="Deseja remover?"
+        isOpen
+        onClose={() => {}}
+        onRemove={() => {}}
+        isProcessing
+      />
+    );
+
+    const removeButton = screen.getByRole('button', { name: /Removendo/i });
+    expect(removeButton).toBeDisabled();
+  });
+
+  it('calls onRemove when clicking remove and enabled', () => {
+    const onRemove = vi.fn();
+
+    render(
+      <RemoveModal
+        title="Remover arquivo"
+        description="Deseja remover?"
+        isOpen
+        onClose={() => {}}
+        onRemove={onRemove}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Remover/i }));
+    expect(onRemove).toHaveBeenCalled();
+  });
+});
+
+describe('CreateCaseModal', () => {
+  const renderModal = (props: Partial<React.ComponentProps<typeof CreateCaseModal>> = {}) => {
+    const defaultProps = {
+      isOpen: true,
+      onClose: vi.fn(),
+      onSubmit: vi.fn(),
+      ...props,
+    } as React.ComponentProps<typeof CreateCaseModal>;
+
+    render(<CreateCaseModal {...defaultProps} />);
+    return defaultProps;
+  };
+
+  it('disables the submit button when case name is empty', async () => {
+    renderModal();
+    const submitButton = await screen.findByRole('button', { name: /Adicionar/i });
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('shows loading state and disables while isSubmitting is true', async () => {
+    renderModal({ isSubmitting: true });
+
+    const submitButton = await screen.findByRole('button', { name: /Adicionando/i });
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('calls onSubmit with the provided case name when valid', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    renderModal({ onSubmit });
+
+    const nameInput = await screen.findByPlaceholderText('Digite o nome do caso');
+    fireEvent.change(nameInput, { target: { value: 'Caso Teste' } });
+
+    const submitButton = screen.getByRole('button', { name: /Adicionar/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({ caseName: 'Caso Teste' });
+    });
+  });
+});
+
+describe('ConfirmationModal', () => {
+  const renderConfirmation = (
+    props: Partial<React.ComponentProps<typeof ConfirmationModal>> = {}
+  ) => {
+    const defaultProps = {
+      isOpen: true,
+      onClose: vi.fn(),
+      title: 'Confirmar ação',
+      primaryLabel: 'Salvar',
+      secondaryLabel: 'Cancelar',
+      onPrimary: vi.fn(),
+      onSecondary: vi.fn(),
+      ...props,
+    } as React.ComponentProps<typeof ConfirmationModal>;
+
+    render(<ConfirmationModal {...defaultProps} />);
+    return defaultProps;
+  };
+
+  it('renderiza label no gerúndio quando primaryLoading é true', () => {
+    renderConfirmation({ primaryLoading: true });
+
+    const primaryButton = screen.getByRole('button', { name: /Salvando/i });
+    expect(primaryButton).toBeDisabled();
+  });
+
+  it('prioriza primaryLoadingLabel explícito', () => {
+    renderConfirmation({ primaryLoading: true, primaryLoadingLabel: 'Excluindo...' });
+
+    const primaryButton = screen.getByRole('button', { name: /Excluindo/i });
+    expect(primaryButton).toBeDisabled();
   });
 });
