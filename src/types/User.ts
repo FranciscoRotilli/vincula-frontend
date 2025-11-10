@@ -15,3 +15,7 @@ export type UserResponse = {
     name: string;
 };
 
+export type UserIdName = {
+  id: string;
+  name: string;
+};

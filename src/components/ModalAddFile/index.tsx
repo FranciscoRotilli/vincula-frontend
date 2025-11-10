@@ -3,6 +3,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress } from '@mui/material';
 import React, { useId, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Modal from '@/components/Modals';
 import { useAddFile } from '@/hooks/useFile';
@@ -189,8 +190,10 @@ export default function AddFileModal({ isOpen, onClose, onSubmit, caseId }: AddF
             setIsSavingFile(false);
             onClose();
           }, 6000);
+          toast.success(t('toastSuccess.addFile'))
         },
         onError: () => {
+          toast.success(t('toastError.addFile'))
           setIsSavingFile(false);
         },
       }

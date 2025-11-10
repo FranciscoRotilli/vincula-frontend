@@ -1,35 +1,43 @@
 'use client';
+import { MoreVert } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { CircularProgress } from '@mui/material';
+import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
+import { CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
-import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
+import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
 import { CaseContainer } from '@/components/CaseContainer';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import ListPeople from '@/components/ListPeople';
+import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
+import ChangeOwnerModal from '@/components/Modals/ChangeOwnerModal';
 import ConfirmationModal from '@/components/Modals/ConfirmationModal';
 import RemoveModal from '@/components/Modals/RemoveModal';
 import {
   useAllowVisualization,
   useCaseById,
   useDeleteCase,
+  useRemoveUserAccess,
   useUpdateCaseName,
   useUpdateCaseOwner,
   useUpdateCaseSituation,
+  useUsersWithAccess,
 } from '@/hooks/useCase';
-import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
-import { useUsers } from '@/hooks/useUsers';
+import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
+import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
 import { FileResponse } from '@/types/Files';
 import { Column } from '@/types/Table';
+import { CurrentUser } from '@/types/User';
 import { maskCpfCnpj } from '@/utils/functions';
 
 import styles from './page.module.css';
@@ -40,12 +48,28 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const caseId = id;
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+
+  useEffect(() => {
+    async function fetchCurrentUser() {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Erro ao buscar usuário atual:', error);
+      }
+    }
+    fetchCurrentUser();
+  }, []);
+  const isAdmin = currentUser?.role === 'ADMIN';
+
   const [showNameModal, setShowNameModal] = useState(false);
   const [showSituationModal, setShowSituationModal] = useState(false);
   const [showDeleteCaseModal, setShowDeleteCaseModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
+  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -60,7 +84,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [novoResponsavel, setNovoResponsavel] = useState('');
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState<{
+    open: boolean;
+    userId: string | null;
+  }>({
+    open: false,
+    userId: null,
+  });
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -75,18 +105,19 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const deleteCaseMutation = useDeleteCase();
   const allowViewMutation = useAllowVisualization();
   const updateOwnerMutation = useUpdateCaseOwner();
+  const removeUserMutation = useRemoveUserAccess();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
-  const { data: users, isLoading: isLoadingUsers } = useUsers();
+  const { data: usersWithAccess = [] } = useUsersWithAccess(caseId);
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
+  const addSuspectsBatchMutation = useAddSuspectsBatch();
 
   const [suspects, setSuspects] = useState<SuspectRow[]>([]);
   const [files, setFiles] = useState<FileResponse[]>([]);
   const [newCaseName, setNewCaseName] = useState('');
   const [newSituation, setNewSituation] = useState('');
-  const [selectedUser] = useState('');
 
   const handleUpdateName = async () => {
     if (updateNameMutation.isPending) return;
@@ -95,25 +126,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowNameModal(false);
+          toast.success(t('toastSuccess.handleUpdateName'))
         },
         onError: (error) => {
-          console.error('Failed to update case name: ', error);
+          toast.error(t('toastError.handleUpdateName'))
+          console.error('Failed to update case situation:', error);
         },
       }
     );
   };
 
-  const handleUpdateOwner = async () => {
-    if (!novoResponsavel) {
-      return;
-    }
-    
+  const handleUpdateOwner = async (userId: string) => {
     updateOwnerMutation.mutate(
-      { caseId, userId: novoResponsavel },
+      { caseId, userId },
       {
         onSuccess: () => {
           setShowChangeResponsibleModal(false);
-          setNovoResponsavel(''); 
           refetch(); 
         },
         onError: (error) => {
@@ -130,8 +158,10 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       {
         onSuccess: () => {
           setShowSituationModal(false);
+          toast.success(t('toastSuccess.handleUpdateSituation'))
         },
         onError: (error) => {
+          toast.error(t('toastError.handleUpdateSituation'))
           console.error('Failed to update case situation:', error);
         },
       }
@@ -143,11 +173,13 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     deleteCaseMutation.mutate(caseId, {
       onSuccess: () => {
         setShowDeleteCaseModal(false);
+        toast.success(t('toastSuccess.handleDeleteCase'))
         router.push('/casos');
       },
       onError: (error) => {
-        console.error('Failed to delete case:', error);
-      },
+          toast.error(t('toastError.handleDeleteCase'))
+          console.error('Failed to delete case: ', error);
+        }
     });
   };
 
@@ -190,20 +222,37 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           setNewName('');
           setNewCpf('');
           setNewPhone('');
+          toast.success(t('toastSuccess.handleAddEnvolvido'))
           refetch();
         },
         onError: (error) => {
+          toast.error(t('toastError.handleAddEnvolvido'))
           console.error('Falha na API ao adicionar investigado:', error);
         }
       }
     );
   };
 
-  const handleAllowVisualization = () => {
-    allowViewMutation.mutate({ caseId, userId: selectedUser }, {
+  const handleAddSuspectsBatch = (file: File) => {
+    addSuspectsBatchMutation.mutate(
+      { caseId, file },
+      {
+        onSuccess: () => {
+          setShowAddSuspectsBatchModal(false);
+          refetch();
+        },
+        onError: (error) => {
+          console.error('Falha na API ao adicionar investigados por lote: ', error);
+        },
+      }
+    );
+  };
+
+  const handleAllowVisualization = (userId: string) => {
+    allowViewMutation.mutate({ caseId, userId }, {
       onSuccess: () => {
         setShowAllowVisualizationModal(false);
-        window.location.reload()
+        refetch();
       }
     });
   }
@@ -218,10 +267,28 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
         onSuccess: () => {
           setSuspects((prev) => prev.filter((_, i) => i !== index));
           setShowRemoveSuspectModal({ open: false, index: null });
+          toast.success(t('toastSuccess.handleRemoveEnvolvido'));
           refetch();
         },
         onError: (error) => {
+          toast.error(t('toastError.handleRemoveEnvolvido'));
           console.error('Erro ao remover investigado:', error);
+        },
+      }
+    );
+  };
+
+  const handleRemoveUser = (userId: string) => {
+    if (!userId) return;
+
+    removeUserMutation.mutate(
+      { caseId, userId },
+      {
+        onSuccess: () => {
+          setShowRemoveUserModal({ open: false, userId: null });
+        },
+        onError: (error) => {
+          console.error('Erro ao remover usuário:', error);
         },
       }
     );
@@ -230,12 +297,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const handleRemoveFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
+    toast.success(t('toastSuccess.handleRemoveArquivo'));
+  };
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClickMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
   };
 
   const suspectsColumns: Column<SuspectRow>[] = [
-    { key: 'name', label: 'NOME' },
+    { key: 'name', label: 'Nome' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
-    { key: 'phone_number', label: 'TELEFONE' },
+    { key: 'phone_number', label: 'Telefone' },
   ];
 
   const suspectsRowActions = [
@@ -268,6 +345,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
+          <p>{t('cases.errorMessage')}</p>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -275,6 +353,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
+            />
+            <Button
+              size="medium"
+              label={t('cases.reload')}
+              variant="contained"
+              onClick={() => refetch()}
             />
           </div>
         </div>
@@ -286,9 +370,73 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.pageContainer}>
         <div className={styles.gridContainer}>
           <div className={styles.caseDetails} data-testid="case-details">
-            <h2 className={styles.h2} data-testid="case-name">
-              {caseDetails.name}
-            </h2>
+            <div className={styles.caseNameRow}>
+              <h2 className={styles.h2} data-testid='case-name'>{caseDetails.name}</h2>
+              <div data-testid='case-actions' className={styles.caseActions}>
+                <Tooltip title="Ações">
+                  <IconButton size="medium" onClick={handleClickMenu}>
+                    <MoreVert fontSize="inherit" sx={{ color: 'black' }} />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleCloseMenu}
+                  disableScrollLock={true}
+                  slotProps={{
+                    list: {
+                      'aria-labelledby': 'basic-button',
+                    },
+                    paper: {
+                      elevation: 2,
+                    }
+                  }}
+                >
+                  <MenuItem 
+                    data-testid="menu-change-name"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowNameModal(true); }}
+                  >
+                    {t('cases.title.changeName')}
+                  </MenuItem>
+                  <MenuItem
+                    data-testid="menu-change-situation"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowSituationModal(true); }}
+                  >
+                    {t('cases.title.changeSituation')}
+                    </MenuItem>
+                  <MenuItem
+                    data-testid="menu-allow-view"
+                    sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                    onClick={() => { handleCloseMenu(); setShowAllowVisualizationModal(true); }}
+                  >
+                    {t('cases.title.allowView')}
+                  </MenuItem>
+                  
+                  {isAdmin && [
+                      <MenuItem
+                        key="change-owner"
+                        data-testid="menu-change-case-owner"
+                        sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                        onClick={() => { handleCloseMenu(); setShowChangeResponsibleModal(true); }}
+                      >
+                        {t('cases.title.changeResponsible')}
+                      </MenuItem>,
+                      <MenuItem
+                        key="delete-case"
+                        data-testid="menu-delete-case"
+                        sx={{ fontFamily: 'var(--font-poppins), sans-serif;' }}
+                        onClick={() => { handleCloseMenu(); setShowDeleteCaseModal(true); }}
+                      >
+                        {t('cases.title.delete')}
+                      </MenuItem>
+
+                    ]}
+                </Menu>
+              </div>
+            </div>
             <div className={styles.detailsRow} data-testid="case-informations">
               <div>
                 <strong>{t('modal.owner')}</strong> {caseDetails.owner}
@@ -304,42 +452,17 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           </div>
-
-          <div className={styles.actionsBox} data-testid="case-action-buttons">
-            <h1 className={styles.title3}>{t('cases.title.actions')}</h1>
-            <div className={styles.actionsRow}>
-              <Button
-                size="medium"
-                label={t('cases.title.changeName')}
-                variant="contained"
-                onClick={() => setShowNameModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.changeSituation')}
-                variant="contained"
-                onClick={() => setShowSituationModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.allowView')}
-                variant="contained"
-                onClick={() => {
-                  setShowAllowVisualizationModal(true);
+          <div className={styles.allowedSection}>
+            <div className={styles.sectionHeader}>
+              <h1 className={styles.title3}>{t('listPeople.title')}</h1>
+            </div>
+            <div className={` ${styles.allowedTable}`}>
+              <ListPeople
+                caseId={caseId}
+                users={usersWithAccess}
+                onRemoveUser={(userId) => {
+                  setShowRemoveUserModal({ open: true, userId: userId.toString() });
                 }}
-              />
-               <Button
-                size="small"
-                label={t('cases.title.changeResponsible')}
-                variant="contained"
-                data-testid="btn-change-responsible"
-                onClick={() => setShowChangeResponsibleModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.delete')}
-                variant="outlined"
-                onClick={() => setShowDeleteCaseModal(true)}
               />
             </div>
           </div>
@@ -383,13 +506,25 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
                   onChange={(e) => setNewPhone(e.target.value.replace(/\D/g, ''))}
                   className={styles.input}
                 />
-                <Button
-                  icon={<AddIcon />}
-                  variant="contained"
-                  size="icon"
-                  label=""
-                  onClick={handleAddSuspect}
-                />
+                <div className={styles.investigatedButtons} data-testid="add-investigated-buttons">
+                  <Button
+                    data-testid='add-suspects-batch'
+                    icon={<NoteAddOutlinedIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={() => setShowAddSuspectsBatchModal(true)}
+                    disabled={!newName.trim() || !newCpf.trim()}
+                  />
+                  <Button
+                    data-testid='add-suspect'
+                    icon={<AddIcon />}
+                    variant="contained"
+                    size="icon"
+                    label=""
+                    onClick={handleAddSuspect}
+                  />
+                </div>
               </div>
             </div>
             <div className={styles.GenericTable__container} data-testid="involved-table">
@@ -409,6 +544,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showNameModal && (
           <ConfirmationModal
+            data-testid="modal-change-name"
             isOpen={showNameModal}
             onClose={() => setShowNameModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
@@ -432,6 +568,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showSituationModal && (
           <ConfirmationModal
+            data-testid="modal-change-situation"
             isOpen={showSituationModal}
             onClose={() => setShowSituationModal(false)}
             icon={<FiEdit2 size={36} color="#ff3636" />}
@@ -466,6 +603,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showDeleteCaseModal && (
           <RemoveModal
+            data-testid="delete-case-modal"
             isOpen={showDeleteCaseModal}
             onClose={() => setShowDeleteCaseModal(false)}
             title={t('cases.title.delete', { defaultValue: 'Excluir caso?' })}
@@ -525,52 +663,47 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
 
         {showAllowVisualizationModal && (
           <AllowVisualizationModal
+            data-testid="modal-allow-visualization"
             isOpen={showAllowVisualizationModal}
             onClose={() => setShowAllowVisualizationModal(false)}
             onSubmit={handleAllowVisualization}
             isSubmitting={allowViewMutation.isPending}
           />
         )}
+
+        {showAddSuspectsBatchModal && (
+          <AddSuspectsBatchModal
+            isOpen={showAddSuspectsBatchModal}
+            onClose={() => setShowAddSuspectsBatchModal(false)}
+            onSubmit={handleAddSuspectsBatch}
+            isSubmitting={addSuspectsBatchMutation.isPending}
+          />
+        )}
+
+        {showRemoveUserModal.open && (
+          <ConfirmationModal
+            isOpen={showRemoveUserModal.open}
+            onClose={() => setShowRemoveUserModal({ open: false, userId: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
+            title={t('listPeople.removeUserTitle')}
+            description={t('listPeople.removeUserWarning')}
+            primaryLabel={t('cases.title.remove')}
+            onPrimary={() => handleRemoveUser(showRemoveUserModal.userId!)}
+            secondaryLabel={t('cases.title.cancel')}
+            primaryLoading={removeUserMutation.isPending}
+          />
+        )}
       </div>
 
     {showChangeResponsibleModal && (
-      <ConfirmationModal
-      isOpen={showChangeResponsibleModal}
-      onClose={() => setShowChangeResponsibleModal(false)}
-      data-testid="modal-change-responsible"
-      icon={<FiEdit2 size={36} color="#ff3636" />}
-      title={t('cases.title.changeResponsible')}
-      description={t('cases.title.changeResponsibleDesc')}
-      primaryLabel={t('cases.title.save')}
-      onPrimary={handleUpdateOwner}
-      secondaryLabel={t('cases.title.cancel')}
-      primaryLoading={updateOwnerMutation.isPending}
-      >
-            <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>
-              <ReactSelect
-                isClearable
-                isDisabled={isLoadingUsers || updateOwnerMutation.isPending}
-                options={(users || []).map((u) => ({ value: u.id, label: u.name }))}
-                value={(users || [])
-                  .map((u) => ({ value: u.id, label: u.name }))
-                  .find((opt) => opt.value === novoResponsavel) || null}
-                onChange={(newValue, _actionMeta) => {
-                  const opt = newValue as SingleValue<{ value: string; label: string }>;
-                  setNovoResponsavel(opt?.value ?? '');
-                }}
-                placeholder={
-                  isLoadingUsers
-                    ? t('cases.title.loadingUsers')
-                    : t('cases.title.selectResponsible')
-                }
-                styles={{
-                  control: (provided) => ({ ...provided, minHeight: 40, borderRadius: 6 }),
-                } as StylesConfig}
-                menuPlacement="auto"
-              />
-            </div>
-          </ConfirmationModal>
-        )}
+      <ChangeOwnerModal
+        data-testid="modal-change-responsible"
+        isOpen={showChangeResponsibleModal}
+        onClose={() => setShowChangeResponsibleModal(false)}
+        onSubmit={handleUpdateOwner}
+        isSubmitting={updateOwnerMutation.isPending}
+      />
+      )}
     </CaseContainer>
   );
 }

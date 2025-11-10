@@ -1,5 +1,6 @@
 'use client';
 
+import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
@@ -11,6 +12,7 @@ import { Tooltip } from '@mui/material';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 import type NVL from '@neo4j-nvl/base';
 import React, { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { CaseContainer } from '@/components/CaseContainer';
 import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
@@ -29,7 +31,6 @@ import {
   getRelationshipSourceDatabase,
   transformApiData,
 } from './utils';
-
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
@@ -155,6 +156,25 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
     }
   }, [graphNodes, fitNodes]);
 
+  const handleExportImage = () => { // Pode remover o 'async', pois o método é síncrono
+    if (!nvlRef.current) {
+      console.error("Referência do NVL não encontrada para exportar.");
+      return;
+    }
+
+    try {
+      // Basta chamar o método. Ele cuida de tudo, incluindo o download.
+      nvlRef.current.saveFullGraphToLargeFile({
+        filename: 'grafo-vinculos.png',
+        backgroundColor: '#ffffff' // É bom definir um fundo, ex: branco
+      });
+      
+    } catch (error) {
+      // O seu log de erro antigo mencionava PDF, atualizei.
+      console.error("Erro ao exportar a imagem:", error);
+    }
+  };
+
   const handleNodeClick = (node: Node) => {
     setSelectedElement(node as AppNode);
   };
@@ -193,6 +213,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         }));
         setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
+        toast.error(t('toastError.caseData'))
         console.error(error);
       }
     }
@@ -250,6 +271,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           fields={filterFields}
           values={filterValues}
           onValuesChange={setFilterValues}
+          graphFilter={true}
           onFilter={handleFilter}
           onClear={handleClear}
           autoFilter={true}
@@ -271,6 +293,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 fields={filterFields}
                 values={filterValues}
                 onValuesChange={setFilterValues}
+                graphFilter={true}
                 onFilter={handleFilter}
                 onClear={handleClear}
                 autoFilter={true}
@@ -315,6 +338,16 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
               </button>
             </Tooltip>
+
+            <Tooltip title="Baixar Imagem do Grafo" placement="right">
+              <button
+                onClick={handleExportImage}
+                className={styles.controlButton}
+              >
+                <DownloadIcon />
+              </button>
+            </Tooltip>
+
           </div>
 
           <Graph

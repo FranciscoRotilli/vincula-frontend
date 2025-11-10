@@ -2,7 +2,7 @@
 
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useState } from 'react';
-import { RiDeleteBin6Line } from 'react-icons/ri';
+import { TbTrash } from 'react-icons/tb';
 
 import { useCaseById } from '@/hooks/useCase';
 import { useRemoveFile } from '@/hooks/useFile';
@@ -49,7 +49,7 @@ export default function FilesSection({ caseId }: FilesSectionProps) {
   const rowActions = [
     {
       label: 'Delete',
-      icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
+      icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
       onClick: (row: FileResponse) => {
         setFileToRemove(row);
         setIsRemoveModalOpen(true);

@@ -5,6 +5,7 @@ import {
   FilterParams,
   PaginationParams,
 } from '@/types/Cases';
+import { UserIdName } from '@/types/User';
 
 export type CaseResponse = { caseName: string };
 
@@ -138,6 +139,7 @@ export async function allowUserToViewCase(caseId: string, userId: string) {
 
   return resp.json();
 }
+
 export interface GraphFilters {
   investigated?: string;
   cpf_cnpj?: string;
@@ -184,4 +186,22 @@ export async function updateCaseOwner(caseId: string, userId: string): Promise<v
     headers: { 'Content-Type': 'application/json' },
   });
   if (!resp.ok) await throwIfError(resp, 'Falha ao atualizar responsável do caso');
+}
+
+export async function getUsersWithAccess(caseId: string): Promise<UserIdName[]> {
+  const resp = await fetch(`/api/case/${caseId}/viewers`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao buscar usuários com acesso');
+  return resp.json();
+}
+
+export async function removeUserAccess(caseId: string, userId: string): Promise<void> {
+  const resp = await fetch(`/api/case/${caseId}/viewers/${userId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!resp.ok) await throwIfError(resp, 'Falha ao remover acesso do usuário');
 }
