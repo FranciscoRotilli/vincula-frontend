@@ -19,7 +19,7 @@ export async function DELETE(
     if (ct.includes('application/json') && text) {
       return NextResponse.json(JSON.parse(text), { status: resp.status });
     }
-    
+
     return new NextResponse(text || null, {
       status: resp.status,
       headers: { 'Content-Type': ct || 'text/plain' },
@@ -29,5 +29,26 @@ export async function DELETE(
       { error: 'Failed to delete suspect', details: String(err) },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ caseId: string; fileId: string }> }
+) {
+  const qs = req.nextUrl.search;
+  const { caseId, fileId } = await params;
+
+  const resp = await apiFetch(`/case/${caseId}/files/${fileId}${qs}`, { method: 'GET' });
+
+  const text = await resp.text();
+  try {
+    const json = JSON.parse(text);
+    return NextResponse.json(json, { status: resp.status });
+  } catch {
+    return new NextResponse(text, {
+      status: resp.status,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
