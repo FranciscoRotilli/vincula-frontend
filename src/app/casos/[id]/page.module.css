@@ -86,6 +86,13 @@
   gap: 1rem;
 }
 
+.caseNameRow {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .detailsRow {
   display: flex;
   flex-wrap: wrap;

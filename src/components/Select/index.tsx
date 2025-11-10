@@ -62,6 +62,7 @@ export const CustomSelect: React.FC<SelectProps> = ({
         data-testid={testId}
         MenuProps={{
           disablePortal: true,
+          disableScrollLock: true,
           PaperProps: {
             style: {
               zIndex: 1500,
