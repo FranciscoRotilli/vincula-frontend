@@ -178,9 +178,8 @@ export const texts = {
   'listPeople.loading': 'Carregando...',
   'listPeople.removeAccess': 'Remover acesso',
   'listPeople.removeUserTitle': 'Remover acesso do usuário?',
-  'listPeople.removeUserWarning': 'O usuário não terá mais acesso a este caso.'
-  'graph.download': 'Download graph image',
-  'graph.download': 'Download graph image',
+  'listPeople.removeUserWarning': 'O usuário não terá mais acesso a este caso.',
+  'graph.download': 'Baixar a imagem do grafo',
 } as const;
 
 export type TextKey = keyof typeof texts;
