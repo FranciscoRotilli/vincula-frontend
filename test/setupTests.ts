@@ -3,7 +3,11 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach,beforeEach, vi } from 'vitest';
 
 export const mockRouter = { push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() };
-vi.mock('next/navigation', () => ({ __esModule: true, useRouter: () => mockRouter }));
+vi.mock('next/navigation', () => ({ 
+  __esModule: true, 
+  useRouter: () => mockRouter,
+  usePathname: () => '/test-path'
+}));
 
 // Mock do fetch global mais robusto
 const fetchMock = vi.fn(() =>
