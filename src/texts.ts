@@ -80,6 +80,8 @@ export const texts = {
   'addFile.required': '*',
   'addFile.select': 'Selecionar',
   'addFile.type': 'Tipo',
+  'modal.filterName': 'Nome do filtro:',
+  'filter.multiselect': 'Filtro',
   'addFile.file': 'Arquivo',
   'addFile.add': 'Adicionar',
   'addFile.adding': 'Adicionando arquivo...',

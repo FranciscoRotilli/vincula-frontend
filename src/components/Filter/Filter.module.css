@@ -28,7 +28,7 @@
 
 .fieldsRow {
   display: flex;
-  width: 60%;
+  width: 70%;
   align-items: end;
   gap: 1rem;
 }
