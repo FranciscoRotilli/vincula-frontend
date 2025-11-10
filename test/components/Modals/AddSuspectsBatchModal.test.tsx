@@ -51,64 +51,36 @@ describe('AddSuspectsBatchModal', () => {
 
   it('should not render when isOpen is false', () => {
     render(
-      <AddSuspectsBatchModal
-        isOpen={false}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
+      <AddSuspectsBatchModal isOpen={false} onClose={mockOnClose} onSubmit={mockOnSubmit} />
     );
 
     expect(screen.queryByTestId('modal-add-suspects-batch')).not.toBeInTheDocument();
   });
 
   it('should render when isOpen is true', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     expect(screen.getByTestId('modal-add-suspects-batch')).toBeInTheDocument();
   });
 
   it('should show "Selecione ou arraste o arquivo CSV" when no file is selected', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     expect(screen.getByText('Selecione ou arraste o arquivo CSV')).toBeInTheDocument();
   });
 
   it('should disable action button when no file is selected', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const actionButton = screen.getByTestId('action-button');
     expect(actionButton).toBeDisabled();
   });
 
   it('should handle file selection via input', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const file = new File(['nome;cpfCnpj;telefone'], 'suspects.csv', { type: 'text/csv' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -116,16 +88,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should enable action button when a valid CSV file is selected', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const file = new File(['nome;cpfCnpj;telefone'], 'suspects.csv', { type: 'text/csv' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -134,56 +100,35 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should reject files larger than 50MB', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    // Create a file larger than 50MB (simulated by size property)
     const largeFile = new File(['test'], 'large.csv', { type: 'text/csv' });
     Object.defineProperty(largeFile, 'size', { value: 51 * 1024 * 1024 });
 
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [largeFile] } });
 
-    // File should not be selected
     expect(screen.getByText('Selecione ou arraste o arquivo CSV')).toBeInTheDocument();
     expect(screen.queryByText('large.csv')).not.toBeInTheDocument();
   });
 
   it('should reject non-CSV files', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const txtFile = new File(['test'], 'test.txt', { type: 'text/plain' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [txtFile] } });
 
-    // File should not be selected
     expect(screen.getByText('Selecione ou arraste o arquivo CSV')).toBeInTheDocument();
     expect(screen.queryByText('test.txt')).not.toBeInTheDocument();
   });
 
   it('should accept CSV files with .csv extension', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const csvFile = new File(['data'], 'data.csv', { type: '' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [csvFile] } });
 
@@ -191,16 +136,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should call onSubmit with the selected file when action button is clicked', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const file = new File(['nome;cpfCnpj;telefone'], 'suspects.csv', { type: 'text/csv' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -212,13 +151,7 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should call onClose when cancel button is clicked', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const cancelButton = screen.getByTestId('cancel-button');
     fireEvent.click(cancelButton);
@@ -227,16 +160,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should handle drag and drop file selection', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const file = new File(['nome;cpfCnpj;telefone'], 'dropped.csv', { type: 'text/csv' });
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByTestId('dropzone');
 
     const dataTransfer = {
       files: [file],
@@ -251,15 +178,9 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should set dragActive state on drag enter', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByTestId('dropzone');
     const dataTransfer = {
       files: [],
       types: ['Files'],
@@ -273,15 +194,9 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should clear dragActive state on drag leave', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByTestId('dropzone');
     const dataTransfer = {
       files: [],
       types: ['Files'],
@@ -294,16 +209,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should open file picker when dropzone is clicked', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const dropzone = screen.getByRole('button');
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const dropzone = screen.getByTestId('dropzone');
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     const clickSpy = vi.spyOn(input, 'click');
 
@@ -313,16 +222,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should open file picker when Enter key is pressed on dropzone', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const dropzone = screen.getByRole('button');
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const dropzone = screen.getByTestId('dropzone');
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     const clickSpy = vi.spyOn(input, 'click');
 
@@ -332,16 +235,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should open file picker when Space key is pressed on dropzone', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const dropzone = screen.getByRole('button');
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const dropzone = screen.getByTestId('dropzone');
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     const clickSpy = vi.spyOn(input, 'click');
 
@@ -388,7 +285,7 @@ describe('AddSuspectsBatchModal', () => {
     );
 
     const file = new File(['nome;cpfCnpj;telefone'], 'suspects.csv', { type: 'text/csv' });
-    const input = screen.getByRole('textbox', { hidden: true }) as HTMLInputElement;
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -399,18 +296,12 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should reject files dropped that are too large', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const largeFile = new File(['test'], 'large.csv', { type: 'text/csv' });
     Object.defineProperty(largeFile, 'size', { value: 51 * 1024 * 1024 });
 
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByTestId('dropzone');
     const dataTransfer = {
       files: [largeFile],
       types: ['Files'],
@@ -422,16 +313,10 @@ describe('AddSuspectsBatchModal', () => {
   });
 
   it('should reject non-CSV files dropped', () => {
-    render(
-      <AddSuspectsBatchModal
-        isOpen={true}
-        onClose={mockOnClose}
-        onSubmit={mockOnSubmit}
-      />
-    );
+    render(<AddSuspectsBatchModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
     const txtFile = new File(['test'], 'test.txt', { type: 'text/plain' });
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByTestId('dropzone');
     const dataTransfer = {
       files: [txtFile],
       types: ['Files'],

@@ -12,6 +12,7 @@ import {
   useDeleteCase,
   useRemoveUserAccess,
   useUpdateCaseName,
+  useUpdateCaseOwner,
   useUpdateCaseSituation,
   useUsersWithAccess,
 } from '@/hooks/useCase';
@@ -824,7 +825,7 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        expect(mockReload).toHaveBeenCalled();
+        expect(mockRefetch).toHaveBeenCalled();
       });
     });
   });
