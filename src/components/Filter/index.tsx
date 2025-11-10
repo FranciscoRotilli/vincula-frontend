@@ -1,12 +1,13 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import { FiFilter } from 'react-icons/fi';
+import React, { useEffect, useRef,useState } from 'react';
+import { FiFilter, FiSave } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
 import { CaseStatus } from '@/types/Cases';
 
 import Button from '../Button';
 import Input from '../Input';
+import SaveFilterModal from '../Modals/SaveFilterModal';
 import MultiSelectDropdown from '../MultiSelectDropdown';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
@@ -34,7 +35,7 @@ export type FilterProps = {
   fields: FieldConfig[];
   onFilter: (filters: FilterValues) => void;
   onClear?: () => void;
-  onSaveFilter?: (filters: FilterValues) => void;
+  onSaveFilter?: (name: string, filters: FilterValues) => void;
   defaultValues?: FilterValues;
   values?: FilterValues;
   onValuesChange?: (values: FilterValues) => void;
@@ -58,7 +59,7 @@ const Filter: React.FC<FilterProps> = ({
   fields,
   onFilter,
   onClear,
-  // onSaveFilter,
+  onSaveFilter,
   defaultValues = {},
   values: controlledValues,
   onValuesChange,
@@ -71,8 +72,8 @@ const Filter: React.FC<FilterProps> = ({
   const isControlled = controlledValues !== undefined && onValuesChange !== undefined;
   const [internalFilters, setInternalFilters] = useState<FilterValues>({ ...defaultValues });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSaveFilterModalOpen, setIsSaveFilterModalOpen] = useState(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   const filters = isControlled ? controlledValues : internalFilters;
 
   const updateFilters = (updater: FilterValues | ((prev: FilterValues) => FilterValues)) => {
@@ -108,7 +109,7 @@ const Filter: React.FC<FilterProps> = ({
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     updateFilters((prev) => ({ ...prev, [key]: value }));
-    
+
     if (errors[key]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -118,25 +119,27 @@ const Filter: React.FC<FilterProps> = ({
     }
   };
 
-  const handleSelectChange = (key: string, multi = false) => (value: string | null | string[]) => {
-    const newFilters = {
-      ...filters,
-      [key]: multi ? (value as string[]) : (value && value !== '' ? (value as string) : undefined),
-    };
-    updateFilters(newFilters);
+  const handleSelectChange =
+    (key: string, multi = false) =>
+    (value: string | null | string[]) => {
+      const newFilters = {
+        ...filters,
+        [key]: multi ? (value as string[]) : value && value !== '' ? (value as string) : undefined,
+      };
+      updateFilters(newFilters);
 
-    if (autoFilter) {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
+      if (autoFilter) {
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
+        onFilter(newFilters);
       }
-      onFilter(newFilters);
-    }
-  };
+    };
 
   const handleFilter = () => {
     if (validateField) {
       const newErrors: Record<string, string> = {};
-      
+
       fields.forEach((field) => {
         const value = filters[field.key];
         if (value && typeof value === 'string') {
@@ -146,14 +149,14 @@ const Filter: React.FC<FilterProps> = ({
           }
         }
       });
-      
+
       setErrors(newErrors);
-      
+
       if (Object.keys(newErrors).length > 0) {
         return;
       }
     }
-    
+
     onFilter(filters);
   };
 
@@ -163,115 +166,122 @@ const Filter: React.FC<FilterProps> = ({
     onClear?.();
   };
 
-  // const handleSave = () => {
-  //   if (onSaveFilter) onSaveFilter(filters);
-  // };
+  const handleSave = (name: string) => {
+    if (onSaveFilter) onSaveFilter(name, filters);
+  };
 
   return (
-    <div
-      className={`${styles.filterContainer} ${customStyles?.container || ''}`}
-      data-testid="filter-component"
-    >
-      <div className={`${styles.fieldsRow} ${customStyles?.fieldsRow || ''}`}>
-        {fields.map((field) => {
-          const multiSelected = Array.isArray(filters[field.key])
-            ? (filters[field.key] as string[])
-            : [];
+    <>
+      <div
+        className={`${styles.filterContainer} ${customStyles?.container || ''}`}
+        data-testid="filter-component"
+      >
+        <div className={`${styles.fieldsRow} ${customStyles?.fieldsRow || ''}`}>
+          {fields.map((field) => {
+            const multiSelected = Array.isArray(filters[field.key])
+              ? (filters[field.key] as string[])
+              : [];
 
-          if (field.type === 'input') {
-            return (
-              <Input
-                key={field.key}
-                placeholder={field.placeholder ?? ''}
-                label={field.label}
-                value={(filters[field.key] as string | undefined) ?? ''}
-                onChange={handleInputChange(field.key)}
-                disabled={disabled}
-                error={errors[field.key]}
-                data-testid={field.testId || `${field.key}-input`}
-              />
-            );
-          }
+            if (field.type === 'input') {
+              return (
+                <Input
+                  key={field.key}
+                  placeholder={field.placeholder ?? ''}
+                  label={field.label}
+                  value={(filters[field.key] as string | undefined) ?? ''}
+                  onChange={handleInputChange(field.key)}
+                  disabled={disabled}
+                  error={errors[field.key]}
+                  data-testid={field.testId || `${field.key}-input`}
+                />
+              );
+            }
 
-          if (field.type === 'multi-select') {
+            if (field.type === 'multi-select') {
+              return (
+                <div
+                  key={field.key}
+                  className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
+                  data-testid={field.testId || `${field.key}-multiselect`}
+                >
+                  <label className={styles.label}>{field.label}</label>
+                  <MultiSelectDropdown
+                    options={field.options || []}
+                    defaultSelected={multiSelected}
+                    onChange={handleSelectChange(field.key, true)}
+                    placeholder={field.placeholder ?? ''}
+                    id={field.key}
+                  />
+                </div>
+              );
+            }
+
             return (
               <div
                 key={field.key}
                 className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
-                data-testid={field.testId || `${field.key}-multiselect`}
+                data-testid={field.testId || `${field.key}-select`}
               >
                 <label className={styles.label}>{field.label}</label>
-                <MultiSelectDropdown
+                <CustomSelect
                   options={field.options || []}
-                  defaultSelected={multiSelected}
-                  onChange={handleSelectChange(field.key, true)}
+                  value={(filters[field.key] as string | undefined) ?? ''}
+                  onChange={handleSelectChange(field.key)}
                   placeholder={field.placeholder ?? ''}
-                  id={field.key}
+                  style={{ height: '2.5rem', width: '11.25rem' }}
+                  isControlled
                 />
               </div>
             );
-          }
+          })}
+        </div>
 
-          return (
-            <div
-              key={field.key}
-              className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}
-              data-testid={field.testId || `${field.key}-select`}
-            >
-              <label className={styles.label}>{field.label}</label>
-              <CustomSelect
-                options={field.options || []}
-                value={(filters[field.key] as string | undefined) ?? ''}
-                onChange={handleSelectChange(field.key)}
-                placeholder={field.placeholder ?? ''}
-                style={{ height: '2.5rem', width: '11.25rem' }}
-                isControlled
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
-        {onClear && (
-          <Button
-            data-testid="clear-button"
-            icon={<MdOutlineClear />}
-            variant="outlined"
-            size="icon"
-            label=""
-            onClick={handleClear}
-            className={styles.iconButton}
-            disabled={disabled}
-          />
-        )}
-        <div className={styles.saveFilter}>
-          <Button
-            data-testid="filter-button"
-            icon={<FiFilter />}
-            variant="contained"
-            size="icon"
-            label=""
-            onClick={handleFilter}
-            className={styles.iconButton}
-            disabled={disabled}
-          />
-
-          {/* {onSaveFilter && showSaveButton && (
+        <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
+          {onClear && (
             <Button
-              data-testid="save-filter-button"
-              icon={<BookmarkAddIcon />}
-              variant="contained"
+              data-testid="clear-button"
+              icon={<MdOutlineClear />}
+              variant="outlined"
               size="icon"
               label=""
-              onClick={handleSave}
+              onClick={handleClear}
               className={styles.iconButton}
               disabled={disabled}
             />
-          )} */}
+          )}
+          <div className={styles.saveFilter}>
+            <Button
+              data-testid="filter-button"
+              icon={<FiFilter />}
+              variant="contained"
+              size="icon"
+              label=""
+              onClick={handleFilter}
+              className={styles.iconButton}
+              disabled={disabled}
+            />
+
+            {onSaveFilter && (
+              <Button
+                data-testid="save-filter-button"
+                icon={<FiSave />}
+                variant="contained"
+                size="icon"
+                label=""
+                onClick={() => setIsSaveFilterModalOpen(true)}
+                className={styles.iconButton}
+                disabled={disabled}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <SaveFilterModal
+        isOpen={isSaveFilterModalOpen}
+        onClose={() => setIsSaveFilterModalOpen(false)}
+        onSubmit={(payload) => handleSave(payload.filterName)}
+      />
+    </>
   );
 };
 

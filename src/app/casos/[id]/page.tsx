@@ -417,7 +417,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowNameModal(false)}
             primaryLoading={updateNameMutation.isPending}
           >
             <input
@@ -441,7 +440,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowSituationModal(false)}
             primaryLoading={updateSituationMutation.isPending}
           >
             <select
@@ -493,7 +491,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
             onPrimary={() => handleRemoveFile(showRemoveFileModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
           />
         )}
 
@@ -510,7 +507,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
             onPrimary={() => handleRemoveSuspect(showRemoveSuspectModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveSuspectModal({ open: false, index: null })}
           />
         )}
 
@@ -524,7 +520,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={() => setShowUploadModal(false)}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
         )}
 
@@ -549,8 +544,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       primaryLabel={t('cases.title.save')}
       onPrimary={handleUpdateOwner}
       secondaryLabel={t('cases.title.cancel')}
-      onSecondary={() => setShowChangeResponsibleModal(false)}
-      primaryDisabled={updateOwnerMutation.isPending}
       primaryLoading={updateOwnerMutation.isPending}
       >
             <div style={{ marginBottom: 16, marginTop: 8, width: '100%' }}>

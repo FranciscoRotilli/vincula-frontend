@@ -20,3 +20,10 @@ export interface FileRequest {
   file_type: string;
   file: File;
 }
+
+export interface FileFilterParams {
+  suspects?: string[];
+  names?: string[];
+  cpfs_cnpjs?: string[];
+  phones?: string[];
+}

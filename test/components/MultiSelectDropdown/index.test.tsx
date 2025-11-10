@@ -1,6 +1,6 @@
+import { fireEvent,render, screen, within } from '@testing-library/react';
 import React from 'react';
-import { render, screen, within, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import MultiSelectDropdown, { type Option } from '../../../src/components/MultiSelectDropdown';
 

@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 
 import {
   addCase,
@@ -40,9 +39,9 @@ export function useUpdateCaseName() {
     mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
       updateCaseName(caseId, name),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['case', variables.caseId]});
-      queryClient.invalidateQueries({queryKey: ['cases']});
-    }
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
   });
 }
 
@@ -71,8 +70,8 @@ export function useDeleteCase() {
 
   return useMutation({
     mutationFn: (caseId: string) => deleteCase(caseId),
-    onSuccess: (_data, caseId) => { 
-      queryClient.invalidateQueries({ queryKey: ['cases'] }); 
+    onSuccess: (_data, caseId) => {
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
       queryClient.invalidateQueries({ queryKey: ['case', caseId] });
     },
   });
@@ -102,12 +101,6 @@ export function useCases(
   });
 }
 
-type ApiError = { status?: number; message?: string };
-
-function isApiError(err: unknown): err is ApiError {
-  return typeof err === 'object' && err !== null && ('status' in err || 'message' in err);
-}
-
 export function useCaseById(caseId: string) {
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
@@ -115,22 +108,27 @@ export function useCaseById(caseId: string) {
     refetchOnWindowFocus: false,
   });
 
-  return queryResult;
+  localStorage.removeItem(`case`);
 
+  if (queryResult.isSuccess) {
+    localStorage.setItem(`case`, JSON.stringify(queryResult.data));
+  }
+
+  return queryResult;
 }
 
 export function useAllowVisualization() {
-    return useMutation({
-        mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
-            allowUserToViewCase(caseId, userId),
-    });
+  return useMutation({
+    mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
+      allowUserToViewCase(caseId, userId),
+  });
 }
 
 export function useCaseGraph(caseId: string, filters?: GraphFilters) {
   return useQuery({
     queryKey: [
-      'caseGraph', 
-      caseId, 
+      'caseGraph',
+      caseId,
       filters?.investigated,
       filters?.cpf_cnpj,
       filters?.origin,

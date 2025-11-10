@@ -13,7 +13,6 @@ type ConfirmationModalProps = {
   primaryLabel: string;
   onPrimary: () => void;
   secondaryLabel: string;
-  onSecondary?: () => void;
   primaryColor?: string;
   primaryLoading?: boolean;
   primaryLoadingLabel?: string;
@@ -30,7 +29,6 @@ export default function ConfirmationModal({
   primaryLabel,
   onPrimary,
   secondaryLabel,
-  onSecondary,
   primaryColor,
   primaryLoading,
   primaryLoadingLabel,

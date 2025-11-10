@@ -70,6 +70,7 @@ export const texts = {
 	'graph.filter.databaseDescription': 'Selecione',
 
   'modal.caseName': 'Nome do caso:',
+  'modal.filterName': 'Nome do filtro:',
   'modal.responsibleName': 'Nome do responsável:',
   'modal.creationDate': 'Data de criação:',
   'modal.caseNumber': 'Número do caso',
@@ -100,14 +101,15 @@ export const texts = {
 
   'filter.label1': 'Investigado',
   'filter.label2': 'CPF/CNPJ',
-  'filter.label3': 'Destino',
-  'filter.label4': 'Base de dados',
+  'filter.label3': 'Nome',
+  'filter.label4': 'Telefone',
   'filter.apply': 'Aplicar Filtros',
   'filter.clear': 'Limpar Filtros',
 
   'filter.placeholder1': 'Selecione',
   'filter.placeholder2': 'Digite o CPF/CNPJ',
-  'filter.placeholder3': 'Digite o CPF/CNPJ de destino',
+  'filter.placeholder3': 'Digite o nome',
+  'filter.placeholder4': 'Digite o telefone',
 
   'visualization.filters': 'Filtros',
   'visualization.filtersDesc': 'Clique em um filtro para aplicá-lo',

@@ -15,6 +15,7 @@ export type ButtonProps = {
   loading?: boolean;
   loadingLabel?: string;
   loadingIcon?: React.ReactNode;
+  onRemove?: () => void;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -30,6 +31,7 @@ const Button: React.FC<ButtonProps> = ({
   loading = false,
   loadingLabel,
   loadingIcon,
+  onRemove,
 }) => {
   const fallbackLoadingLabel = (() => {
     if (!loading) return label;
@@ -68,6 +70,11 @@ const Button: React.FC<ButtonProps> = ({
       )}
       {hasLabel && (
         <span className={shouldHideLabel ? styles.srOnly : undefined}>{effectiveLabel}</span>
+      )}
+      {onRemove && !loading && (
+        <span className={styles.removeIcon} aria-hidden onClick={onRemove}>
+          {'x'}
+        </span>
       )}
     </button>
   );
