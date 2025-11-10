@@ -251,6 +251,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           fields={filterFields}
           values={filterValues}
           onValuesChange={setFilterValues}
+          graphFilter={true}
           onFilter={handleFilter}
           onClear={handleClear}
           autoFilter={true}
@@ -272,6 +273,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 fields={filterFields}
                 values={filterValues}
                 onValuesChange={setFilterValues}
+                graphFilter={true}
                 onFilter={handleFilter}
                 onClear={handleClear}
                 autoFilter={true}

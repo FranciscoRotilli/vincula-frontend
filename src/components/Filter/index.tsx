@@ -100,6 +100,7 @@ const Filter: React.FC<FilterProps> = ({
   };
 
   useEffect(() => {
+    console.log(graphFilter)
     if (!autoFilter) return;
 
     if (debounceTimerRef.current) {
@@ -304,22 +305,23 @@ const Filter: React.FC<FilterProps> = ({
           );
         }
         )}
-          <div className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}>
-            <label className={styles.label}>Filtro</label>
-            <CustomSelect
-              options={savedFilters.map(f => ({ value: f.name, label: f.name }))}
-              value={selectedSavedFilter}
-              onChange={(name) => {
-                const chosen = savedFilters.find(f => f.name === name);
-                setSelectedSavedFilter(name || '');
-                if (chosen) applySavedFilter(chosen);
-              }}
-              placeholder='Filtro'
-              style={{ height: '2.5rem', width: '11.25rem' }}
-              isControlled
-            />
-          </div>
-        
+          {graphFilter && (
+            <div className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}>
+              <label className={styles.label}>Filtro</label>
+              <CustomSelect
+                options={savedFilters.map(f => ({ value: f.name, label: f.name }))}
+                value={selectedSavedFilter}
+                onChange={(name) => {
+                  const chosen = savedFilters.find(f => f.name === name);
+                  setSelectedSavedFilter(name || '');
+                  if (chosen) applySavedFilter(chosen);
+                }}
+                placeholder='Filtro'
+                style={{ height: '2.5rem', width: '11.25rem' }}
+                isControlled
+              />
+            </div>
+          )}
       </div>
 
       <div className={`${styles.actions} ${customStyles?.actions || ''}`}>    
