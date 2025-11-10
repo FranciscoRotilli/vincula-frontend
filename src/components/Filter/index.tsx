@@ -1,18 +1,19 @@
 'use client';
+import { Save } from '@mui/icons-material';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
+import { t } from '@/texts';
 import { CaseStatus } from '@/types/Cases';
 
 import Button from '../Button';
 import Input from '../Input';
+import SaveFilterModal from '../Modals/SaveFilterModal';
 import MultiSelectDropdown from '../MultiSelectDropdown';
 import { CustomSelect } from '../Select';
 import styles from './Filter.module.css';
-import { Save } from '@mui/icons-material';
-import { usePathname } from 'next/navigation';
-import SaveFilterModal from '../Modals/SaveFilterModal';
 
 export type FilterValues = {
   caseNumber?: string;
@@ -116,7 +117,7 @@ const Filter: React.FC<FilterProps> = ({
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [filters, autoFilter, debounceMs, onFilter]);
+  }, [filters, autoFilter, debounceMs, onFilter, graphFilter]);
 
   const handleInputChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -157,18 +158,18 @@ const Filter: React.FC<FilterProps> = ({
       return null;
     }
   };
+
   const pathname = usePathname();
-  const STORAGE_KEY = `graphFilters_${pathname}`;
 
   const getSavedFilters = () => {
-    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(STORAGE_KEY));
+    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(`graphFilters_${pathname}`));
     if (Array.isArray(parsed)) setSavedFilters(parsed);
   };
 
   const addSavedFilters = (filter: SavedFilter) => {
-    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(STORAGE_KEY)) ?? [];
+    const parsed = safeParse<SavedFilter[]>(localStorage.getItem(`graphFilters_${pathname}`)) ?? [];
     parsed.push(filter);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    localStorage.setItem(`graphFilters_${pathname}`, JSON.stringify(parsed));
     setSavedFilters(parsed);
   };
 
@@ -176,11 +177,11 @@ const Filter: React.FC<FilterProps> = ({
     getSavedFilters();
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) getSavedFilters();
+      if (e.key === `graphFilters_${pathname}`) getSavedFilters();
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  });
 
   const applySavedFilter = (sf: SavedFilter) => {
     const allowedKeys = new Set(fields.map(f => f.key));
@@ -191,6 +192,7 @@ const Filter: React.FC<FilterProps> = ({
       if (typeof v === 'string' && _isCaseStatus(v)) {
         next[k] = v as CaseStatus;
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         next[k] = v as any;
       }
     });
@@ -307,7 +309,7 @@ const Filter: React.FC<FilterProps> = ({
         )}
           {graphFilter && (
             <div className={`${styles.inputWrapper} ${customStyles?.inputWrapper || ''}`}>
-              <label className={styles.label}>Filtro</label>
+              <label className={styles.label}>{t('filter.multiselect')}</label>
               <CustomSelect
                 options={savedFilters.map(f => ({ value: f.name, label: f.name }))}
                 value={selectedSavedFilter}

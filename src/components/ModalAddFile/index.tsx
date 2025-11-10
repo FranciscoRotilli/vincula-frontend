@@ -3,6 +3,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { CircularProgress } from '@mui/material';
 import React, { useId, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Modal from '@/components/Modals';
 import { useAddFile } from '@/hooks/useFile';
@@ -10,7 +11,6 @@ import { t } from '@/texts';
 import { FileRequest } from '@/types/Files';
 
 import styles from './AddFileModal.module.css';
-import { toast } from 'react-toastify';
 
 type AddFileModalProps = {
   isOpen: boolean;
