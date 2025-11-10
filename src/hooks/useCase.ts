@@ -101,12 +101,6 @@ export function useCases(
   });
 }
 
-// type ApiError = { status?: number; message?: string };
-
-// function isApiError(err: unknown): err is ApiError {
-//   return typeof err === 'object' && err !== null && ('status' in err || 'message' in err);
-// }
-
 export function useCaseById(caseId: string) {
   const queryResult = useQuery<CompleteCaseResponse, Error>({
     queryKey: ['case', caseId],
