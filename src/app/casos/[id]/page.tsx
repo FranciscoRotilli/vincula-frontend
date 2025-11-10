@@ -8,7 +8,6 @@ import React, { use, useEffect, useState } from 'react';
 import { BiSolidError } from 'react-icons/bi';
 import { FiAlertCircle, FiEdit2, FiUpload } from 'react-icons/fi';
 import { TbTrash } from 'react-icons/tb';
-import ReactSelect, { SingleValue, StylesConfig } from 'react-select';
 import { toast } from 'react-toastify';
 
 import Button from '@/components/Button';
@@ -30,7 +29,6 @@ import {
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
-import { useUsers } from '@/hooks/useUsers';
 import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
@@ -83,7 +81,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     index: null,
   });
   const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
-  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -239,8 +236,8 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
-  const handleAllowVisualization = () => {
-    allowViewMutation.mutate({ caseId, userId: selectedUser }, {
+  const handleAllowVisualization = (userId: string) => {
+    allowViewMutation.mutate({ caseId, userId }, {
       onSuccess: () => {
         setShowAllowVisualizationModal(false);
         refetch();
