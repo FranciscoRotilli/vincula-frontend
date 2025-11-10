@@ -19,7 +19,7 @@ import Filter, { FieldConfig, FilterValues } from '@/components/Filter';
 import Graph from '@/components/Graph';
 import { GraphAlerts } from '@/components/GraphAlerts';
 import NodeModal from '@/components/NodeModal';
-import { useCaseGraph } from '@/hooks/useCase';
+import { useCaseById, useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
 
 import styles from './page.module.css';
@@ -31,9 +31,11 @@ import {
   getRelationshipSourceDatabase,
   transformApiData,
 } from './utils';
+import { Suspect } from '@/types/Cases';
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
+  const { data: caseDetails } = useCaseById(id);
 
   const [graphNodes, setGraphNodes] = useState<AppNode[]>([]);
   const [graphRels, setGraphRels] = useState<AppRelationship[]>([]);
@@ -81,9 +83,12 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
     error: graphError,
   } = useCaseGraph(id, graphFilters);
 
+  const suspects: Suspect[] | undefined = caseDetails?.suspects;
+
   useEffect(() => {
     if (graphData) {
-      const { nodes, rels } = transformApiData(graphData);
+
+      const { nodes, rels } = transformApiData(graphData, suspects);
       setGraphNodes(nodes);
       setGraphRels(rels);
     }

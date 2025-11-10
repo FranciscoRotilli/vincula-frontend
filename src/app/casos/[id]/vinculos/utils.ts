@@ -1,3 +1,5 @@
+import { useCaseById } from '@/hooks/useCase';
+import { Suspect } from '@/types/Cases';
 import type { Node, Relationship } from '@neo4j-nvl/base';
 
 export interface AppNode extends Node {
@@ -13,6 +15,7 @@ export interface RawNode {
   name?: string;
   identity?: string;
   case_number?: string;
+  vincula_case_id?: string;
   file_name?: string | string[];
   phone_number?: string | string[];
   type: string;
@@ -38,21 +41,21 @@ export const calculateWidth = (quantity: number, allQuantities: number[]) => {
   if (!allQuantities.length || quantity === undefined || quantity <= 0) return 1;
 
   const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
-  
+
   if (validQuantities.length === 0) return 1;
   if (validQuantities.length === 1) return quantity > 0 ? 3 : 1;
-  
+
   const min = validQuantities[0];
   const max = validQuantities[validQuantities.length - 1];
-  
+
   if (min === max) return 3;
-  
+
   const logMin = Math.log(min);
   const logMax = Math.log(max);
   const logQuantity = Math.log(quantity);
-  
+
   const normalized = (logQuantity - logMin) / (logMax - logMin);
-  
+
   if (normalized <= 0.1) return 1;
   if (normalized <= 0.3) return 2;
   if (normalized <= 0.6) return 3;
@@ -71,7 +74,7 @@ export const calculateNodeSize = (
   const quantity = rels
     .filter(rel => rel.from === nodeId)
     .reduce((sum, rel) => sum + (Number(rel.properties?.quantity) || 0), 0);
-  
+
   if (
     !allQuantities.length ||
     typeof quantity !== 'number' ||
@@ -79,21 +82,21 @@ export const calculateNodeSize = (
   ) return default_size;
 
   const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
-  
+
   if (validQuantities.length === 0) return default_size;
   if (validQuantities.length === 1) return quantity > 0 ? default_size * 2 : default_size;
-  
+
   const min = validQuantities[0];
   const max = validQuantities[validQuantities.length - 1];
-  
+
   if (min === max) return default_size * 1.5;
-  
+
   const logMin = Math.log(min);
   const logMax = Math.log(max);
   const logQuantity = Math.log(quantity);
-  
+
   const normalized = (logQuantity - logMin) / (logMax - logMin);
-  
+
   if (normalized <= 0.1) return default_size;
   if (normalized <= 0.3) return default_size * 1.3;
   if (normalized <= 0.6) return default_size * 1.8;
@@ -102,9 +105,9 @@ export const calculateNodeSize = (
 
 };
 
-export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }) => {
+export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
   const allQuantities = apiData.edges.map(edge => edge.quantity).filter(q => q != null) as number[];
-  
+
   const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
     return {
       id: rawEdge.id,
@@ -121,11 +124,25 @@ export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }
   });
 
   const nodes: AppNode[] = apiData.nodes.map(rawNode => {
+    const hasIdentity = !!rawNode.identity;
+    const hasFile = !hasIdentity;
+    const isInvestigated =
+      hasIdentity &&
+      suspects?.some(
+        (s) =>
+          String(s.cpf_cnpj).replace(/\D/g, '') ===
+          String(rawNode.identity).replace(/\D/g, '')
+      );
+
+    let color = '#f0ad4e'
+    if (isInvestigated) color = '#e04141';
+    else if (hasFile) color = '#007bff';
+
     return {
       id: rawNode.id,
       caption: rawNode.identity ? rawNode.name : rawNode.type,
       size: rawNode.identity ? calculateNodeSize(rels, rawNode.id, allQuantities) : 40,
-      color: rawNode.identity ? '#f0ad4e' : '#e04141',
+      color,
       properties: {
         identity: rawNode.identity,
         case_number: rawNode.case_number,
@@ -135,7 +152,7 @@ export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }
       },
     };
   });
-  
+
   return { nodes, rels };
 };
 
@@ -146,10 +163,10 @@ export const generateRelationshipName = (
   const fromNode = graphNodes.find(node => node.id === selectedElement.from);
   const toNode = graphNodes.find(node => node.id === selectedElement.to);
   const quantity = selectedElement.properties?.quantity || 0;
-  
+
   let personName = '';
   let nonPersonType = '';
-  
+
   if (fromNode?.properties?.identity) {
     personName = fromNode.properties?.name as string || fromNode.caption || 'Fulano';
     nonPersonType = toNode?.properties?.type as string || 'Desconhecido';
@@ -157,7 +174,7 @@ export const generateRelationshipName = (
     personName = toNode.properties?.name as string || toNode.caption || 'Fulano';
     nonPersonType = fromNode?.properties?.type as string || 'Desconhecido';
   }
-  
+
   return `${personName} → ${nonPersonType} (${quantity})`;
 };
 
@@ -167,7 +184,7 @@ export const getRelationshipSourceDatabase = (
 ): string => {
   const fromNode = graphNodes.find(node => node.id === selectedElement.from);
   const toNode = graphNodes.find(node => node.id === selectedElement.to);
-  
+
   if (!fromNode?.properties?.identity) {
     return fromNode?.properties?.type as string;
   } else if (!toNode?.properties?.identity) {
