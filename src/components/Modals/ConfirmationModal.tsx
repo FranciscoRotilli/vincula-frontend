@@ -30,7 +30,6 @@ export default function ConfirmationModal({
   primaryLabel,
   onPrimary,
   secondaryLabel,
-  onSecondary,
   primaryColor,
   primaryLoading,
   primaryLoadingLabel,
