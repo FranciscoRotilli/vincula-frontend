@@ -28,7 +28,6 @@ export interface RawEdge {
 }
 
 export const baseOptions = [
-  { value: '', label: 'Todos' },
   { value: 'SIMBA', label: 'SIMBA' },
   { value: 'SITTEL', label: 'SITTEL' },
   { value: 'RIF', label: 'RIF' },

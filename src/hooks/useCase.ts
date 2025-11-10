@@ -137,7 +137,7 @@ export function useCaseGraph(caseId: string, filters?: GraphFilters) {
       'caseGraph',
       caseId,
       filters?.investigated,
-      filters?.cpf_cnpj,
+      filters?.identities,
       filters?.origin,
       filters?.archive,
     ],

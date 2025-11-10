@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
 
-import { SuspectInput } from '@/types/Cases';
+import { SuspectRequest } from '@/types/Cases';
 
 import { addSuspect, deleteSuspect } from '../../src/services/suspectService';
 
-vi.stubGlobal('fetch', vi.fn());
+const mockFetch = vi.fn() as MockedFunction<typeof fetch>;
+vi.stubGlobal('fetch', mockFetch);
 
 describe('suspectService', () => {
   const caseId = 'case-123';
@@ -17,15 +18,16 @@ describe('suspectService', () => {
   });
 
   describe('addSuspect', () => {
-    const suspect: SuspectInput = {
+    const suspect: SuspectRequest = {
       name: 'Fulano da Silva',
-      cpf: '123.456.789-00',
+      cpf_cnpj: '123.456.789-00',
+      phone_number: '(11) 98765-4321',
     };
 
     it('should call fetch with the correct URL, method, headers, and body', async () => {
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
-      });
+      } as Response);
 
       await addSuspect(caseId, suspect);
 
@@ -35,17 +37,21 @@ describe('suspectService', () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(suspect),
+        body: JSON.stringify({
+          name: suspect.name,
+          cpf_cnpj: '12345678900',
+          phone_number: suspect.phone_number,
+        }),
       });
       expect(fetch).toHaveBeenCalledTimes(1);
     });
 
     it('should throw an error if the fetch response is not ok', async () => {
       const errorStatusText = 'Bad Request';
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         statusText: errorStatusText,
-      });
+      } as Response);
 
       await expect(addSuspect(caseId, suspect)).rejects.toThrow(
         `Falha ao adicionar suspeito: ${errorStatusText}`
@@ -55,9 +61,9 @@ describe('suspectService', () => {
 
   describe('deleteSuspect', () => {
     it('should call fetch with the correct URL, method, and headers', async () => {
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
-      });
+      } as Response);
 
       await deleteSuspect(caseId, suspectId);
 
@@ -75,10 +81,10 @@ describe('suspectService', () => {
 
     it('should throw an error if the fetch response is not ok', async () => {
       const errorStatusText = 'Internal Server Error';
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         statusText: errorStatusText,
-      });
+      } as Response);
 
       await expect(deleteSuspect(caseId, suspectId)).rejects.toThrow(
         `Falha ao remover suspeito: ${errorStatusText}`

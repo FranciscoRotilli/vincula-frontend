@@ -1,5 +1,5 @@
-import { fireEvent,render, screen, within } from '@testing-library/react';
-import React from 'react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import React, { useMemo } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import MultiSelectDropdown, { type Option } from '../../../src/components/MultiSelectDropdown';
@@ -16,13 +16,28 @@ const FEW_OPTIONS: Option[] = [
   { value: 'a4', label: 'Opção A4' },
 ];
 
+function TestWrapper({
+  options,
+  ...props
+}: React.ComponentProps<typeof MultiSelectDropdown>) {
+  const stableOptions = useMemo(() => options, [JSON.stringify(options)]);
+  const stableDefaultSelected = useMemo(
+    () => props.defaultSelected,
+    [JSON.stringify(props.defaultSelected)]
+  );
+
+  return (
+    <MultiSelectDropdown {...props} options={stableOptions} defaultSelected={stableDefaultSelected} />
+  );
+}
+
 function setup(
   options: Option[] = FEW_OPTIONS,
   customProps: Partial<React.ComponentProps<typeof MultiSelectDropdown>> = {}
 ) {
   const onChange = vi.fn();
   render(
-    <MultiSelectDropdown
+    <TestWrapper
       options={options}
       placeholder="Selecionar"
       {...customProps}
@@ -94,6 +109,35 @@ describe('MultiSelectDropdown (essencial)', () => {
 
     fireEvent.click(field);
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('updates selected items when defaultSelected prop changes (localStorage scenario)', () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <MultiSelectDropdown
+        options={FEW_OPTIONS}
+        defaultSelected={['a1']}
+        onChange={onChange}
+        placeholder="Selecionar"
+      />
+    );
+
+    const field = screen.getByRole('button', { name: /seleção múltipla/i });
+    expect(within(field).getByText('Opção A1')).toBeInTheDocument();
+    expect(within(field).queryByText('Opção A2')).not.toBeInTheDocument();
+
+    rerender(
+      <MultiSelectDropdown
+        options={FEW_OPTIONS}
+        defaultSelected={['a2', 'a3']}
+        onChange={onChange}
+        placeholder="Selecionar"
+      />
+    );
+
+    expect(within(field).queryByText('Opção A1')).not.toBeInTheDocument();
+    expect(within(field).getByText('Opção A2')).toBeInTheDocument();
+    expect(within(field).getByText('Opção A3')).toBeInTheDocument();
   });
 });
 

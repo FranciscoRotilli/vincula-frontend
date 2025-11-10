@@ -1,7 +1,7 @@
 'use client';
 import { Save } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
 
@@ -163,10 +163,10 @@ const Filter: React.FC<FilterProps> = ({
 
   const pathname = usePathname();
 
-  const getSavedFilters = () => {
+  const getSavedFilters = useCallback(() => {
     const parsed = safeParse<SavedFilter[]>(localStorage.getItem(`graphFilters_${pathname}`));
     if (Array.isArray(parsed)) setSavedFilters(parsed);
-  };
+  }, [pathname]);
 
   const addSavedFilters = (filter: SavedFilter) => {
     const parsed = safeParse<SavedFilter[]>(localStorage.getItem(`graphFilters_${pathname}`)) ?? [];
@@ -183,7 +183,7 @@ const Filter: React.FC<FilterProps> = ({
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [pathname]);
+  }, [pathname, getSavedFilters]);
 
   const applySavedFilter = (sf: SavedFilter) => {
     const allowedKeys = new Set(fields.map((f) => f.key));
@@ -241,6 +241,7 @@ const Filter: React.FC<FilterProps> = ({
   const handleClear = () => {
     updateFilters({ ...defaultValues });
     setErrors({});
+    setSelectedSavedFilter('');
     onClear?.();
   };
 
