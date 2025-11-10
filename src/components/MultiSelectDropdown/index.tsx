@@ -39,6 +39,10 @@ export default function MultiSelectDropdown({
   const [selected, setSelected] = useState<string[]>(defaultSelected);
   const [expanded, setExpanded] = useState(false);
 
+  useEffect(() => {
+    setSelected(defaultSelected);
+  }, [defaultSelected]);
+
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import {
   PaginationParams,
 } from '@/types/Cases';
 import { UserIdName } from '@/types/User';
+import { onlyNumbers } from '@/utils/functions';
 
 export type CaseResponse = { caseName: string };
 
@@ -141,29 +142,40 @@ export async function allowUserToViewCase(caseId: string, userId: string) {
 }
 
 export interface GraphFilters {
-  investigated?: string;
-  cpf_cnpj?: string;
-  origin?: string;
-  archive?: string;
+  investigated?: string[];
+  identities?: string[];
+  origin?: string[];
+  archive?: string[];
 }
 
 export async function getCaseGraph(caseId: string, filters?: GraphFilters) {
   const params = new URLSearchParams();
 
-  if (filters?.investigated) {
-    params.append('investigated', filters.investigated);
+  if (filters?.investigated?.length) {
+    filters.investigated.forEach(value => {
+      if (value) params.append('investigated', value);
+    });
   }
 
-  if (filters?.cpf_cnpj) {
-    params.append('cpf_cnpj', filters.cpf_cnpj);
+  if (filters?.identities?.length) {
+    filters.identities.forEach(value => {
+      if (value) {
+        const cleanedCpfCnpj = onlyNumbers(value);
+        params.append('identities', cleanedCpfCnpj);
+      }
+    });
   }
 
-  if (filters?.origin) {
-    params.append('origin', filters.origin);
+  if (filters?.origin?.length) {
+    filters.origin.forEach(value => {
+      if (value) params.append('origin', value);
+    });
   }
 
-  if (filters?.archive) {
-    params.append('archive', filters.archive);
+  if (filters?.archive?.length) {
+    filters.archive.forEach(value => {
+      if (value) params.append('archive', value);
+    });
   }
 
   const qs = params.toString();
