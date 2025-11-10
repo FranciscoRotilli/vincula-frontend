@@ -4,7 +4,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import { beforeEach, describe, expect, it, Mock,vi } from 'vitest';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import {
   useAllowVisualization,
@@ -13,7 +13,7 @@ import {
   useUpdateCaseName,
   useUpdateCaseSituation,
 } from '@/hooks/useCase';
-import { useAddSuspect, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useAddSuspect, useAddSuspectsBatch,useDeleteSuspect } from '@/hooks/useSuspect';
 import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CompleteCaseResponse } from '@/types/Cases';
@@ -21,12 +21,10 @@ import { CompleteCaseResponse } from '@/types/Cases';
 import GeneralInfoPage from '../../../../src/app/casos/[id]/page';
 import { renderWithClient } from '../../../renderWithClient';
 
-// Mock dos hooks e serviços
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
 }));
 
-// Ensure React.use hook resolves the params Promise synchronously in tests
 vi.mock('react', async () => {
   const actual: any = await vi.importActual('react');
   return {
@@ -47,6 +45,7 @@ vi.mock('@/hooks/useCase', () => ({
 vi.mock('@/hooks/useSuspect', () => ({
   useAddSuspect: vi.fn(),
   useDeleteSuspect: vi.fn(),
+  useAddSuspectsBatch: vi.fn(),
 }));
 
 vi.mock('@/services/auth', () => ({
@@ -55,13 +54,14 @@ vi.mock('@/services/auth', () => ({
 
 vi.mock('@/components/Button', () => ({
   __esModule: true,
-  default: ({ label, onClick, disabled, loading, icon, size, variant, className, loadingLabel }: any) => (
+  default: ({ label, onClick, disabled, loading, icon, size, variant, className, loadingLabel, ...props }: any) => (
     <button
       onClick={onClick}
       disabled={disabled || loading}
       className={className}
       data-variant={variant}
       data-size={size}
+      {...props}
     >
       {icon}
       {loading ? loadingLabel || 'Loading...' : label}
@@ -256,6 +256,10 @@ describe('GeneralInfoPage', () => {
     });
 
     (useDeleteSuspect as Mock).mockReturnValue({
+      mutate: vi.fn(),
+    });
+
+    (useAddSuspectsBatch as Mock).mockReturnValue({
       mutate: vi.fn(),
     });
   });
@@ -486,41 +490,6 @@ describe('GeneralInfoPage', () => {
     });
   });
 
-  describe('Ações rápidas (botões de ação)', () => {
-    it('deve abrir o modal de alterar nome ao clicar no botão de ação', async () => {
-      render(renderWithClient(<GeneralInfoPage params={mockParams} />));
-
-      const btn = await screen.findByText(t('cases.title.changeName'));
-      fireEvent.click(btn);
-
-      await waitFor(() => {
-        expect(screen.getAllByText(t('cases.title.changeName'))[0]).toBeInTheDocument();
-      });
-    });
-
-    it('deve abrir o modal de alterar situação ao clicar no botão de ação', async () => {
-      render(renderWithClient(<GeneralInfoPage params={mockParams} />));
-
-      const btn = await screen.findByText(t('cases.title.changeSituation'));
-      fireEvent.click(btn);
-
-      await waitFor(() => {
-        expect(screen.getAllByText(t('cases.title.changeSituation'))[0]).toBeInTheDocument();
-      });
-    });
-
-    it('deve abrir o modal de permitir visualização ao clicar no botão de ação', async () => {
-      render(renderWithClient(<GeneralInfoPage params={mockParams} />));
-
-      const btn = await screen.findByText(t('cases.title.allowView'));
-      fireEvent.click(btn);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('modal-allow-visualization')).toBeInTheDocument();
-      });
-    });
-  });
-
   describe('Modal de alteração de nome', () => {
     it('deve abrir o modal ao clicar em "Alterar nome"', async () => {
       render(renderWithClient(
@@ -621,7 +590,12 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      const openBtn = await screen.findByText(t('cases.title.changeName'));
+      // Abre o menu de ações
+      const actionsButton = await screen.findByLabelText('Ações');
+      fireEvent.click(actionsButton);
+
+      // Clica na opção de alterar nome
+      const openBtn = await screen.findByTestId('menu-change-name');
       fireEvent.click(openBtn);
 
       const inputs = await screen.findAllByPlaceholderText(t('cases.title.inputName'));
@@ -704,7 +678,12 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      const openBtn = await screen.findByText(t('cases.title.changeSituation'));
+      // Abre o menu de ações
+      const actionsButton = await screen.findByLabelText('Ações');
+      fireEvent.click(actionsButton);
+
+      // Clica na opção de alterar situação
+      const openBtn = await screen.findByTestId('menu-change-situation');
       fireEvent.click(openBtn);
 
       const select = await screen.findByRole('combobox');
@@ -823,7 +802,12 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      const btn = await screen.findByText(t('cases.title.allowView'));
+      // Abre o menu de ações
+      const actionsButton = await screen.findByLabelText('Ações');
+      fireEvent.click(actionsButton);
+
+      // Clica na opção de permitir visualização
+      const btn = await screen.findByTestId('menu-allow-view');
       fireEvent.click(btn);
 
       const submit = await screen.findByText('Submit');
@@ -850,9 +834,7 @@ describe('GeneralInfoPage', () => {
     });
 
     it('deve chamar useAddSuspect ao adicionar um investigado', async () => {
-      const mockMutate = vi.fn((_, { onSuccess }) => {
-        onSuccess();
-      });
+      const mockMutate = vi.fn();
       const mockRefetch = vi.fn();
       (useAddSuspect as Mock).mockReturnValue({
         mutate: mockMutate,
@@ -875,34 +857,48 @@ describe('GeneralInfoPage', () => {
         fireEvent.change(inputs[2], { target: { value: '11999999999' } });
       });
 
-      const addButton = screen.getByRole('button', { name: '' });
+      const addButton = screen.getByTestId('add-suspect');
       fireEvent.click(addButton);
 
-      expect(mockMutate).toHaveBeenCalledWith(
-        {
-          caseId: '123',
-          newSuspect: {
-            name: 'Novo Investigado',
-            cpf_cnpj: '12345678901',
-            phone_number: '11999999999',
+      await waitFor(() => {
+        expect(mockMutate).toHaveBeenCalledWith(
+          {
+            caseId: '123',
+            newSuspect: {
+              name: 'Novo Investigado',
+              cpf_cnpj: '12345678901',
+              phone_number: '11999999999',
+            },
           },
-        },
-        expect.any(Object)
-      );
+          expect.any(Object)
+        );
+      });
     });
 
-    it('deve desabilitar o botão de adicionar quando os campos obrigatórios não estão preenchidos', async () => {
+    it('deve desabilitar o botão de adicionar em lote quando os campos obrigatórios não estão preenchidos', async () => {
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
       await waitFor(() => {
-        const addButton = screen.getByRole('button', { name: '' });
-        expect(addButton).toBeDisabled();
+        const addBatchButton = screen.getByTestId('add-suspects-batch');
+        expect(addBatchButton).toBeDisabled();
+      });
+    });
+
+    it('não deve desabilitar o botão de adicionar individual', async () => {
+      render(renderWithClient(<GeneralInfoPage params={mockParams} />));
+
+      await waitFor(() => {
+        const addButton = screen.getByTestId('add-suspect');
+        expect(addButton).not.toBeDisabled();
       });
     });
 
     it('deve limpar os campos após adicionar um investigado com sucesso', async () => {
-      const mockMutate = vi.fn((_, { onSuccess }) => {
-        onSuccess();
+      const mockMutate = vi.fn((data, callbacks) => {
+        // Executa o callback onSuccess imediatamente
+        if (callbacks?.onSuccess) {
+          callbacks.onSuccess();
+        }
       });
       const mockRefetch = vi.fn();
       (useAddSuspect as Mock).mockReturnValue({
@@ -917,21 +913,30 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      await waitFor(() => {
-        const addSection = screen.getByTestId('add-investigated');
-        const inputs = addSection.querySelectorAll('input');
-        
-        fireEvent.change(inputs[0], { target: { value: 'Novo Investigado' } });
-        fireEvent.change(inputs[1], { target: { value: '12345678901' } });
-        fireEvent.change(inputs[2], { target: { value: '11999999999' } });
-      });
+      // Preenche os campos
+      const addSection = screen.getByTestId('add-investigated');
+      const inputs = addSection.querySelectorAll('input');
+      
+      fireEvent.change(inputs[0], { target: { value: 'Novo Investigado' } });
+      fireEvent.change(inputs[1], { target: { value: '12345678901' } });
+      fireEvent.change(inputs[2], { target: { value: '11999999999' } });
 
-      const addButton = screen.getByRole('button', { name: '' });
+      // Verifica que os campos foram preenchidos
+      expect(inputs[0]).toHaveValue('Novo Investigado');
+      expect(inputs[1]).toHaveValue('123.456.789-01'); // Formatado
+      expect(inputs[2]).toHaveValue('11999999999');
+
+      // Clica no botão de adicionar
+      const addButton = screen.getByTestId('add-suspect');
       fireEvent.click(addButton);
 
+      // Aguarda que a mutação seja chamada
       await waitFor(() => {
-        const addSection = screen.getByTestId('add-investigated');
-        const inputs = addSection.querySelectorAll('input');
+        expect(mockMutate).toHaveBeenCalled();
+      });
+
+      // Aguarda que os campos sejam limpos
+      await waitFor(() => {
         expect(inputs[0]).toHaveValue('');
         expect(inputs[1]).toHaveValue('');
         expect(inputs[2]).toHaveValue('');
@@ -1080,8 +1085,11 @@ describe('GeneralInfoPage', () => {
     });
 
     it('deve atualizar o contador após adicionar um investigado', async () => {
-      const mockMutate = vi.fn((_, { onSuccess }) => {
-        onSuccess();
+      const mockMutate = vi.fn((data, callbacks) => {
+        // Executa o callback onSuccess imediatamente
+        if (callbacks?.onSuccess) {
+          callbacks.onSuccess();
+        }
       });
       const mockRefetch = vi.fn();
       (useAddSuspect as Mock).mockReturnValue({
@@ -1096,18 +1104,22 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      await waitFor(() => {
-        const addSection = screen.getByTestId('add-investigated');
-        const inputs = addSection.querySelectorAll('input');
-        
-        fireEvent.change(inputs[0], { target: { value: 'Novo Investigado' } });
-        fireEvent.change(inputs[1], { target: { value: '12345678901' } });
-      });
+      const addSection = screen.getByTestId('add-investigated');
+      const inputs = addSection.querySelectorAll('input');
+      
+      fireEvent.change(inputs[0], { target: { value: 'Novo Investigado' } });
+      fireEvent.change(inputs[1], { target: { value: '12345678901' } });
 
-      const addButton = screen.getByRole('button', { name: '' });
+      const addButton = screen.getByTestId('add-suspect');
       fireEvent.click(addButton);
 
-      expect(mockRefetch).toHaveBeenCalled();
+      await waitFor(() => {
+        expect(mockMutate).toHaveBeenCalled();
+      });
+
+      await waitFor(() => {
+        expect(mockRefetch).toHaveBeenCalled();
+      });
     });
   });
 });

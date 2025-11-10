@@ -419,42 +419,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div className={styles.actionsBox} data-testid="case-action-buttons">
-            <h1 className={styles.title3}>{t('cases.title.actions')}</h1>
-            <div className={styles.actionsRow}>
-              <Button
-                size="medium"
-                label={t('cases.title.changeName')}
-                variant="contained"
-                onClick={() => setShowNameModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.changeSituation')}
-                variant="contained"
-                onClick={() => setShowSituationModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.allowView')}
-                variant="contained"
-                onClick={() => {
-                  setShowAllowVisualizationModal(true);
-                }}
-              />
-              <Button
-                size="small"
-                label={t('cases.title.changeResponsible')}
-                variant="contained"
-                data-testid="btn-change-responsible"
-                onClick={() => setShowChangeResponsibleModal(true)}
-              />
-              <Button
-                size="medium"
-                label={t('cases.title.delete')}
-                variant="outlined"
-                onClick={() => setShowDeleteCaseModal(true)}
-              />
-            </div>
+            
           </div>
 
           <div className={styles.investigatedSection} data-testid="investigated-section">
