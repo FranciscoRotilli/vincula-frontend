@@ -29,7 +29,7 @@ import {
   baseOptions,
   generateRelationshipName,
   getRelationshipSourceDatabase,
-  transformApiData,
+  transformApiData
 } from './utils';
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
@@ -121,7 +121,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const {
     data: graphData,
     isLoading: isLoadingGraph,
-    error: graphError,
+    error: graphError
   } = useCaseGraph(id, graphFilters);
 
   useEffect(() => {
@@ -176,6 +176,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       const wasFullscreen = isFullscreen;
       setIsFullscreen(isCurrentlyFullscreen);
 
+
       if (isCurrentlyFullscreen !== wasFullscreen && nvlRef.current) {
         setTimeout(() => {
           fitNodes();
@@ -195,25 +196,24 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         fitNodes();
       }, 100);
 
+
       return () => clearTimeout(timer);
     }
   }, [graphNodes, fitNodes]);
 
-  const handleExportImage = () => { // Pode remover o 'async', pois o método é síncrono
+  const handleExportImage = () => {
     if (!nvlRef.current) {
       console.error("Referência do NVL não encontrada para exportar.");
       return;
     }
 
     try {
-      // Basta chamar o método. Ele cuida de tudo, incluindo o download.
       nvlRef.current.saveFullGraphToLargeFile({
         filename: 'grafo-vinculos.png',
-        backgroundColor: '#ffffff' // É bom definir um fundo, ex: branco
+        backgroundColor: '#f1f1f1'
       });
-      
+
     } catch (error) {
-      // O seu log de erro antigo mencionava PDF, atualizei.
       console.error("Erro ao exportar a imagem:", error);
     }
   };
@@ -238,6 +238,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           throw new Error('Failed to fetch case data');
         }
         const data = await response.json();
+
 
         const suspects = data.suspects || [];
         const options = [
@@ -326,6 +327,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         />
       )}
 
+
       <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
         <div
           className={`${styles.graphContainer} ${!showFilters && !isFullscreen ? styles.graphContainerExpanded : ''}`}
@@ -351,17 +353,26 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
 
           <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
-              <button onClick={zoomIn} className={styles.controlButton}>
+              <button
+                onClick={zoomIn}
+                className={styles.controlButton}
+              >
                 <ZoomInIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.zoomOut')} placement="right">
-              <button onClick={zoomOut} className={styles.controlButton}>
+              <button
+                onClick={zoomOut}
+                className={styles.controlButton}
+              >
                 <ZoomOutIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.fitToScreen')} placement="right">
-              <button onClick={fitNodes} className={styles.controlButton}>
+              <button
+                onClick={fitNodes}
+                className={styles.controlButton}
+              >
                 <FitScreenIcon />
               </button>
             </Tooltip>
@@ -382,17 +393,13 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
               </button>
             </Tooltip>
 
-            <Tooltip title="Baixar Imagem do Grafo" placement="right">
-              <button
-                onClick={handleExportImage}
-                className={styles.controlButton}
-              >
+            <Tooltip title={t('graph.download')} placement="right">
+              <button onClick={handleExportImage} className={styles.controlButton}>
                 <DownloadIcon />
               </button>
             </Tooltip>
 
           </div>
-
           <Graph
             ref={nvlRef}
             nodes={graphNodes}
@@ -424,8 +431,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                     ? 'from' in selectedElement
                       ? generateRelationshipName(selectedElement, graphNodes)
                       : (selectedElement.properties?.name as string) ||
-                        selectedElement.caption ||
-                        'Nó'
+                      selectedElement.caption ||
+                      'Nó'
                     : ''
                 }
                 quantity={
@@ -447,6 +454,18 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 files={
                   selectedElement && 'from' in selectedElement
                     ? (() => {
+                      const fileNames = selectedElement.properties?.file_name;
+                      if (Array.isArray(fileNames)) {
+                        return fileNames;
+                      } else if (typeof fileNames === 'string') {
+                        return [fileNames];
+                      }
+                      return undefined;
+                    })()
+                    : selectedElement &&
+                      !('from' in selectedElement) &&
+                      selectedElement.properties?.type !== 'Person'
+                      ? (() => {
                         const fileNames = selectedElement.properties?.file_name;
                         if (Array.isArray(fileNames)) {
                           return fileNames;
@@ -455,18 +474,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                         }
                         return undefined;
                       })()
-                    : selectedElement &&
-                        !('from' in selectedElement) &&
-                        selectedElement.properties?.type !== 'Person'
-                      ? (() => {
-                          const fileNames = selectedElement.properties?.file_name;
-                          if (Array.isArray(fileNames)) {
-                            return fileNames;
-                          } else if (typeof fileNames === 'string') {
-                            return [fileNames];
-                          }
-                          return undefined;
-                        })()
                       : undefined
                 }
               />
