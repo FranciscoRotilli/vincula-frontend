@@ -170,8 +170,15 @@ export const texts = {
   'toastSuccess.handleRemoveArquivo': 'Arquivo removido com sucesso.',
   'toastError.caseData': 'Erro ao carregar os dados do caso.',
   'toastSuccess.addFile': 'Arquivo adicionado com sucesso.',
-  'toastError.addFile': 'Não foi possível adicionar o arquivo.'
-
+  'toastError.addFile': 'Não foi possível adicionar o arquivo.',
+  'listPeople.title': 'Usuários com Acesso',
+  'listPeople.titleWithCount': 'Usuários com Acesso ({count})',
+  'listPeople.description': 'Usuários que podem visualizar este caso além do responsável.',
+  'listPeople.noUsers': 'Nenhum usuário com acesso além do responsável.',
+  'listPeople.loading': 'Carregando...',
+  'listPeople.removeAccess': 'Remover acesso',
+  'listPeople.removeUserTitle': 'Remover acesso do usuário?',
+  'listPeople.removeUserWarning': 'O usuário não terá mais acesso a este caso.'
 } as const;
 
 export type TextKey = keyof typeof texts;

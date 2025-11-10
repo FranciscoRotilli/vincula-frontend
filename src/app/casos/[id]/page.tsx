@@ -15,6 +15,7 @@ import { CaseContainer } from '@/components/CaseContainer';
 import FilesSection from '@/components/FilesSection';
 import GenericTable from '@/components/GenericTable';
 import Input from '@/components/Input';
+import ListPeople from '@/components/ListPeople';
 import AddSuspectsBatchModal from '@/components/Modals/AddSuspectsBatchModal';
 import AllowVisualizationModal from '@/components/Modals/AllowVisualizationModal';
 import ChangeOwnerModal from '@/components/Modals/ChangeOwnerModal';
@@ -24,11 +25,14 @@ import {
   useAllowVisualization,
   useCaseById,
   useDeleteCase,
+  useRemoveUserAccess,
   useUpdateCaseName,
   useUpdateCaseOwner,
   useUpdateCaseSituation,
+  useUsersWithAccess,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
+import { useUsers } from '@/hooks/useUsers';
 import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
@@ -66,6 +70,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showAllowVisualizationModal, setShowAllowVisualizationModal] = useState(false);
   const [showChangeResponsibleModal, setShowChangeResponsibleModal] = useState(false);
+  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
   const [showRemoveFileModal, setShowRemoveFileModal] = useState<{
     open: boolean;
     index: number | null;
@@ -80,7 +85,14 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     index: null,
   });
-  const [showAddSuspectsBatchModal, setShowAddSuspectsBatchModal] = useState(false);
+  const [showRemoveUserModal, setShowRemoveUserModal] = useState<{
+    open: boolean;
+    userId: string | null;
+  }>({
+    open: false,
+    userId: null,
+  });
+  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -95,8 +107,11 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const deleteCaseMutation = useDeleteCase();
   const allowViewMutation = useAllowVisualization();
   const updateOwnerMutation = useUpdateCaseOwner();
+  const removeUserMutation = useRemoveUserAccess();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
+  const { data: users, isLoading: isLoadingUsers } = useUsers();
+  const { data: usersWithAccess = [] } = useUsersWithAccess(caseId);
 
   const addSuspectMutation = useAddSuspect();
   const deleteSuspectMutation = useDeleteSuspect();
@@ -266,6 +281,22 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     );
   };
 
+  const handleRemoveUser = (userId: string) => {
+    if (!userId) return;
+
+    removeUserMutation.mutate(
+      { caseId, userId },
+      {
+        onSuccess: () => {
+          setShowRemoveUserModal({ open: false, userId: null });
+        },
+        onError: (error) => {
+          console.error('Erro ao remover usuário:', error);
+        },
+      }
+    );
+  };
+
   const handleRemoveFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
     setShowRemoveFileModal({ open: false, index: null });
@@ -282,9 +313,9 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   };
 
   const suspectsColumns: Column<SuspectRow>[] = [
-    { key: 'name', label: 'NOME' },
+    { key: 'name', label: 'Nome' },
     { key: 'cpf_cnpj', label: 'CPF / CNPJ' },
-    { key: 'phone_number', label: 'TELEFONE' },
+    { key: 'phone_number', label: 'Telefone' },
   ];
 
   const suspectsRowActions = [
@@ -317,6 +348,7 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
       <div className={styles.loadingOrErrorContainer}>
         <div className={styles.errorContent}>
           <BiSolidError size={60} className={styles.errorIcon} />
+          <p>{t('cases.errorMessage')}</p>
           <div className={styles.errorButtons}>
             <Button
               size="medium"
@@ -324,6 +356,12 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               variant="error"
               className={styles.returnButton}
               onClick={() => router.push('/casos')}
+            />
+            <Button
+              size="medium"
+              label={t('cases.reload')}
+              variant="contained"
+              onClick={() => refetch()}
             />
           </div>
         </div>
@@ -417,9 +455,19 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           </div>
-
-          <div className={styles.actionsBox} data-testid="case-action-buttons">
-            
+          <div className={styles.allowedSection}>
+            <div className={styles.sectionHeader}>
+              <h1 className={styles.title3}>{t('listPeople.title')}</h1>
+            </div>
+            <div className={` ${styles.allowedTable}`}>
+              <ListPeople
+                caseId={caseId}
+                users={usersWithAccess}
+                onRemoveUser={(userId) => {
+                  setShowRemoveUserModal({ open: true, userId: userId.toString() });
+                }}
+              />
+            </div>
           </div>
 
           <div className={styles.investigatedSection} data-testid="investigated-section">
@@ -637,6 +685,21 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             onClose={() => setShowAddSuspectsBatchModal(false)}
             onSubmit={handleAddSuspectsBatch}
             isSubmitting={addSuspectsBatchMutation.isPending}
+          />
+        )}
+
+        {showRemoveUserModal.open && (
+          <ConfirmationModal
+            isOpen={showRemoveUserModal.open}
+            onClose={() => setShowRemoveUserModal({ open: false, userId: null })}
+            icon={<FiAlertCircle size={36} color="#ff3636" />}
+            title={t('listPeople.removeUserTitle')}
+            description={t('listPeople.removeUserWarning')}
+            primaryLabel={t('cases.title.remove')}
+            onPrimary={() => handleRemoveUser(showRemoveUserModal.userId!)}
+            secondaryLabel={t('cases.title.cancel')}
+            onSecondary={() => setShowRemoveUserModal({ open: false, userId: null })}
+            primaryLoading={removeUserMutation.isPending}
           />
         )}
       </div>

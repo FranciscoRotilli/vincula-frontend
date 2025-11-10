@@ -1,5 +1,6 @@
 'use client';
 
+import DownloadIcon from '@mui/icons-material/Download';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
@@ -154,6 +155,25 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       return () => clearTimeout(timer);
     }
   }, [graphNodes, fitNodes]);
+
+  const handleExportImage = () => { // Pode remover o 'async', pois o método é síncrono
+    if (!nvlRef.current) {
+      console.error("Referência do NVL não encontrada para exportar.");
+      return;
+    }
+
+    try {
+      // Basta chamar o método. Ele cuida de tudo, incluindo o download.
+      nvlRef.current.saveFullGraphToLargeFile({
+        filename: 'grafo-vinculos.png',
+        backgroundColor: '#ffffff' // É bom definir um fundo, ex: branco
+      });
+      
+    } catch (error) {
+      // O seu log de erro antigo mencionava PDF, atualizei.
+      console.error("Erro ao exportar a imagem:", error);
+    }
+  };
 
   const handleNodeClick = (node: Node) => {
     setSelectedElement(node as AppNode);
@@ -318,6 +338,16 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
               </button>
             </Tooltip>
+
+            <Tooltip title="Baixar Imagem do Grafo" placement="right">
+              <button
+                onClick={handleExportImage}
+                className={styles.controlButton}
+              >
+                <DownloadIcon />
+              </button>
+            </Tooltip>
+
           </div>
 
           <Graph
