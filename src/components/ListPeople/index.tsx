@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { RiDeleteBin6Line } from 'react-icons/ri';
+import { TbTrash } from 'react-icons/tb';
 
 import GenericTable from '@/components/GenericTable';
 import { t } from '@/texts';
@@ -31,7 +31,7 @@ export default function ListPeople({
 
   const rowActions = onRemoveUser ? [
     {
-      icon: <RiDeleteBin6Line size={18} color="var(--button-error)" />,
+      icon: <TbTrash style={{ color: 'red', fontSize: 20 }} />,
       label: t('listPeople.removeAccess'),
       onClick: (row: UserWithAccess) => {
         onRemoveUser(row.id);
