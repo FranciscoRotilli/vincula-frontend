@@ -181,7 +181,7 @@ const Filter: React.FC<FilterProps> = ({
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  });
+  }, [pathname]);
 
   const applySavedFilter = (sf: SavedFilter) => {
     const allowedKeys = new Set(fields.map(f => f.key));
