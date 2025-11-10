@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SuspectInput } from '@/types/Cases';
+import { SuspectRequest } from '@/types/Cases';
 
 import { addSuspect, deleteSuspect } from '../../src/services/suspectService';
 
@@ -17,9 +17,10 @@ describe('suspectService', () => {
   });
 
   describe('addSuspect', () => {
-    const suspect: SuspectInput = {
+    const suspect: SuspectRequest = {
       name: 'Fulano da Silva',
-      cpf: '123.456.789-00',
+      cpf_cnpj: '123.456.789-00',
+      phone_number: '(11) 98765-4321',
     };
 
     it('should call fetch with the correct URL, method, headers, and body', async () => {
@@ -35,7 +36,11 @@ describe('suspectService', () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(suspect),
+        body: JSON.stringify({
+          name: suspect.name,
+          cpf_cnpj: '12345678900',
+          phone_number: suspect.phone_number,
+        }),
       });
       expect(fetch).toHaveBeenCalledTimes(1);
     });
