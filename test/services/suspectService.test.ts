@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
 
 import { SuspectRequest } from '@/types/Cases';
 
 import { addSuspect, deleteSuspect } from '../../src/services/suspectService';
 
-vi.stubGlobal('fetch', vi.fn());
+const mockFetch = vi.fn() as MockedFunction<typeof fetch>;
+vi.stubGlobal('fetch', mockFetch);
 
 describe('suspectService', () => {
   const caseId = 'case-123';
@@ -24,9 +25,9 @@ describe('suspectService', () => {
     };
 
     it('should call fetch with the correct URL, method, headers, and body', async () => {
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
-      });
+      } as Response);
 
       await addSuspect(caseId, suspect);
 
@@ -47,10 +48,10 @@ describe('suspectService', () => {
 
     it('should throw an error if the fetch response is not ok', async () => {
       const errorStatusText = 'Bad Request';
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         statusText: errorStatusText,
-      });
+      } as Response);
 
       await expect(addSuspect(caseId, suspect)).rejects.toThrow(
         `Falha ao adicionar suspeito: ${errorStatusText}`
@@ -60,9 +61,9 @@ describe('suspectService', () => {
 
   describe('deleteSuspect', () => {
     it('should call fetch with the correct URL, method, and headers', async () => {
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
-      });
+      } as Response);
 
       await deleteSuspect(caseId, suspectId);
 
@@ -80,10 +81,10 @@ describe('suspectService', () => {
 
     it('should throw an error if the fetch response is not ok', async () => {
       const errorStatusText = 'Internal Server Error';
-      (fetch as vi.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         statusText: errorStatusText,
-      });
+      } as Response);
 
       await expect(deleteSuspect(caseId, suspectId)).rejects.toThrow(
         `Falha ao remover suspeito: ${errorStatusText}`
