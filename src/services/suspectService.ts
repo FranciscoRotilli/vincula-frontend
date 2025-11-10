@@ -1,14 +1,20 @@
 import { SuspectRequest } from '@/types/Cases';
+import { onlyNumbers } from '@/utils/functions';
 
 
 export async function addSuspect(caseId: string, suspect: SuspectRequest) {
+  const cleanedSuspect = {
+    ...suspect,
+    cpf_cnpj: onlyNumbers(suspect.cpf_cnpj),
+  };
+
   const resp = await fetch(`/api/case/${caseId}/suspect`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
-    body: JSON.stringify(suspect),
+    body: JSON.stringify(cleanedSuspect),
   });
 
   if (!resp.ok) {

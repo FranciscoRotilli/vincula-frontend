@@ -52,27 +52,70 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   };
 
   const graphFilters = useMemo(() => {
-    let cpfCnpjValue: string | undefined = undefined;
+    const identitiesArray: string[] = [];
 
-    if (filters.investigado) {
-      cpfCnpjValue = String(filters.investigado);
-    } else if (filters.cpfCnpj) {
-      const cpfCnpjInput = String(filters.cpfCnpj);
-      if (isValidCpfCnpjLength(cpfCnpjInput)) {
-        cpfCnpjValue = cpfCnpjInput;
+    if (filters.investigated) {
+      const investigatedValue = filters.investigated;
+      if (Array.isArray(investigatedValue)) {
+        if (investigatedValue.includes('')) {
+          const allCpfCnpj = investigated
+            .filter(option => option.value !== '')
+            .map(option => option.value);
+          identitiesArray.push(...allCpfCnpj);
+        } else {
+          identitiesArray.push(...investigatedValue.filter(v => v));
+        }
+      } else if (typeof investigatedValue === 'string' && investigatedValue) {
+        identitiesArray.push(investigatedValue);
+      }
+    }
+
+    if (filters.identities) {
+      const identitiesInput = String(filters.identities);
+      if (isValidCpfCnpjLength(identitiesInput)) {
+        identitiesArray.push(identitiesInput);
+      }
+    }
+
+    const originArray: string[] = [];
+    if (filters.baseDados) {
+      const originValue = filters.baseDados;
+      if (Array.isArray(originValue)) {
+        originArray.push(...originValue.filter(v => v));
+      } else if (typeof originValue === 'string' && originValue) {
+        originArray.push(originValue);
+      }
+    }
+
+    const archiveArray: string[] = [];
+    if (filters.archive) {
+      const archiveValue = filters.archive;
+      if (Array.isArray(archiveValue)) {
+        if (archiveValue.includes('')) {
+          const allFiles = file
+            .filter(option => option.value !== '')
+            .map(option => option.value);
+          archiveArray.push(...allFiles);
+        } else {
+          archiveArray.push(...archiveValue.filter(v => v));
+        }
+      } else if (typeof archiveValue === 'string' && archiveValue) {
+        archiveArray.push(archiveValue);
       }
     }
 
     return {
-      cpf_cnpj: cpfCnpjValue,
-      investigated: filters.nome ? String(filters.nome) : undefined,
-      origin: filters.baseDados ? String(filters.baseDados) : undefined,
-      file: filters.arquivo ? String(filters.arquivo) : undefined,
+      identities: identitiesArray.length > 0 ? identitiesArray : undefined,
+      investigated: filters.nome ? [String(filters.nome)] : undefined,
+      origin: originArray.length > 0 ? originArray : undefined,
+      archive: archiveArray.length > 0 ? archiveArray : undefined,
     };
-  }, [filters]);
+  }, [filters, investigated, file]);
 
   const hasActiveFilters = useMemo(() => {
-    return Object.values(graphFilters).some((value) => value !== undefined && value !== '');
+    return Object.values(graphFilters).some((value) => 
+      Array.isArray(value) ? value.length > 0 : value !== undefined && value !== ''
+    );
   }, [graphFilters]);
 
   const {
@@ -207,10 +250,10 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         ];
         setInvestigated(options);
 
-        const caseFiles = data.files || [];
-        const fileOptions = caseFiles.map((a: { name: string, id: string }) => ({
-          value: a.id,
-          label: a.name,
+        const caseFiles = data.archives || [];
+        const fileOptions = caseFiles.map((archive: { name: string, id: string }) => ({
+          value: archive.name,
+          label: archive.name,
         }));
         setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
@@ -223,23 +266,23 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
 
   const filterFields: FieldConfig[] = [
     {
-      key: 'investigado',
-      label: 'Investigado (CPF/CNPJ)',
+      key: 'investigated',
+      label: 'Investigado',
       type: 'multi-select',
       options: investigated,
       placeholder: 'Selecione',
     },
     { key: 'nome', label: 'Nome', type: 'input', placeholder: 'Digite o nome' },
-    { key: 'cpfCnpj', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
+    { key: 'identities', label: 'CPF/CNPJ', type: 'input', placeholder: 'Digite o CPF/CNPJ' },
     {
       key: 'baseDados',
       label: 'Base de dados',
-      type: 'select',
+      type: 'multi-select',
       options: baseOptions,
       placeholder: 'Selecione',
     },
     {
-      key: 'arquivo',
+      key: 'archive',
       label: 'Arquivo',
       type: 'multi-select',
       options: file,
@@ -257,7 +300,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   };
 
   const validateFilterField = (key: string, value: string): string | undefined => {
-    if (key === 'cpfCnpj' && value) {
+    if (key === 'identities' && value) {
       if (!isValidCpfCnpjLength(value)) {
         return ' ';
       }

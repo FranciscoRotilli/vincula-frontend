@@ -41,6 +41,15 @@ export default function MultiSelectDropdown({
 
   const rootRef = useRef<HTMLDivElement | null>(null);
 
+  const defaultSelectedStr = JSON.stringify(defaultSelected);
+  useEffect(() => {
+    const newDefaults = JSON.parse(defaultSelectedStr) as string[];
+    const currentStr = JSON.stringify(selected);
+    if (currentStr !== defaultSelectedStr) {
+      setSelected(newDefaults);
+    }
+  }, [defaultSelectedStr]);
+
   useEffect(() => {
     if (!expanded) return;
     const onDocClick = (e: MouseEvent) => {

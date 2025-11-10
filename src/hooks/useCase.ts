@@ -42,9 +42,9 @@ export function useUpdateCaseName() {
     mutationFn: ({ caseId, name }: { caseId: string; name: string }) =>
       updateCaseName(caseId, name),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['case', variables.caseId]});
-      queryClient.invalidateQueries({queryKey: ['cases']});
-    }
+      queryClient.invalidateQueries({ queryKey: ['case', variables.caseId] });
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
+    },
   });
 }
 
@@ -73,8 +73,8 @@ export function useDeleteCase() {
 
   return useMutation({
     mutationFn: (caseId: string) => deleteCase(caseId),
-    onSuccess: (_data, caseId) => { 
-      queryClient.invalidateQueries({ queryKey: ['cases'] }); 
+    onSuccess: (_data, caseId) => {
+      queryClient.invalidateQueries({ queryKey: ['cases'] });
       queryClient.invalidateQueries({ queryKey: ['case', caseId] });
     },
   });
@@ -111,29 +111,33 @@ export function useCaseById(caseId: string) {
     refetchOnWindowFocus: false,
   });
 
-  return queryResult;
+  localStorage.removeItem(`case`);
 
+  if (queryResult.isSuccess) {
+    localStorage.setItem(`case`, JSON.stringify(queryResult.data));
+  }
+
+  return queryResult;
 }
 
 export function useAllowVisualization() {
-    const queryClient = useQueryClient();
-    
-    return useMutation({
-        mutationFn: ({ caseId, userId }: { caseId: string; userId: string}) =>
-            allowUserToViewCase(caseId, userId),
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['caseUsers', variables.caseId] });
-        },
-    });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
+      allowUserToViewCase(caseId, userId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['caseUsers', variables.caseId] });
+    },
+  });
 }
 
 export function useCaseGraph(caseId: string, filters?: GraphFilters) {
   return useQuery({
     queryKey: [
-      'caseGraph', 
-      caseId, 
+      'caseGraph',
+      caseId,
       filters?.investigated,
-      filters?.cpf_cnpj,
+      filters?.identities,
       filters?.origin,
       filters?.archive,
     ],
@@ -154,7 +158,7 @@ export function useUsersWithAccess(caseId: string) {
 
 export function useRemoveUserAccess() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ caseId, userId }: { caseId: string; userId: string }) =>
       removeUserAccess(caseId, userId),

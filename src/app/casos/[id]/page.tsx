@@ -32,7 +32,6 @@ import {
   useUsersWithAccess,
 } from '@/hooks/useCase';
 import { useAddSuspect, useAddSuspectsBatch, useDeleteSuspect } from '@/hooks/useSuspect';
-import { useUsers } from '@/hooks/useUsers';
 import { getCurrentUser } from '@/services/auth';
 import { t } from '@/texts';
 import { CaseItem, SuspectRequest } from '@/types/Cases';
@@ -92,7 +91,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
     open: false,
     userId: null,
   });
-  const [novoResponsavel, setNovoResponsavel] = useState('');
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newCpf, setNewCpf] = useState('');
@@ -110,7 +108,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
   const removeUserMutation = useRemoveUserAccess();
 
   const { data: caseDetails, isLoading, isError, refetch } = useCaseById(caseId);
-  const { data: users, isLoading: isLoadingUsers } = useUsers();
   const { data: usersWithAccess = [] } = useUsersWithAccess(caseId);
 
   const addSuspectMutation = useAddSuspect();
@@ -556,7 +553,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateName}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowNameModal(false)}
             primaryLoading={updateNameMutation.isPending}
           >
             <input
@@ -581,7 +577,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={handleUpdateSituation}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowSituationModal(false)}
             primaryLoading={updateSituationMutation.isPending}
           >
             <select
@@ -634,7 +629,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
             onPrimary={() => handleRemoveFile(showRemoveFileModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveFileModal({ open: false, index: null })}
           />
         )}
 
@@ -651,7 +645,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.remove', { defaultValue: 'Remover' })}
             onPrimary={() => handleRemoveSuspect(showRemoveSuspectModal.index!)}
             secondaryLabel={t('cases.title.cancel', { defaultValue: 'Cancelar' })}
-            onSecondary={() => setShowRemoveSuspectModal({ open: false, index: null })}
           />
         )}
 
@@ -665,7 +658,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.save')}
             onPrimary={() => setShowUploadModal(false)}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowUploadModal(false)}
           ></ConfirmationModal>
         )}
 
@@ -698,7 +690,6 @@ export default function GeneralInfoPage({ params }: { params: Promise<{ id: stri
             primaryLabel={t('cases.title.remove')}
             onPrimary={() => handleRemoveUser(showRemoveUserModal.userId!)}
             secondaryLabel={t('cases.title.cancel')}
-            onSecondary={() => setShowRemoveUserModal({ open: false, userId: null })}
             primaryLoading={removeUserMutation.isPending}
           />
         )}
