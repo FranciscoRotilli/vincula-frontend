@@ -1,5 +1,8 @@
 import type { Node, Relationship } from '@neo4j-nvl/base';
 
+import { useCaseById } from '@/hooks/useCase';
+import { Suspect } from '@/types/Cases';
+
 import { Suspect } from '@/types/Cases';
 
 export interface AppNode extends Node {
@@ -104,9 +107,10 @@ export const calculateNodeSize = (
 
 };
 
-export const transformApiData = (
-  apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
-  const allQuantities = apiData.edges.map(edge => edge.quantity).filter(q => q != null) as number[];
+export const transformApiData = 
+  (apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
+  const allQuantities = apiData.edges.map(edge => edge.quantity)
+  .filter(q => q != null) as number[];
 
   const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
     return {
@@ -116,7 +120,8 @@ export const transformApiData = (
       caption: String(rawEdge.quantity || ''),
       width: rawEdge.quantity ? calculateWidth(rawEdge.quantity, allQuantities) : 1,
       properties: {
-        file_name: Array.isArray(rawEdge.file_name) ? rawEdge.file_name.join(', ') : rawEdge.file_name,
+        file_name: Array.isArray(rawEdge.file_name) ? 
+          rawEdge.file_name.join(', ') : rawEdge.file_name,
         quantity: rawEdge.quantity,
         rif_involvment: rawEdge.rif_involvment,
       },
