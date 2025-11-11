@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert, CircularProgress, Paper } from '@mui/material';
-import { useEffect, useMemo,useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 
 import Button from '@/components/Button';
@@ -54,7 +54,7 @@ export default function VinculosDadosPage({ params }: PageProps) {
   const [storedFilters, setStoredFilters] = useState<{ name: string; values: FilterValues }[]>([]);
   const [suspects, setSuspects] = useState<SuspectOption[]>([]);
 
-  const fetchStoredCaseData = () => {
+  const fetchStoredCaseData = useCallback(() => {
     if (!id) return;
     try {
       setFilesError(null);
@@ -86,15 +86,15 @@ export default function VinculosDadosPage({ params }: PageProps) {
     } finally {
       setIsLoadingFiles(false);
     }
-  };
+  }, [id]);
 
-  const fetchStoredCaseFilters = () => {
+  const fetchStoredCaseFilters = useCallback(() => {
     if (!id) return;
     const savedFilters = localStorage.getItem(`savedFilters_case_${id}`);
     if (!savedFilters) return;
     const parsedFilters = JSON.parse(savedFilters);
     setStoredFilters(parsedFilters);
-  };
+  }, [id]);
 
   const handleFilter = (newFilters: FilterValues) => {
     const formattedFilters = {
@@ -260,7 +260,7 @@ export default function VinculosDadosPage({ params }: PageProps) {
   useEffect(() => {
     fetchStoredCaseData();
     fetchStoredCaseFilters();
-  }, [id]);
+  }, [id, fetchStoredCaseData, fetchStoredCaseFilters]);
 
   return (
     <CaseContainer caseId={id}>

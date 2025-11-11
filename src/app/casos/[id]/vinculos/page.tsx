@@ -21,6 +21,7 @@ import { GraphAlerts } from '@/components/GraphAlerts';
 import NodeModal from '@/components/NodeModal';
 import { useCaseById, useCaseGraph } from '@/hooks/useCase';
 import { t } from '@/texts';
+import { Suspect } from '@/types/Cases';
 
 import styles from './page.module.css';
 import {
@@ -31,7 +32,6 @@ import {
   getRelationshipSourceDatabase,
   transformApiData
 } from './utils';
-import { Suspect } from '@/types/Cases';
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
   const { id } = use(params);
@@ -135,7 +135,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       setGraphNodes(nodes);
       setGraphRels(rels);
     }
-  }, [graphData]);
+  }, [graphData, suspects]);
 
   const fitNodes = useCallback(() => {
     if (nvlRef.current && graphNodes.length > 0) {
