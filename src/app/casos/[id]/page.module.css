@@ -72,7 +72,7 @@
 }
 
 .caseDetails {
-  max-height: 12.375rem;
+  min-height: 15rem;
   position: relative;
   overflow: auto;
   stroke: var(--gray);
@@ -97,7 +97,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
-  row-gap: 1rem;
+  row-gap: 1.5rem;
+  font-size: 1.1rem;
+  margin-top: 1rem
 }
 
 .suspectsBox {
@@ -126,8 +128,8 @@
 .allowedSection {
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  max-height: 32.4375rem; 
+  min-height: 15rem;
+  max-height: 40rem;
   position: relative;
   background: var(--white);
   border-radius: 0.3125rem; 
@@ -135,19 +137,15 @@
 }
 .allowedTable {
   overflow: auto;
-  max-height: 6.500rem;
+  max-height: 12rem;
   border-radius: 0.3125rem;
-  margin-top: -20px;
-
 }
-
 
 .investigatedButtons {
   display: flex;
   flex-direction: row;
   row-gap: 1rem;
 }
-
 
 .sectionHeader {
   display: flex;
@@ -167,7 +165,7 @@
 }
 
 .h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
 }
 
