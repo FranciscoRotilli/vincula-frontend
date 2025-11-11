@@ -27,7 +27,17 @@ export async function apiFetch(
 
   if (resp.status === 401) {
     const newAccess = await tryRefreshAndGetAccess();
-    if (newAccess) resp = await doFetch(newAccess);
+    if (newAccess) {
+      resp = await doFetch(newAccess);
+    } else {
+      const headers = new Headers(resp.headers);
+      headers.set('X-Auth-Required', 'true');
+      return new Response(resp.body, {
+        status: 401,
+        statusText: resp.statusText,
+        headers,
+      });
+    }
   }
 
   return resp;
@@ -60,7 +70,17 @@ export async function apiFetchFormData(
 
   if (resp.status === 401) {
     const newAccess = await tryRefreshAndGetAccess();
-    if (newAccess) resp = await doFetch(newAccess);
+    if (newAccess) {
+      resp = await doFetch(newAccess);
+    } else {
+      const headers = new Headers(resp.headers);
+      headers.set('X-Auth-Required', 'true');
+      return new Response(resp.body, {
+        status: 401,
+        statusText: resp.statusText,
+        headers,
+      });
+    }
   }
 
   return resp;
