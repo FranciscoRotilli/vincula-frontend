@@ -34,6 +34,9 @@ vi.mock('@/hooks/useCase', () => ({
     isLoading: false, 
     error: null 
   })),
+  useCaseById: vi.fn(() => {
+    caseId: null
+  })
 }));
 
 // Mock do componente Graph
