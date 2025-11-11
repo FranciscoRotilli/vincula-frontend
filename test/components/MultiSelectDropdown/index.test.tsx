@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import React, { useMemo } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -73,7 +73,7 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(within(listbox).getAllByRole('option')).toHaveLength(MANY_OPTIONS.length);
   });
 
-  it('selects multiple options and displays the chips (called onChange)', () => {
+  it('selects multiple options and displays the chips (called onChange)', async () => {
     const { field, onChange } = setup();
 
     fireEvent.click(field);
@@ -82,7 +82,9 @@ describe('MultiSelectDropdown (essencial)', () => {
     fireEvent.click(within(listbox).getByRole('option', { name: 'Opção A1' }));
     fireEvent.click(within(listbox).getByRole('option', { name: 'Opção A2' }));
 
-    expect(screen.queryByText('Selecionar')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Selecionar')).not.toBeInTheDocument();
+    });
 
     expect(within(field).getByText('Opção A1')).toBeInTheDocument();
     expect(within(field).getByText('Opção A2')).toBeInTheDocument();
@@ -91,13 +93,16 @@ describe('MultiSelectDropdown (essencial)', () => {
     expect(last).toEqual(expect.arrayContaining(['a1', 'a2']));
   });
 
-  it('remove chip by “×” and update selection', () => {
+  it('remove chip by "×" and update selection', async () => {
     const { field, onChange } = setup(FEW_OPTIONS, { defaultSelected: ['a1', 'a2'] });
 
     expect(within(field).getByText('Opção A1')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /remover opção a1/i }));
-    expect(within(field).queryByText('Opção A1')).not.toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(within(field).queryByText('Opção A1')).not.toBeInTheDocument();
+    });
 
     const last = onChange.mock.calls.at(-1)?.[0];
     expect(last).toEqual(expect.arrayContaining(['a2']));
@@ -142,7 +147,7 @@ describe('MultiSelectDropdown (essencial)', () => {
 });
 
 describe('MultiSelectDropdown (estresse)', () => {
-  it('remains stable with many selections and keeps the menu functional', () => {
+  it('remains stable with many selections and keeps the menu functional', async () => {
     const { field, onChange } = setup(MANY_OPTIONS);
 
     fireEvent.click(field);
@@ -152,8 +157,10 @@ describe('MultiSelectDropdown (estresse)', () => {
       fireEvent.click(within(listbox).getByRole('option', { name: label }));
     });
 
-    ['Opção A1', 'Opção A2', 'Opção A3', 'Opção A4', 'Opção A5', 'Opção A6'].forEach((label) => {
-      expect(within(field).getByText(label)).toBeInTheDocument();
+    await waitFor(() => {
+      ['Opção A1', 'Opção A2', 'Opção A3', 'Opção A4', 'Opção A5', 'Opção A6'].forEach((label) => {
+        expect(within(field).getByText(label)).toBeInTheDocument();
+      });
     });
 
     const last = onChange.mock.calls.at(-1)?.[0];

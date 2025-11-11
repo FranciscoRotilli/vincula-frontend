@@ -44,10 +44,7 @@ export default function MultiSelectDropdown({
   const defaultSelectedStr = JSON.stringify(defaultSelected);
   useEffect(() => {
     const newDefaults = JSON.parse(defaultSelectedStr) as string[];
-    const currentStr = JSON.stringify(selected);
-    if (currentStr !== defaultSelectedStr) {
-      setSelected(newDefaults);
-    }
+    setSelected(newDefaults);
   }, [defaultSelectedStr]);
 
   useEffect(() => {

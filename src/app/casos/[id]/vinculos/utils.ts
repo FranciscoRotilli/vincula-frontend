@@ -1,6 +1,6 @@
-import { useCaseById } from '@/hooks/useCase';
-import { Suspect } from '@/types/Cases';
 import type { Node, Relationship } from '@neo4j-nvl/base';
+
+import { Suspect } from '@/types/Cases';
 
 export interface AppNode extends Node {
   properties: Record<string, unknown>;
@@ -104,7 +104,8 @@ export const calculateNodeSize = (
 
 };
 
-export const transformApiData = (apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
+export const transformApiData = (
+  apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
   const allQuantities = apiData.edges.map(edge => edge.quantity).filter(q => q != null) as number[];
 
   const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
