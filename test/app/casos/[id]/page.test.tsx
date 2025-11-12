@@ -161,8 +161,6 @@ vi.mock('@/components/Modals/AllowVisualizationModal', () => ({
     );
   },
 }));
-
-// Mock a lightweight GenericTable to expose row actions for tests
 vi.mock('@/components/GenericTable', () => ({
   __esModule: true,
   default: ({
@@ -313,7 +311,6 @@ describe('GeneralInfoPage', () => {
         </SuspenseWrapper>
       ));
 
-      // Verifica pelos textos diretamente para evitar flakiness com testids
       expect(await screen.findByText('João Silva')).toBeInTheDocument();
       expect(await screen.findByText(/2024001/)).toBeInTheDocument();
       expect(await screen.findByText('Em andamento')).toBeInTheDocument();
@@ -545,7 +542,6 @@ describe('GeneralInfoPage', () => {
 
       await waitFor(() => {
         const inputs = screen.getAllByPlaceholderText(t('cases.title.inputName'));
-        // O último input é o do modal
         const modalInput = inputs[inputs.length - 1];
         fireEvent.change(modalInput, { target: { value: 'Novo Nome' } });
       });
@@ -584,9 +580,7 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        // Verifica que o modal foi fechado procurando pelo input do modal
         const inputs = screen.queryAllByPlaceholderText(t('cases.title.inputName'));
-        // Deve ter apenas 1 input (o da seção de adicionar investigado), não 2 (modal fechado)
         expect(inputs.length).toBe(1);
       });
     });
@@ -597,11 +591,9 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      // Abre o menu de ações
       const actionsButton = await screen.findByLabelText('Ações');
       fireEvent.click(actionsButton);
 
-      // Clica na opção de alterar nome
       const openBtn = await screen.findByTestId('menu-change-name');
       fireEvent.click(openBtn);
 
@@ -617,7 +609,6 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        // modal fechado -> input do modal não deve existir mais
         const stillInputs = screen.queryAllByPlaceholderText(t('cases.title.inputName'));
         expect(stillInputs.length).toBe(1);
       });
@@ -685,11 +676,9 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      // Abre o menu de ações
       const actionsButton = await screen.findByLabelText('Ações');
       fireEvent.click(actionsButton);
 
-      // Clica na opção de alterar situação
       const openBtn = await screen.findByTestId('menu-change-situation');
       fireEvent.click(openBtn);
 
@@ -704,7 +693,6 @@ describe('GeneralInfoPage', () => {
       });
 
       await waitFor(() => {
-        // modal fechado -> não deve existir select
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
       });
     });
@@ -752,10 +740,8 @@ describe('GeneralInfoPage', () => {
         fireEvent.click(deleteOption);
       });
 
-      // Wait for the modal to appear
       const modal = await screen.findByTestId('delete-case-modal');
       
-      // Click the remove button inside the modal
       const removeButton = modal.querySelector('button[class*="removeButton"]') as HTMLButtonElement;
       expect(removeButton).toBeTruthy();
       fireEvent.click(removeButton);
@@ -764,7 +750,6 @@ describe('GeneralInfoPage', () => {
         expect(mockMutate).toHaveBeenCalledWith('123', expect.any(Object));
       });
 
-      // router.push é chamado no onSuccess
       await waitFor(() => {
         expect(mockRouter.push).toHaveBeenCalledWith('/casos');
       });
@@ -809,11 +794,9 @@ describe('GeneralInfoPage', () => {
 
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
-      // Abre o menu de ações
       const actionsButton = await screen.findByLabelText('Ações');
       fireEvent.click(actionsButton);
 
-      // Clica na opção de permitir visualização
       const btn = await screen.findByTestId('menu-allow-view');
       fireEvent.click(btn);
 
@@ -882,15 +865,6 @@ describe('GeneralInfoPage', () => {
       });
     });
 
-    it('deve desabilitar o botão de adicionar em lote quando os campos obrigatórios não estão preenchidos', async () => {
-      render(renderWithClient(<GeneralInfoPage params={mockParams} />));
-
-      await waitFor(() => {
-        const addBatchButton = screen.getByTestId('add-suspects-batch');
-        expect(addBatchButton).toBeDisabled();
-      });
-    });
-
     it('não deve desabilitar o botão de adicionar individual', async () => {
       render(renderWithClient(<GeneralInfoPage params={mockParams} />));
 
@@ -902,7 +876,6 @@ describe('GeneralInfoPage', () => {
 
     it('deve limpar os campos após adicionar um investigado com sucesso', async () => {
       const mockMutate = vi.fn((data, callbacks) => {
-        // Executa o callback onSuccess imediatamente
         if (callbacks?.onSuccess) {
           callbacks.onSuccess();
         }

@@ -1,4 +1,4 @@
-enum FileOrigin {
+export enum FileOrigin {
   SIMBA,
   SITTEL,
   RIFF,
