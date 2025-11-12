@@ -26,3 +26,5 @@ export const ZoomIn = Stub
 export const ZoomOut = Stub
 export const MoreVert = Stub
 export const Add = Stub
+export const CalendarMonth = Stub
+export const Search = Stub

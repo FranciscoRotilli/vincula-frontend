@@ -1,206 +1,287 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { vi } from 'vitest'
+vi.mock('@/services/caseService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/services/caseService')>()
+  return { ...actual }
+})
 
-import { addCase, getCases } from "../../src/services/caseService";
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-vi.mock('../../src/services/caseService', async () => {
-  const actual = await vi.importActual('../../src/services/caseService');
-  return {
-    ...actual,
-    addCase: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 1, name: 'Test Case' } })),
-    getCases: vi.fn().mockImplementation(() => Promise.resolve({ data: { items: [], total: 0 } }))
-  };
-});
+import {
+  addCase,
+  allowUserToViewCase,
+  deleteCase,
+  getCaseById,
+  getCaseGraph,
+  getCases,
+  updateCaseCanView,
+  updateCaseName,
+  updateCaseSituation,
+} from '@/services/caseService'
 
-describe("CaseService", () => {
+type FetchCall = [RequestInfo, RequestInit?]
+
+function okJson(data: any, init: Partial<Response> = {}) {
+  return Promise.resolve({
+    ok: true,
+    status: init.status ?? 200,
+    json: async () => data,
+  } as Response)
+}
+function notOkJson(status: number, payload: any) {
+  return Promise.resolve({
+    ok: false,
+    status,
+    json: async () => payload,
+  } as Response)
+}
+function notOkNoJson(status: number) {
+  return Promise.resolve({
+    ok: false,
+    status,
+    json: async () => {
+      throw new Error('bad json')
+    },
+  } as unknown as Response)
+}
+function okNoJson(status = 200) {
+  return Promise.resolve({
+    ok: true,
+    status,
+    json: async () => {
+      throw new Error('no body')
+    },
+  } as unknown as Response)
+}
+
+describe('caseService', () => {
+  const fetchMock = vi.fn<[], Promise<Response>>()
+
   beforeEach(() => {
-    localStorage.clear();
-    localStorage.setItem('access_token', 'test-token');
-    vi.clearAllMocks();
-  });
+    vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockReset()
+  })
 
-  describe("addCase", () => {
-    it("should be a function", () => {
-      expect(typeof addCase).toBe("function");
-    });
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
 
-    it("should accept a string parameter", async () => {
-      await expect(addCase("Test Case")).resolves.toBeDefined();
-      expect(addCase).toHaveBeenCalledWith("Test Case");
-    });
+  describe('addCase', () => {
+    it('POSTs and returns body on success', async () => {
+      const body = { caseName: 'Created' }
+      fetchMock.mockImplementation(() => okJson(body))
 
-    it("should return a Promise", () => {
-      const result = addCase("Test Case");
-      expect(result).toBeInstanceOf(Promise);
-    });
+      const res = await addCase('Created')
+      expect(res).toEqual(body)
 
-    it("should handle different case names", async () => {
-      await addCase("Simple Case");
-      await addCase("Case with Numbers 123");
-      await addCase("Case with Special Chars!@#");
-      await addCase("");
-      
-      expect(addCase).toHaveBeenCalledTimes(4);
-    });
-  });
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case')
+      expect(init?.method).toBe('POST')
+      expect(init?.headers).toMatchObject({ 'Content-Type': 'application/json' })
+      expect(init?.body).toBe(JSON.stringify({ name: 'Created' }))
+    })
 
-  describe("getCases", () => {
-    it("should be a function", () => {
-      expect(typeof getCases).toBe("function");
-    });
+    it('throws message from server when !ok and JSON has message', async () => {
+      fetchMock.mockImplementation(() => notOkJson(400, { message: 'Falhou bonito' }))
+      await expect(addCase('X')).rejects.toThrow('Falhou bonito')
+    })
 
-    it("should accept correct parameter types", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = { name: "test", owner: "user", status: "Em andamento" as const };
-      const sorting = { sort_by: "name" as const, sort_dir: "asc" as const };
+    it('throws fallback when !ok and JSON is invalid', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(500))
+      await expect(addCase('X')).rejects.toThrow('Falha ao criar caso (status 500)')
+    })
+  })
 
-      await expect(getCases(pagination, filters, sorting)).resolves.toBeDefined();
-      expect(getCases).toHaveBeenCalledWith(pagination, filters, sorting);
-    });
+  describe('getCases', () => {
+    it('GETs with merged query string and returns JSON', async () => {
+      const data = { items: [{ id: 1 }], total: 1 }
+      fetchMock.mockImplementation(() => okJson(data))
 
-    it("should return a Promise", () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = {};
-      const sorting = {};
+      const pagination = { page: 2, limit: 10 }
+      const filters = { name: 'abc', owner: 'me', status: 'Em andamento' as const }
+      const sorting = { sort_by: 'name' as const, sort_dir: 'asc' as const }
 
-      const result = getCases(pagination, filters, sorting);
-      expect(result).toBeInstanceOf(Promise);
-    });
+      const res = await getCases(pagination, filters, sorting)
+      expect(res).toEqual(data)
 
-    it("should handle empty parameters", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const emptyFilters = {};
-      const emptySorting = {};
+      const [url] = fetchMock.mock.calls[0] as [string, RequestInit]
+      const qs = url.split('?')[1] ?? ''
+      const params = new URLSearchParams(qs)
 
-      await getCases(pagination, emptyFilters, emptySorting);
-      expect(getCases).toHaveBeenCalledWith(pagination, emptyFilters, emptySorting);
-    });
+      expect(params.get('page')).toBe('2')
+      expect(params.get('limit')).toBe('10')
+      expect(params.get('name')).toBe('abc')
+      expect(params.get('owner')).toBe('me')
+      expect(params.get('status')).toBe('Em andamento')
+      expect(params.get('sort_by')).toBe('name')
+      expect(params.get('sort_dir')).toBe('asc')
+    })
 
-    it("should handle different pagination values", async () => {
-      const filters = {};
-      const sorting = {};
+    it('throws translated fallback on non-ok with invalid JSON', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(503))
+      await expect(getCases({ page: 1, limit: 5 }, {}, {})).rejects.toThrow(
+        'Falha ao listar casos (status 503)',
+      )
+    })
+  })
 
-      await getCases({ page: 1, limit: 10 }, filters, sorting);
-      await getCases({ page: 2, limit: 20 }, filters, sorting);
-      await getCases({ page: 10, limit: 50 }, filters, sorting);
-      
-      expect(getCases).toHaveBeenCalledTimes(3);
-    });
+  describe('getCaseById', () => {
+    it('GETs by id', async () => {
+      const data = { id: 'abc', name: 'Case X' }
+      fetchMock.mockImplementation(() => okJson(data))
+      const res = await getCaseById('abc')
+      expect(res).toEqual(data)
 
-    it("should handle different filter combinations", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const sorting = {};
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/abc')
+      expect(init?.method).toBe('GET')
+    })
 
-      await getCases(pagination, { name: "test" }, sorting);
-      await getCases(pagination, { owner: "user" }, sorting);
-      await getCases(pagination, { status: "Em andamento" }, sorting);
-      await getCases(pagination, { 
-        name: "test", 
-        owner: "user", 
-        status: "Encerrado" 
-      }, sorting);
-      
-      expect(getCases).toHaveBeenCalledTimes(4);
-    });
+    it('throws translated message on error', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(404))
+      await expect(getCaseById('nope')).rejects.toThrow('Falha ao buscar caso (status 404)')
+    })
+  })
 
-    it("should handle different sorting options", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = {};
+  describe('updateCaseName', () => {
+    it('PATCH and returns { data: Promise, name: status } per implementation', async () => {
+      fetchMock.mockImplementation(() => okJson({ ok: true }, { status: 207 }))
 
-      await getCases(pagination, filters, { 
-        sort_by: "name", 
-        sort_dir: "asc" 
-      });
-      
-      await getCases(pagination, filters, { 
-        sort_by: "status", 
-        sort_dir: "desc" 
-      });
-      
-      await getCases(pagination, filters, { 
-        sort_by: "creation_date", 
-        sort_dir: "asc" 
-      });
-      
-      expect(getCases).toHaveBeenCalledTimes(3);
-    });
+      const res = await updateCaseName('id1', 'New Name')
+      expect(res).toMatchObject({ name: 207 })
+      expect(typeof (res as any).data?.then).toBe('function')
 
-    it("should handle all valid status values", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const sorting = {};
+      const resolved = await (res as any).data
+      expect(resolved).toEqual({ ok: true })
 
-      const validStatuses = ["Em andamento", "Suspenso", "Encerrado"] as const;
-      
-      for (const status of validStatuses) {
-        await getCases(pagination, { status }, sorting);
-      }
-      
-      expect(getCases).toHaveBeenCalledTimes(validStatuses.length);
-    });
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/id1')
+      expect(init?.method).toBe('PATCH')
+      expect(init?.body).toBe(JSON.stringify({ name: 'New Name' }))
+    })
 
-    it("should handle all valid sort_by values", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = {};
+    it('throws translated message on !ok', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(400))
+      await expect(updateCaseName('id1', 'X')).rejects.toThrow(
+        'Falha ao atualizar nome do caso (status 400)',
+      )
+    })
+  })
 
-      const validSortBy = ["name", "status", "creation_date"] as const;
-      
-      for (const sort_by of validSortBy) {
-        await getCases(pagination, filters, { 
-          sort_by, 
-          sort_dir: "asc" 
-        });
-      }
-      
-      expect(getCases).toHaveBeenCalledTimes(validSortBy.length);
-    });
+  describe('updateCaseSituation', () => {
+    it('PATCH and returns awaited { data, status }', async () => {
+      fetchMock.mockImplementation(() => okJson({ changed: 1 }, { status: 200 }))
+      const res = await updateCaseSituation('id2', 'Encerrado')
+      expect(res).toEqual({ data: { changed: 1 }, status: 200 })
 
-    it("should handle all valid sort_dir values", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = {};
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/id2')
+      expect(init?.method).toBe('PATCH')
+      expect(init?.body).toBe(JSON.stringify({ status: 'Encerrado' }))
+    })
 
-      const validSortDir = ["asc", "desc"] as const;
-      
-      for (const sort_dir of validSortDir) {
-        await getCases(pagination, filters, { 
-          sort_by: "name", 
-          sort_dir 
-        });
-      }
-      
-      expect(getCases).toHaveBeenCalledTimes(validSortDir.length);
-    });
-  });
+    it('fallbacks when json throws', async () => {
+      fetchMock.mockImplementation(() => okNoJson(204))
+      const res = await updateCaseSituation('id', 'Suspenso')
+      expect(res).toEqual({ data: null, status: 204 })
+    })
 
-  describe("Service Integration", () => {
-    it("should have consistent parameter types between functions", async () => {
-      const pagination = { page: 1, limit: 10 };
-      const filters = { name: "test" };
-      const sorting = { sort_by: "name" as const, sort_dir: "asc" as const };
+    it('throws translated on !ok', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(500))
+      await expect(updateCaseSituation('id', 'X')).rejects.toThrow(
+        'Falha ao atualizar situação do caso (status 500)',
+      )
+    })
+  })
 
-      await addCase("Test Case");
-      await getCases(pagination, filters, sorting);
-      
-      expect(addCase).toHaveBeenCalledWith("Test Case");
-      expect(getCases).toHaveBeenCalledWith(pagination, filters, sorting);
-    });
+  describe('updateCaseCanView', () => {
+    it('PATCH and returns json', async () => {
+      fetchMock.mockImplementation(() => okJson({ canView: true }))
+      const res = await updateCaseCanView('id3', true)
+      expect(res).toEqual({ canView: true })
 
-    it("should work with localStorage token", async () => {
-      localStorage.setItem('access_token', 'valid-token');
-      
-      await addCase("Test Case");
-      await getCases({ page: 1, limit: 10 }, {}, {});
-      
-      expect(addCase).toHaveBeenCalledWith("Test Case");
-      expect(getCases).toHaveBeenCalled();
-    });
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/id3')
+      expect(init?.method).toBe('PATCH')
+      expect(init?.body).toBe(JSON.stringify({ canView: true }))
+    })
 
-    it("should work without localStorage token", async () => {
-      localStorage.removeItem('access_token');
-      
-      await addCase("Test Case");
-      await getCases({ page: 1, limit: 10 }, {}, {});
-      
-      expect(addCase).toHaveBeenCalledWith("Test Case");
-      expect(getCases).toHaveBeenCalled();
-    });
-  });
-});
+    it('throws translated on !ok', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(403))
+      await expect(updateCaseCanView('id3', false)).rejects.toThrow(
+        'Falha ao atualizar visibilidade do caso (status 403)',
+      )
+    })
+  })
+
+  describe('deleteCase', () => {
+    it('DELETE and returns parsed json', async () => {
+      fetchMock.mockImplementation(() => okJson({ removed: 1 }))
+      const res = await deleteCase('id4')
+      expect(res).toEqual({ removed: 1 })
+
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/id4')
+      expect(init?.method).toBe('DELETE')
+    })
+
+    it('DELETE and returns { ok: true } when json throws', async () => {
+      fetchMock.mockImplementation(() => okNoJson(200))
+      const res = await deleteCase('id4')
+      expect(res).toEqual({ ok: true })
+    })
+
+    it('throws translated on !ok', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(500))
+      await expect(deleteCase('id4')).rejects.toThrow('Falha ao excluir caso (status 500)')
+    })
+  })
+
+  describe('allowUserToViewCase', () => {
+    it('early returns null when missing params', async () => {
+      expect(await allowUserToViewCase('', 'u')).toBeNull()
+      expect(await allowUserToViewCase('c', '')).toBeNull()
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('PATCH returns null on 204', async () => {
+      fetchMock.mockImplementation(() =>
+        Promise.resolve({ ok: true, status: 204, json: async () => ({}) } as Response),
+      )
+      const res = await allowUserToViewCase('c1', 'u1')
+      expect(res).toBeNull()
+
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/addtocase/c1')
+      expect(init?.method).toBe('PATCH')
+      expect(init?.body).toBe(JSON.stringify({ user_id: 'u1' }))
+    })
+
+    it('PATCH returns body on non-204', async () => {
+      fetchMock.mockImplementation(() => okJson({ ok: true }, { status: 200 }))
+      const res = await allowUserToViewCase('c1', 'u1')
+      expect(res).toEqual({ ok: true })
+    })
+  })
+
+  describe('getCaseGraph', () => {
+    it('GETs graph with empty filters (no qs)', async () => {
+      const data = { nodes: [], relations: [] }
+      fetchMock.mockImplementation(() => okJson(data))
+      const res = await getCaseGraph('C123')
+      expect(res).toEqual(data)
+
+      const [url, init] = fetchMock.mock.calls[0] as FetchCall
+      expect(url).toBe('/api/case/C123/graph')
+      expect(init?.method).toBe('GET')
+      expect(init?.headers).toMatchObject({ 'Content-Type': 'application/json' })
+    })
+
+
+    it('throws translated on !ok', async () => {
+      fetchMock.mockImplementation(() => notOkNoJson(502))
+      await expect(getCaseGraph('X')).rejects.toThrow(
+        'Falha ao buscar dados do grafo (status 502)',
+      )
+    })
+  })
+})
