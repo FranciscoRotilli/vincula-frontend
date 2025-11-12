@@ -47,7 +47,7 @@ describe('Graph component', () => {
   it('uses onLayoutDone to switch renderer to "canvas" immediately', async () => {
     render(<Graph nodes={[{ id: '1' } as Node]} rels={[]} />)
 
-    let props = lastWrapperProps()
+    const props = lastWrapperProps()
     expect(props.nvlOptions?.renderer).toBe('webgl')
 
     await act(async () => {
@@ -67,7 +67,7 @@ describe('Graph component', () => {
 
       render(<Graph nodes={[{ id: 'n1' } as Node]} rels={[]} />)
 
-      let props = lastWrapperProps()
+      const props = lastWrapperProps()
       expect(props.nvlOptions?.renderer).toBe('webgl')
 
       const WAIT_MS = 2300
@@ -113,7 +113,7 @@ describe('Graph component', () => {
   it('resets to "webgl" and layoutDone=false when the number of nodes/relationships changes', async () => {
     const { rerender } = render(<Graph nodes={[{ id: '1' } as Node]} rels={[]} />)
 
-    let props = lastWrapperProps()
+    const props = lastWrapperProps()
     await act(async () => {
       props.nvlCallbacks?.onLayoutDone?.()
     })

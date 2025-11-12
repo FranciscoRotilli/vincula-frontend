@@ -15,7 +15,6 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      includeSource: true,
 
       // Exclude noisy/irrelevant files from coverage
       exclude: [

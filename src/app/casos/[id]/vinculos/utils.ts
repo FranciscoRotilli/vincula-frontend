@@ -3,8 +3,6 @@ import type { Node, Relationship } from '@neo4j-nvl/base';
 import { useCaseById } from '@/hooks/useCase';
 import { Suspect } from '@/types/Cases';
 
-import { Suspect } from '@/types/Cases';
-
 export interface AppNode extends Node {
   properties: Record<string, unknown>;
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GET, PATCH, DELETE } from '@/app/api/case/[caseId]/route'
+import { DELETE,GET, PATCH } from '@/app/api/case/[caseId]/route'
 import { apiFetch } from '@/lib/backend'
 
 vi.mock('@/lib/backend', () => ({

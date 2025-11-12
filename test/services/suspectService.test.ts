@@ -1,5 +1,5 @@
 // test/services/suspectService.test.ts
-import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest';
+import { beforeEach, describe, expect, it, type MockedFunction,vi } from 'vitest';
 
 import { addSuspect, deleteSuspect } from '@/services/suspectService';
 import type { SuspectRequest } from '@/types/Cases';
