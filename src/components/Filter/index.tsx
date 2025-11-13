@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FiFilter } from 'react-icons/fi';
 import { MdOutlineClear } from 'react-icons/md';
+import { MdSimCardDownload } from 'react-icons/md';
 
 import { t } from '@/texts';
 import { CaseStatus } from '@/types/Cases';
@@ -53,6 +54,7 @@ export type FilterProps = {
     inputWrapper?: string;
     actions?: string;
   };
+  handleClick?: () => void;
 };
 
 type SavedFilter = {
@@ -78,6 +80,7 @@ const Filter: React.FC<FilterProps> = ({
   autoFilter = false,
   debounceMs = 2000,
   validateField,
+  handleClick,
   customStyles = {},
 }) => {
   const isControlled = controlledValues !== undefined && onValuesChange !== undefined;
@@ -330,18 +333,30 @@ const Filter: React.FC<FilterProps> = ({
 
         <div className={`${styles.actions} ${customStyles?.actions || ''}`}>
           {graphFilter && (
-            <Button
-              data-testid="save-filter-button"
-              icon={<Save />}
-              variant="contained"
-              size="icon"
-              label=""
-              onClick={() => {
-                setIsSaveFilterModalOpen(true);
-              }}
-              className={styles.iconButton}
-              disabled={disabled}
-            />
+            <>
+              <Button
+                data-testid="generate-report-button"
+                icon={<MdSimCardDownload size={24} />}
+                variant="contained"
+                size="icon"
+                label=""
+                onClick={handleClick ?? (() => {})}
+                className={styles.iconButton}
+                disabled={disabled}
+              />
+              <Button
+                data-testid="save-filter-button"
+                icon={<Save />}
+                variant="contained"
+                size="icon"
+                label=""
+                onClick={() => {
+                  setIsSaveFilterModalOpen(true);
+                }}
+                className={styles.iconButton}
+                disabled={disabled}
+              />
+            </>
           )}
           {onClear && (
             <Button

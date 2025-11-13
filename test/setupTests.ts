@@ -21,6 +21,7 @@ const fetchMock = vi.fn(() =>
       }),
     text: () => Promise.resolve(''),
   })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 ) as any;
 
 global.fetch = fetchMock;

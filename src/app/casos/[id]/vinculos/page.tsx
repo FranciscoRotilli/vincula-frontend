@@ -30,7 +30,7 @@ import {
   baseOptions,
   generateRelationshipName,
   getRelationshipSourceDatabase,
-  transformApiData
+  transformApiData,
 } from './utils';
 export default function VinculosPage({ params }: { params: Promise<{ id: string }> }) {
   const nvlRef = useRef<NVL | null>(null);
@@ -46,6 +46,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [selectedElement, setSelectedElement] = useState<AppNode | AppRelationship | null>(null);
+  const [_loading, setLoading] = useState(false);
 
   const isValidCpfCnpjLength = (value: string): boolean => {
     if (!value) return false;
@@ -61,11 +62,11 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       if (Array.isArray(investigatedValue)) {
         if (investigatedValue.includes('')) {
           const allCpfCnpj = investigated
-            .filter(option => option.value !== '')
-            .map(option => option.value);
+            .filter((option) => option.value !== '')
+            .map((option) => option.value);
           identitiesArray.push(...allCpfCnpj);
         } else {
-          identitiesArray.push(...investigatedValue.filter(v => v));
+          identitiesArray.push(...investigatedValue.filter((v) => v));
         }
       } else if (typeof investigatedValue === 'string' && investigatedValue) {
         identitiesArray.push(investigatedValue);
@@ -83,7 +84,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
     if (filters.baseDados) {
       const originValue = filters.baseDados;
       if (Array.isArray(originValue)) {
-        originArray.push(...originValue.filter(v => v));
+        originArray.push(...originValue.filter((v) => v));
       } else if (typeof originValue === 'string' && originValue) {
         originArray.push(originValue);
       }
@@ -95,11 +96,11 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       if (Array.isArray(archiveValue)) {
         if (archiveValue.includes('')) {
           const allFiles = file
-            .filter(option => option.value !== '')
-            .map(option => option.value);
+            .filter((option) => option.value !== '')
+            .map((option) => option.value);
           archiveArray.push(...allFiles);
         } else {
-          archiveArray.push(...archiveValue.filter(v => v));
+          archiveArray.push(...archiveValue.filter((v) => v));
         }
       } else if (typeof archiveValue === 'string' && archiveValue) {
         archiveArray.push(archiveValue);
@@ -115,7 +116,7 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   }, [filters, investigated, file]);
 
   const hasActiveFilters = useMemo(() => {
-    return Object.values(graphFilters).some((value) => 
+    return Object.values(graphFilters).some((value) =>
       Array.isArray(value) ? value.length > 0 : value !== undefined && value !== ''
     );
   }, [graphFilters]);
@@ -123,14 +124,13 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
   const {
     data: graphData,
     isLoading: isLoadingGraph,
-    error: graphError
+    error: graphError,
   } = useCaseGraph(id, graphFilters);
 
   const suspects: Suspect[] | undefined = caseDetails?.suspects;
 
   useEffect(() => {
     if (graphData) {
-
       const { nodes, rels } = transformApiData(graphData, suspects);
       setGraphNodes(nodes);
       setGraphRels(rels);
@@ -181,7 +181,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
       const wasFullscreen = isFullscreen;
       setIsFullscreen(isCurrentlyFullscreen);
 
-
       if (isCurrentlyFullscreen !== wasFullscreen && nvlRef.current) {
         setTimeout(() => {
           fitNodes();
@@ -201,25 +200,23 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         fitNodes();
       }, 100);
 
-
       return () => clearTimeout(timer);
     }
   }, [graphNodes, fitNodes]);
 
   const handleExportImage = () => {
     if (!nvlRef.current) {
-      console.error("Referência do NVL não encontrada para exportar.");
+      console.error('Referência do NVL não encontrada para exportar.');
       return;
     }
 
     try {
       nvlRef.current.saveFullGraphToLargeFile({
         filename: 'grafo-vinculos.png',
-        backgroundColor: '#f1f1f1'
+        backgroundColor: '#f1f1f1',
       });
-
     } catch (error) {
-      console.error("Erro ao exportar a imagem:", error);
+      console.error('Erro ao exportar a imagem:', error);
     }
   };
 
@@ -244,7 +241,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         }
         const data = await response.json();
 
-
         const suspects = data.suspects || [];
         const options = [
           { value: '', label: 'Todos' },
@@ -256,18 +252,69 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
         setInvestigated(options);
 
         const caseFiles = data.archives || [];
-        const fileOptions = caseFiles.map((archive: { name: string, id: string }) => ({
+        const fileOptions = caseFiles.map((archive: { name: string; id: string }) => ({
           value: archive.name,
           label: archive.name,
         }));
         setFile([{ value: '', label: 'Todos' }, ...fileOptions]);
       } catch (error) {
-        toast.error(t('toastError.caseData'))
+        toast.error(t('toastError.caseData'));
         console.error(error);
       }
     }
     fetchCaseData();
   }, [id]);
+
+  const buildQueryString = () => {
+    const params = new URLSearchParams();
+
+    if (graphFilters.identities) {
+      graphFilters.identities.forEach((v) => params.append('identities', v));
+    }
+    if (graphFilters.investigated) {
+      graphFilters.investigated.forEach((v) => params.append('investigated', v));
+    }
+    if (graphFilters.origin) {
+      graphFilters.origin.forEach((v) => params.append('origin', v));
+    }
+    if (graphFilters.archive) {
+      graphFilters.archive.forEach((v) => params.append('archive', v));
+    }
+
+    const queryString = params.toString();
+    return queryString ? `?${queryString}` : '';
+  };
+
+  const downloadFile = (blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `case-${id}-graph.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleClick = async () => {
+    try {
+      setLoading(true);
+      const queryString = buildQueryString();
+
+      const res = await fetch(`/api/case/${id}/graph/export${queryString}`, {
+        method: 'GET',
+        headers: { Accept: 'text/csv' },
+      });
+      if (!res.ok) throw new Error('Falha ao exportar');
+
+      const blob = await res.blob();
+      downloadFile(blob);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filterFields: FieldConfig[] = [
     {
@@ -329,9 +376,9 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
           customStyles={{
             container: styles.containerOverride,
           }}
+          handleClick={handleClick}
         />
       )}
-
 
       <div className={isFullscreen ? styles.fullscreenContainer : ''} data-testid="graph-container">
         <div
@@ -352,32 +399,24 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 customStyles={{
                   container: styles.containerOverride,
                 }}
+                handleClick={handleClick}
               />
             </div>
           )}
 
           <div className={styles.graphControls} data-testid="graph-controls">
             <Tooltip title={t('graph.zoomIn')} placement="right">
-              <button
-                onClick={zoomIn}
-                className={styles.controlButton}
-              >
+              <button onClick={zoomIn} className={styles.controlButton}>
                 <ZoomInIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.zoomOut')} placement="right">
-              <button
-                onClick={zoomOut}
-                className={styles.controlButton}
-              >
+              <button onClick={zoomOut} className={styles.controlButton}>
                 <ZoomOutIcon />
               </button>
             </Tooltip>
             <Tooltip title={t('graph.fitToScreen')} placement="right">
-              <button
-                onClick={fitNodes}
-                className={styles.controlButton}
-              >
+              <button onClick={fitNodes} className={styles.controlButton}>
                 <FitScreenIcon />
               </button>
             </Tooltip>
@@ -403,7 +442,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 <DownloadIcon />
               </button>
             </Tooltip>
-
           </div>
           <Graph
             ref={nvlRef}
@@ -436,8 +474,8 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                     ? 'from' in selectedElement
                       ? generateRelationshipName(selectedElement, graphNodes)
                       : (selectedElement.properties?.name as string) ||
-                      selectedElement.caption ||
-                      'Nó'
+                        selectedElement.caption ||
+                        'Nó'
                     : ''
                 }
                 quantity={
@@ -459,18 +497,6 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                 files={
                   selectedElement && 'from' in selectedElement
                     ? (() => {
-                      const fileNames = selectedElement.properties?.file_name;
-                      if (Array.isArray(fileNames)) {
-                        return fileNames;
-                      } else if (typeof fileNames === 'string') {
-                        return [fileNames];
-                      }
-                      return undefined;
-                    })()
-                    : selectedElement &&
-                      !('from' in selectedElement) &&
-                      selectedElement.properties?.type !== 'Person'
-                      ? (() => {
                         const fileNames = selectedElement.properties?.file_name;
                         if (Array.isArray(fileNames)) {
                           return fileNames;
@@ -479,6 +505,18 @@ export default function VinculosPage({ params }: { params: Promise<{ id: string 
                         }
                         return undefined;
                       })()
+                    : selectedElement &&
+                        !('from' in selectedElement) &&
+                        selectedElement.properties?.type !== 'Person'
+                      ? (() => {
+                          const fileNames = selectedElement.properties?.file_name;
+                          if (Array.isArray(fileNames)) {
+                            return fileNames;
+                          } else if (typeof fileNames === 'string') {
+                            return [fileNames];
+                          }
+                          return undefined;
+                        })()
                       : undefined
                 }
               />

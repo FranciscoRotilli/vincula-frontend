@@ -14,7 +14,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'Vincula',
+  title: 'MPRS | Vincula',
+  icons: {
+    icon: '/icon.svg',
+  },
   description: 'Login Vincula',
 };
 
