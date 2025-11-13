@@ -40,7 +40,7 @@ export const baseOptions = [
 export const calculateWidth = (quantity: number, allQuantities: number[]) => {
   if (!allQuantities.length || quantity === undefined || quantity <= 0) return 1;
 
-  const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
+  const validQuantities = allQuantities.filter((q) => q != null && q > 0).sort((a, b) => a - b);
 
   if (validQuantities.length === 0) return 1;
   if (validQuantities.length === 1) return quantity > 0 ? 3 : 1;
@@ -68,20 +68,15 @@ export const calculateNodeSize = (
   nodeId: string,
   allQuantities: number[]
 ) => {
-
   const default_size = 30;
 
   const quantity = rels
-    .filter(rel => rel.from === nodeId)
+    .filter((rel) => rel.from === nodeId)
     .reduce((sum, rel) => sum + (Number(rel.properties?.quantity) || 0), 0);
 
-  if (
-    !allQuantities.length ||
-    typeof quantity !== 'number' ||
-    quantity <= 0
-  ) return default_size;
+  if (!allQuantities.length || typeof quantity !== 'number' || quantity <= 0) return default_size;
 
-  const validQuantities = allQuantities.filter(q => q != null && q > 0).sort((a, b) => a - b);
+  const validQuantities = allQuantities.filter((q) => q != null && q > 0).sort((a, b) => a - b);
 
   if (validQuantities.length === 0) return default_size;
   if (validQuantities.length === 1) return quantity > 0 ? default_size * 2 : default_size;
@@ -102,15 +97,17 @@ export const calculateNodeSize = (
   if (normalized <= 0.6) return default_size * 1.8;
   if (normalized <= 0.85) return default_size * 2;
   return default_size * 2.5;
-
 };
 
-export const transformApiData = 
-  (apiData: { nodes: RawNode[]; edges: RawEdge[] }, suspects: Suspect[] | undefined) => {
-  const allQuantities = apiData.edges.map(edge => edge.quantity)
-  .filter(q => q != null) as number[];
+export const transformApiData = (
+  apiData: { nodes: RawNode[]; edges: RawEdge[] },
+  suspects: Suspect[] | undefined
+) => {
+  const allQuantities = apiData.edges
+    .map((edge) => edge.quantity)
+    .filter((q) => q != null) as number[];
 
-  const rels: AppRelationship[] = apiData.edges.map(rawEdge => {
+  const rels: AppRelationship[] = apiData.edges.map((rawEdge) => {
     return {
       id: rawEdge.id,
       from: rawEdge.source,
@@ -118,26 +115,25 @@ export const transformApiData =
       caption: String(rawEdge.quantity || ''),
       width: rawEdge.quantity ? calculateWidth(rawEdge.quantity, allQuantities) : 1,
       properties: {
-        file_name: Array.isArray(rawEdge.file_name) ? 
-          rawEdge.file_name.join(', ') : rawEdge.file_name,
+        file_name: Array.isArray(rawEdge.file_name)
+          ? rawEdge.file_name.join(', ')
+          : rawEdge.file_name,
         quantity: rawEdge.quantity,
         rif_involvment: rawEdge.rif_involvment,
       },
     };
   });
 
-  const nodes: AppNode[] = apiData.nodes.map(rawNode => {
+  const nodes: AppNode[] = apiData.nodes.map((rawNode) => {
     const hasIdentity = !!rawNode.identity;
     const hasFile = !hasIdentity;
     const isInvestigated =
       hasIdentity &&
       suspects?.some(
-        (s) =>
-          String(s.cpf_cnpj).replace(/\D/g, '') ===
-          String(rawNode.identity).replace(/\D/g, '')
+        (s) => String(s.cpf_cnpj).replace(/\D/g, '') === String(rawNode.identity).replace(/\D/g, '')
       );
 
-    let color = '#f0ad4e'
+    let color = '#f0ad4e';
     if (isInvestigated) color = '#e04141';
     else if (hasFile) color = '#007bff';
 
@@ -149,8 +145,12 @@ export const transformApiData =
       properties: {
         identity: rawNode.identity,
         case_number: rawNode.case_number,
-        file_name: Array.isArray(rawNode.file_name) ? rawNode.file_name.join(', ') : rawNode.file_name,
-        phone_number: Array.isArray(rawNode.phone_number) ? rawNode.phone_number.join(', ') : rawNode.phone_number,
+        file_name: Array.isArray(rawNode.file_name)
+          ? rawNode.file_name.join(', ')
+          : rawNode.file_name,
+        phone_number: Array.isArray(rawNode.phone_number)
+          ? rawNode.phone_number.join(', ')
+          : rawNode.phone_number,
         type: rawNode.type,
       },
     };
@@ -163,19 +163,19 @@ export const generateRelationshipName = (
   selectedElement: AppRelationship,
   graphNodes: AppNode[]
 ): string => {
-  const fromNode = graphNodes.find(node => node.id === selectedElement.from);
-  const toNode = graphNodes.find(node => node.id === selectedElement.to);
+  const fromNode = graphNodes.find((node) => node.id === selectedElement.from);
+  const toNode = graphNodes.find((node) => node.id === selectedElement.to);
   const quantity = selectedElement.properties?.quantity || 0;
 
   let personName = '';
   let nonPersonType = '';
 
   if (fromNode?.properties?.identity) {
-    personName = fromNode.properties?.name as string || fromNode.caption || 'Fulano';
-    nonPersonType = toNode?.properties?.type as string || 'Desconhecido';
+    personName = (fromNode.properties?.name as string) || fromNode.caption || 'Fulano';
+    nonPersonType = (toNode?.properties?.type as string) || 'Desconhecido';
   } else if (toNode?.properties?.identity) {
-    personName = toNode.properties?.name as string || toNode.caption || 'Fulano';
-    nonPersonType = fromNode?.properties?.type as string || 'Desconhecido';
+    personName = (toNode.properties?.name as string) || toNode.caption || 'Fulano';
+    nonPersonType = (fromNode?.properties?.type as string) || 'Desconhecido';
   }
 
   return `${personName} → ${nonPersonType} (${quantity})`;
@@ -185,8 +185,8 @@ export const getRelationshipSourceDatabase = (
   selectedElement: AppRelationship,
   graphNodes: AppNode[]
 ): string => {
-  const fromNode = graphNodes.find(node => node.id === selectedElement.from);
-  const toNode = graphNodes.find(node => node.id === selectedElement.to);
+  const fromNode = graphNodes.find((node) => node.id === selectedElement.from);
+  const toNode = graphNodes.find((node) => node.id === selectedElement.to);
 
   if (!fromNode?.properties?.identity) {
     return fromNode?.properties?.type as string;
@@ -195,4 +195,3 @@ export const getRelationshipSourceDatabase = (
   }
   return 'N/A';
 };
-
