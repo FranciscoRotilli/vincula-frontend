@@ -22,7 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ca
   const { caseId } = await params;
   const body = await req.json();
 
-  const resp = await apiFetch(`/case/${caseId}/`, {
+  const resp = await apiFetch(`/case/${caseId}`, {
     method: 'PATCH',
     body: JSON.stringify(body),
   });
