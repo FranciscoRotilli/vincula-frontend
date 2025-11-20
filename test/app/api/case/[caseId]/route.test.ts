@@ -70,7 +70,7 @@ describe('/api/case/[caseId]', () => {
 
       expect(response.status).toBe(200)
       expect(body).toEqual(mockUpdatedCase)
-      expect(mockApiFetch).toHaveBeenCalledWith('/case/case-123/', {
+      expect(mockApiFetch).toHaveBeenCalledWith('/case/case-123', {
         method: 'PATCH',
         body: JSON.stringify(updatePayload),
       })

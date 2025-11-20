@@ -1,5 +1,3 @@
-import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
-
 describe('Case Actions Menu - by role', () => {
   beforeEach(() => {
     cy.visit('/casos');

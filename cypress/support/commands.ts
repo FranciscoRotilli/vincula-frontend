@@ -93,24 +93,19 @@ Cypress.Commands.add('selectCase', (rowIndex = 0, options = {}) => {
 
   cy.wait(waitBefore)
 
-  // garante que a tabela está presente
   cy.get('[data-testid="cases-table"]', { timeout }).should('exist')
 
-  // tenta clicar no "Ver detalhes" dentro da linha escolhida
   cy.get('table tbody tr', { timeout })
     .eq(rowIndex)
     .then(($row) => {
       const row = cy.wrap($row)
-      // primeiro tenta o link "Ver detalhes"
       row.contains('a', /^ver detalhes$/i, { timeout })
         .scrollIntoView()
         .click({ force: true })
         .then(() => {
-          // ok, clicou no link
         })
     })
 
-  // valida que foi redirecionado para /casos/<id>
   cy.location('pathname', { timeout }).should((path) => {
     expect(path).to.match(/^\/casos\/.+/)
   })
