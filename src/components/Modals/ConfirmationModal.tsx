@@ -17,6 +17,7 @@ type ConfirmationModalProps = {
   primaryLoading?: boolean;
   primaryLoadingLabel?: string;
   children?: React.ReactNode;
+  'data-testid'?: string;
 };
 
 export default function ConfirmationModal({
@@ -33,12 +34,17 @@ export default function ConfirmationModal({
   primaryLoading,
   primaryLoadingLabel,
   children,
+  'data-testid': dataTestId,
 }: Readonly<ConfirmationModalProps>) {
   const primaryVariant = primaryColor === 'error' ? 'error' : 'primary';
   const gerund = primaryLabel.replace(/r$/i, '') + 'ndo';
-  const actionLabel = primaryLoading ? (primaryLoadingLabel ?? gerund) : primaryLabel;
+  const actionLabel = primaryLoading
+    ? primaryLoadingLabel ?? gerund
+    : primaryLabel;
+
   return (
     <Modal
+      data-testid={dataTestId}
       buttonsPosition={buttonsPosition ?? 'center'}
       showCloseIcon={false}
       onAction={onPrimary}

@@ -3,8 +3,8 @@ import React, { ReactNode, useEffect } from 'react';
 import styles from './Modal.module.css';
 
 type ModalProps = {
-	buttonsPosition?: 'left' | 'center' | 'right';
-	showCloseIcon?: boolean;
+  buttonsPosition?: 'left' | 'center' | 'right';
+  showCloseIcon?: boolean;
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -20,11 +20,12 @@ type ModalProps = {
   actionDisabled?: boolean;
   isError?: boolean;
   actionButtonColor?: 'primary' | 'error';
+  'data-testid'?: string;
 };
 
 const Modal = ({
-	showCloseIcon = true,
-	buttonsPosition = 'right',
+  showCloseIcon = true,
+  buttonsPosition = 'right',
   isOpen,
   onClose,
   children,
@@ -40,6 +41,7 @@ const Modal = ({
   actionDisabled = false,
   isError: _isError = false,
   actionButtonColor = 'primary',
+  'data-testid': dataTestId,
 }: ModalProps) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -75,10 +77,12 @@ const Modal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
+        data-testid={dataTestId}
       >
         <header className={styles.header}>
           <div style={{ flex: 1, textAlign: 'center' }}>
             {icon && <div style={{ margin: '0 auto 12px auto' }}>{icon}</div>}
+
             {title && (
               <h2
                 className={styles.title}
@@ -88,56 +92,76 @@ const Modal = ({
                 {title}
               </h2>
             )}
+
             {description && (
               <div
-                style={{ color: '#222', fontSize: '1rem', textAlign: 'center', marginTop: 8, marginBottom: 8 }}
+                style={{
+                  color: '#222',
+                  fontSize: '1rem',
+                  textAlign: 'center',
+                  marginTop: 8,
+                  marginBottom: 8,
+                }}
               >
                 {description}
               </div>
             )}
-					</div>
-					{showCloseIcon && (
-          <button className={styles.closeButton} onClick={onClose} aria-label="Fechar">
-            &times;
-						</button>
-					)}
+          </div>
+
+          {showCloseIcon && (
+            <button
+              className={styles.closeButton}
+              onClick={onClose}
+              aria-label="Fechar"
+            >
+              &times;
+            </button>
+          )}
         </header>
+
         <div className={styles.body}>
           <main className={styles.content}>{children}</main>
         </div>
+
         {(cancelButton || actionButton) && (
-						<footer
-						className={styles.footer}
-						style={{
-							justifyContent:
-							buttonsPosition === 'left'
-								? 'flex-start'
-								: buttonsPosition === 'center'
-								? 'center'
-								: 'flex-end',
-						}}
-						>
-						{actionButton && (
-							<button
+          <footer
+            className={styles.footer}
+            style={{
+              justifyContent:
+                buttonsPosition === 'left'
+                  ? 'flex-start'
+                  : buttonsPosition === 'center'
+                  ? 'center'
+                  : 'flex-end',
+            }}
+          >
+            {actionButton && (
+              <button
                 type="button"
-							className={
-								actionButtonColor === 'error'
-								? `${styles.button} ${styles.error}`
-								: `${styles.button} ${styles.primary}`
-							}
-							onClick={onAction}
+                data-testid="action-button"
+                className={
+                  actionButtonColor === 'error'
+                    ? `${styles.button} ${styles.error}`
+                    : `${styles.button} ${styles.primary}`
+                }
+                onClick={onAction}
                 disabled={actionDisabled}
                 aria-disabled={actionDisabled}
-							>
-							{actionButton}
-							</button>
-						)}
-						{cancelButton && (
-							<button className={`${styles.button} ${styles.secondary}`} onClick={onClose}>
-							{cancelButton}
-							</button>
-						)}
-						</footer>
+              >
+                {actionButton}
+              </button>
+            )}
+
+            {cancelButton && (
+              <button
+                data-testid="cancel-button"
+                className={`${styles.button} ${styles.secondary}`}
+                onClick={onClose}
+              >
+                {cancelButton}
+              </button>
+            )}
+          </footer>
         )}
       </div>
     </div>
