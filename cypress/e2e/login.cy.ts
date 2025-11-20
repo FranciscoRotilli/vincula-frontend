@@ -3,25 +3,12 @@ describe('Login Page', () => {
     cy.visit('/')
   })
 
-  it('should log in successfully', () => {
-    const username = Cypress.env('USERNAME') || 'usuario_teste'
-    const password = Cypress.env('PASSWORD') || 'senha_teste'
+  it('should log in successfully as an ADMIN', () => {
+    cy.loginAdmin()
+  })
 
-    cy.get('[data-testid="username-input"]').type(username)
-    cy.get('[data-testid="password-input"]').type(password, { log: false })
-    cy.get('[data-testid="login-button"]').click()
-
-    cy.location('pathname', { timeout: 15000 }).should('eq', '/casos')
-
-    cy.window().then((win) => {
-      const at = win.localStorage.getItem('access_token')
-      const rt = win.localStorage.getItem('refresh_token')
-
-      if (at || rt) {
-        expect(at).to.be.a('string')
-        expect(rt).to.be.a('string')
-      }
-    })
+  it('should log in successfully as an USER', () => {
+    cy.loginUser()
   })
 
   it('shows validation errors when submitting empty form', () => {
@@ -37,8 +24,8 @@ describe('Login Page', () => {
   })
 
   it('disables button and shows loading state while pending', () => {
-    const username = Cypress.env('USERNAME') || 'usuario_teste'
-    const password = Cypress.env('PASSWORD') || 'senha_teste'
+    const username = Cypress.env('ADMIN_USERNAME')
+    const password = Cypress.env('ADMIN_PASSWORD')
 
     cy.get('[data-testid="username-input"]').type(username)
     cy.get('[data-testid="password-input"]').type(password, { log: false })
@@ -52,8 +39,8 @@ describe('Login Page', () => {
   it('shows invalid credentials error when server denies login', () => {
     cy.intercept('GET', '**/me', { statusCode: 401, body: {} }).as('me')
 
-    const username = Cypress.env('USERNAME') || 'usuario_teste'
-    const wrongPassword = Cypress.env('WRONG_PASSWORD') || 'senha_incorreta'
+    const username = 'usuario_teste'
+    const wrongPassword = 'senha_incorreta'
 
     cy.get('[data-testid="username-input"]').type(username)
     cy.get('[data-testid="password-input"]').type(wrongPassword, { log: false })
