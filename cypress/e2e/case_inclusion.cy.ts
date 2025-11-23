@@ -1,14 +1,21 @@
-describe('Case inclusion flow', () => {
+describe('Case creation flow', () => {
   beforeEach(() => {
-    cy.intercept('POST', '/api/auth/login', {
+    cy.loginAdmin()
+
+    cy.intercept('GET', '/api/me', {
       statusCode: 200,
       body: {
-        access_token: 'fake-access-token',
-        refresh_token: 'fake-refresh-token',
+        id: 'user-1',
+        username: Cypress.env('ADMIN_USERNAME'),
+        email: 'admin@example.com',
       },
-    }).as('login');
+    }).as('getMe')
+  })
 
-    cy.intercept('GET', /\/api\/case.*/, {
+  it('opens the modal and creates a new case successfully', () => {
+    const newCaseName = `Caso Cypress ${Date.now()}`
+
+    cy.intercept('GET', '/api/case*', {
       statusCode: 200,
       body: {
         total: 0,
@@ -17,45 +24,23 @@ describe('Case inclusion flow', () => {
         items: [],
         sorting: {},
       },
-    }).as('getCasesInitial');
+    }).as('getCasesInitial')
 
-    cy.visit('/');
-  });
+    cy.visit('/casos')
+    cy.wait('@getCasesInitial')
 
-  it('logs in and creates a new case', () => {
-    const username = Cypress.env('USERNAME');
-    const password = Cypress.env('PASSWORD');
-    if (!username || !password) {
-      throw new Error('Cypress env variables USERNAME and PASSWORD must be set');
-    }
-    cy.get('[data-testid="username-input"]').type(username);
-    cy.get('[data-testid="password-input"]').type(password, { log: false });
-    cy.get('[data-testid="login-button"]').click();
-    cy.wait('@login');
+    cy.contains('button', /ADICIONAR CASO/i).click()
 
-    // Intercept the /api/me endpoint
-    cy.intercept('GET', '/api/me', {
-      statusCode: 200,
-      body: {
-        id: 'user-1',
-        username: username,
-        email: `${username}@example.com`,
-      },
-    }).as('getMe');
+    cy.contains('Adicionar caso').should('be.visible')
 
-    cy.setCookie('access_token', 'fake-access-token', { path: '/' });
-    cy.setCookie('refresh_token', 'fake-refresh-token', { path: '/' });
-
-    cy.visit('/casos');
-
-    cy.url().should('include', '/casos');
+    cy.get('input[placeholder="Digite o nome do caso"]').type(newCaseName)
 
     cy.intercept('POST', '/api/case', {
       statusCode: 201,
-      body: { id: 'case-cypress-1', name: 'Caso Cypress Teste' },
-    }).as('createCase');
+      body: { id: 'case-cypress-1', name: newCaseName },
+    }).as('createCase')
 
-    cy.intercept('GET', /\/api\/case.*/, {
+    cy.intercept('GET', '/api/case*', {
       statusCode: 200,
       body: {
         total: 1,
@@ -64,64 +49,53 @@ describe('Case inclusion flow', () => {
         items: [
           {
             id: 'case-cypress-1',
-            name: 'Caso Cypress Teste',
-            owner: username,
+            name: newCaseName,
+            owner: Cypress.env('ADMIN_USERNAME'),
             status: 'Em andamento',
             creation_date: '01/01/2025',
           },
         ],
         sorting: {},
       },
-    }).as('getCasesAfterCreate');
+    }).as('getCasesAfterCreate')
 
-    cy.contains(/ADICIONAR CASO|ADD CASE/i).click();
+    cy.contains('button', /^Adicionar$/i).click()
 
-    cy.get('input[placeholder="Digite o nome do caso"], input[placeholder="Enter case name"]').type('Caso Cypress Teste');
-    cy.contains(/^(Adicionar|Add)$/i).click();
+    cy.wait('@createCase')
+    cy.wait('@getCasesAfterCreate')
 
-    cy.wait('@createCase');
-    cy.wait('@getCasesAfterCreate');
+    cy.get('[data-testid="cases-table"]').should('be.visible')
+    cy.contains('[data-testid="cases-table"] td', newCaseName).should('be.visible')
+  })
 
-    cy.contains('Caso Cypress Teste').should('be.visible');
-  });
-
-  it('does not allow creating a case without a name', () => {
-    const username = Cypress.env('USERNAME');
-    const password = Cypress.env('PASSWORD');
-    if (!username || !password) {
-      throw new Error('Cypress env variables USERNAME and PASSWORD must be set');
-    }
-
-    cy.get('[data-testid="username-input"]').type(username);
-    cy.get('[data-testid="password-input"]').type(password, { log: false });
-    cy.get('[data-testid="login-button"]').click();
-    cy.wait('@login');
-
-    // Intercept the /api/me endpoint
-    cy.intercept('GET', '/api/me', {
+  it('does not allow creating a case with empty name', () => {
+    cy.intercept('GET', '/api/case*', {
       statusCode: 200,
       body: {
-        id: 'user-1',
-        username: username,
-        email: `${username}@example.com`,
+        total: 0,
+        page: 1,
+        limit: 10,
+        items: [],
+        sorting: {},
       },
-    }).as('getMe');
+    }).as('getCasesInitial')
 
-    cy.setCookie('access_token', 'fake-access-token', { path: '/' });
-    cy.setCookie('refresh_token', 'fake-refresh-token', { path: '/' });
-    cy.visit('/casos');
+    cy.visit('/casos')
+    cy.wait('@getCasesInitial')
 
-    cy.contains(/ADICIONAR CASO|ADD CASE/i).click();
+    cy.contains('button', /ADICIONAR CASO/i).click()
 
-    cy.intercept('POST', '/api/case').as('createCase');
+    cy.contains('Adicionar caso').should('be.visible')
 
-    cy.contains(/^(Adicionar|Add)$/i).should('be.disabled');
+    cy.intercept('POST', '/api/case').as('createCase')
 
-    cy.contains(/^(Adicionar|Add)$/i).click({ force: true });
+    cy.contains('button', /^Adicionar$/i).should('be.disabled')
 
-    cy.wait(500); 
-    cy.get('@createCase.all').should('have.length', 0);
+    cy.contains('button', /^Adicionar$/i).click({ force: true })
 
-    cy.get('input[placeholder="Digite o nome do caso"], input[placeholder="Enter case name"]').should('exist');
-  });
-});
+    cy.wait(300)
+    cy.get('@createCase.all').should('have.length', 0)
+
+    cy.get('input[placeholder="Digite o nome do caso"]').should('exist')
+  })
+})
