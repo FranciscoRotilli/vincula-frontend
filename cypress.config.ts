@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env' })
 
 export default defineConfig({
+  projectId: 'cw12m3',
   e2e: {
     baseUrl: 'http://localhost:3000',
     env: {
